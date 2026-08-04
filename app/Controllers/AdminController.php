@@ -457,4 +457,115 @@ class AdminController extends Controller {
         $orderModel->deleteOrder((int)$id);
         $this->redirect(BASE_URL . '/admin');
     }
+
+    public function categories() {
+        $this->requireAuth();
+        $categoryModel = new Category();
+        $categories = $categoryModel->getAll();
+        
+        $data = [
+            'pageTitle' => 'Manage Categories | Admin Dashboard',
+            'categories' => $categories
+        ];
+        
+        $this->render('admin/categories', $data, 'admin');
+    }
+
+    public function addCategory() {
+        $this->requireAuth();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = trim($_POST['name'] ?? '');
+            $slug = trim($_POST['slug'] ?? '');
+            if(empty($slug)) {
+                $slug = strtolower(str_replace(' ', '-', $name));
+                $slug = preg_replace('/[^a-z0-9\-]/', '', $slug);
+            }
+            $description = trim($_POST['description'] ?? '');
+            $imagePath = '';
+            
+            // Image upload or URL logic
+            if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = __DIR__ . '/../../public/assets/images/';
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+                
+                $fileName = time() . '_' . basename($_FILES['image_file']['name']);
+                $targetFile = $uploadDir . $fileName;
+                
+                if (move_uploaded_file($_FILES['image_file']['tmp_name'], $targetFile)) {
+                    $imagePath = BASE_URL . '/assets/images/' . $fileName;
+                }
+            } else if (!empty($_POST['image'])) {
+                $imagePath = $_POST['image'];
+            }
+            
+            if ($name && $slug && $imagePath) {
+                $db = Database::getInstance();
+                $stmt = $db->prepare("INSERT INTO categories (name, slug, description, image) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$name, $slug, $description, $imagePath]);
+                $this->logActivity('CATEGORY_ADD', "Added category: $name");
+            }
+        }
+        $this->redirect(BASE_URL . '/admin/categories');
+    }
+
+    public function editCategory($id) {
+        $this->requireAuth();
+        $categoryModel = new Category();
+        $category = null;
+        
+        // Find category by ID since there's no getById in Category.php, we'll fetch manually
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM categories WHERE id = ?");
+        $stmt->execute([$id]);
+        $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$category) {
+            $this->redirect(BASE_URL . '/admin/categories');
+        }
+
+        $data = [
+            'pageTitle' => 'Edit Category - ' . $category['name'],
+            'category' => $category
+        ];
+        
+        $this->render('admin/category_edit', $data, 'admin');
+    }
+
+    public function updateCategory($id) {
+        $this->requireAuth();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $db = Database::getInstance();
+            $stmt = $db->prepare("SELECT * FROM categories WHERE id = ?");
+            $stmt->execute([$id]);
+            $category = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($category) {
+                $name = trim($_POST['name'] ?? $category['name']);
+                $slug = trim($_POST['slug'] ?? $category['slug']);
+                $description = trim($_POST['description'] ?? $category['description']);
+                $imagePath = $category['image'];
+                
+                if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = __DIR__ . '/../../public/assets/images/';
+                    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+                    
+                    $fileName = time() . '_' . basename($_FILES['image_file']['name']);
+                    $targetFile = $uploadDir . $fileName;
+                    
+                    if (move_uploaded_file($_FILES['image_file']['tmp_name'], $targetFile)) {
+                        $imagePath = BASE_URL . '/assets/images/' . $fileName;
+                    }
+                } else if (!empty($_POST['image'])) {
+                    $imagePath = $_POST['image'];
+                }
+                
+                $stmt = $db->prepare("UPDATE categories SET name = ?, slug = ?, description = ?, image = ? WHERE id = ?");
+                $stmt->execute([$name, $slug, $description, $imagePath, $id]);
+                $this->logActivity('CATEGORY_EDIT', "Updated category: $name");
+            }
+        }
+        $this->redirect(BASE_URL . '/admin/categories');
+    }
 }

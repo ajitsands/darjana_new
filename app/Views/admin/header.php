@@ -91,6 +91,7 @@
                     $isAdminHome = rtrim($uri, '/') == '/admin' || strpos($uri, '?') !== false && strpos($uri, '/admin?') === 0;
                 ?>
                 <li><a href="<?= BASE_URL ?>/admin" class="<?= $isAdminHome ? 'active' : '' ?>">Dashboard</a></li>
+                <li><a href="<?= BASE_URL ?>/admin/categories" class="<?= strpos($uri, '/admin/categories') !== false ? 'active' : '' ?>">Categories</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/users" class="<?= strpos($uri, '/admin/users') !== false ? 'active' : '' ?>">Manage Admins</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/history" class="<?= strpos($uri, '/admin/history') !== false ? 'active' : '' ?>">Activity History</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/orders" class="<?= strpos($uri, '/admin/orders') !== false ? 'active' : '' ?>">Customer Orders</a></li>
