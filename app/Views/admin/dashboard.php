@@ -63,7 +63,7 @@
                             $('#productsTable').DataTable({
                                 "ajax": "<?= BASE_URL ?>/admin/products/ajax",
                                 "processing": true,
-                                "pageLength": 10,
+                                "pageLength": 20,
                                 "ordering": false,
                                 "language": {
                                     "search": "Search Products:",
