@@ -26,6 +26,8 @@
 
     <!-- Main Header Wrapper -->
     <header class="header-wrapper">
+    <?php $activeNav = $currentCategory ?? $currentSlug ?? ($product['category_slug'] ?? ''); ?>
+
         <div class="header-container">
             <div class="site-header">
                 
