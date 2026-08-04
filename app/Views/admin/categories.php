@@ -35,7 +35,7 @@
                                             <div style="font-size: 11px; color: var(--color-accent); font-weight: 700; margin-top: 2px;">/collections/<?= htmlspecialchars($c['slug']) ?></div>
                                         </td>
                                         <td>
-                                            <a href="<?= BASE_URL ?>/admin/category/edit/<?= $c['id'] ?>" class="btn-primary" style="padding: 6px 12px; font-size: 12px; display: inline-block; text-decoration: none;">Edit</a>
+                                            <a href="<?= BASE_URL ?>/admin/category/edit/<?= $c['id'] ?>" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px; text-decoration: none;">Edit</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
