@@ -42,15 +42,15 @@
                 <!-- Desktop Navigation Menu (9 Category Links) -->
                 <nav class="header-nav" aria-label="Main Navigation">
                     <ul class="main-nav">
-                        <li><a href="<?= BASE_URL ?>/" class="nav-link <?= empty($currentCategory) ? 'active' : '' ?>">HOME</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/all-abaya" class="nav-link <?= ($currentCategory ?? '') === 'all-abaya' ? 'active' : '' ?>">ALL ABAYA</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/black-abaya" class="nav-link <?= ($currentCategory ?? '') === 'black-abaya' ? 'active' : '' ?>">BLACK ABAYA</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/colourful-abaya" class="nav-link <?= ($currentCategory ?? '') === 'colourful-abaya' ? 'active' : '' ?>">COLOURFUL ABAYA</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/sets" class="nav-link <?= ($currentCategory ?? '') === 'sets' ? 'active' : '' ?>">SETS</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/blazer" class="nav-link <?= ($currentCategory ?? '') === 'blazer' ? 'active' : '' ?>">BLAZER</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/inner" class="nav-link <?= ($currentCategory ?? '') === 'inner' ? 'active' : '' ?>">INNER</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/offers" class="nav-link <?= ($currentCategory ?? '') === 'offers' ? 'active' : '' ?>">OFFERS</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/ramadan-collection" class="nav-link <?= ($currentCategory ?? '') === 'ramadan-collection' ? 'active' : '' ?>">RAMADAN COLLECTION</a></li>
+                        <li><a href="<?= BASE_URL ?>/" class="nav-link <?= empty($activeNav) ? 'active' : '' ?>">HOME</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/all-abaya" class="nav-link <?= $activeNav === 'all-abaya' ? 'active' : '' ?>">ALL ABAYA</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/black-abaya" class="nav-link <?= $activeNav === 'black-abaya' ? 'active' : '' ?>">BLACK ABAYA</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/colourful-abaya" class="nav-link <?= $activeNav === 'colourful-abaya' ? 'active' : '' ?>">COLOURFUL ABAYA</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/sets" class="nav-link <?= $activeNav === 'sets' ? 'active' : '' ?>">SETS</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/blazer" class="nav-link <?= $activeNav === 'blazer' ? 'active' : '' ?>">BLAZER</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/inner" class="nav-link <?= $activeNav === 'inner' ? 'active' : '' ?>">INNER</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/offers" class="nav-link <?= $activeNav === 'offers' ? 'active' : '' ?>">OFFERS</a></li>
+                        <li><a href="<?= BASE_URL ?>/collections/ramadan-collection" class="nav-link <?= $activeNav === 'ramadan-collection' ? 'active' : '' ?>">RAMADAN COLLECTION</a></li>
                     </ul>
                 </nav>
 
@@ -90,15 +90,15 @@
         </div>
         <div class="mobile-menu-body">
             <ul class="mobile-nav-list">
-                <li><a href="<?= BASE_URL ?>/" class="mobile-nav-link <?= empty($currentCategory) ? 'active' : '' ?>">HOME</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/all-abaya" class="mobile-nav-link <?= ($currentCategory ?? '') === 'all-abaya' ? 'active' : '' ?>">ALL ABAYA</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/black-abaya" class="mobile-nav-link <?= ($currentCategory ?? '') === 'black-abaya' ? 'active' : '' ?>">BLACK ABAYA</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/colourful-abaya" class="mobile-nav-link <?= ($currentCategory ?? '') === 'colourful-abaya' ? 'active' : '' ?>">COLOURFUL ABAYA</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/sets" class="mobile-nav-link <?= ($currentCategory ?? '') === 'sets' ? 'active' : '' ?>">SETS</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/blazer" class="mobile-nav-link <?= ($currentCategory ?? '') === 'blazer' ? 'active' : '' ?>">BLAZER</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/inner" class="mobile-nav-link <?= ($currentCategory ?? '') === 'inner' ? 'active' : '' ?>">INNER</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/offers" class="mobile-nav-link <?= ($currentCategory ?? '') === 'offers' ? 'active' : '' ?>">OFFERS</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/ramadan-collection" class="mobile-nav-link <?= ($currentCategory ?? '') === 'ramadan-collection' ? 'active' : '' ?>">RAMADAN COLLECTION</a></li>
+                <li><a href="<?= BASE_URL ?>/" class="mobile-nav-link <?= empty($activeNav) ? 'active' : '' ?>">HOME</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/all-abaya" class="mobile-nav-link <?= $activeNav === 'all-abaya' ? 'active' : '' ?>">ALL ABAYA</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/black-abaya" class="mobile-nav-link <?= $activeNav === 'black-abaya' ? 'active' : '' ?>">BLACK ABAYA</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/colourful-abaya" class="mobile-nav-link <?= $activeNav === 'colourful-abaya' ? 'active' : '' ?>">COLOURFUL ABAYA</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/sets" class="mobile-nav-link <?= $activeNav === 'sets' ? 'active' : '' ?>">SETS</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/blazer" class="mobile-nav-link <?= $activeNav === 'blazer' ? 'active' : '' ?>">BLAZER</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/inner" class="mobile-nav-link <?= $activeNav === 'inner' ? 'active' : '' ?>">INNER</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/offers" class="mobile-nav-link <?= $activeNav === 'offers' ? 'active' : '' ?>">OFFERS</a></li>
+                <li><a href="<?= BASE_URL ?>/collections/ramadan-collection" class="mobile-nav-link <?= $activeNav === 'ramadan-collection' ? 'active' : '' ?>">RAMADAN COLLECTION</a></li>
             </ul>
         </div>
         <div class="mobile-menu-footer">
