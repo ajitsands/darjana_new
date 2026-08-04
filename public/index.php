@@ -43,6 +43,7 @@ $router->add('GET', '/admin/users', 'AdminController@users');
 $router->add('POST', '/admin/users/add', 'AdminController@addUser');
 $router->add('GET', '/admin/history', 'AdminController@history');
 $router->add('GET', '/admin/orders', 'AdminController@orders');
+$router->add('GET', '/admin/products/ajax', 'AdminController@ajaxProducts');
 $router->add('POST', '/admin/product/add', 'AdminController@addProduct');
 $router->add('GET', '/admin/product/edit/{id}', 'AdminController@editProduct');
 $router->add('POST', '/admin/product/edit/{id}', 'AdminController@updateProduct');

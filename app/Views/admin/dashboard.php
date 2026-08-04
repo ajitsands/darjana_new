@@ -29,8 +29,18 @@
                 <!-- Product List -->
                 <div>
                     <h3 style="font-size: 18px; margin-bottom: 16px;">Product Catalog</h3>
+                    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+                    <style>
+                        /* Custom DataTable Styling for Dar Jana Admin */
+                        #productsTable_wrapper { margin-top: 10px; font-size: 13px; }
+                        #productsTable_wrapper .dataTables_filter input { border: 1px solid #cbd5e0; padding: 4px 8px; border-radius: 4px; margin-left: 8px; }
+                        #productsTable_wrapper .dataTables_length select { border: 1px solid #cbd5e0; padding: 4px; border-radius: 4px; }
+                        table.dataTable thead th { border-bottom: 2px solid #e2e8f0; font-size: 12px; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--heading-font-family); padding: 12px; }
+                        table.dataTable tbody td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+                        table.dataTable.no-footer { border-bottom: 1px solid #e2e8f0; }
+                    </style>
                     <div class="table-responsive">
-                        <table>
+                        <table id="productsTable" class="display" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>IMAGE</th>
@@ -42,31 +52,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($products as $p): ?>
-                                    <tr>
-                                        <td>
-                                            <img src="<?= $p['image'] ?>" style="width: 40px; height: 50px; object-fit: cover; border-radius: 4px;">
-                                        </td>
-                                        <td>
-                                            <div style="font-size: 11px; color: var(--color-accent); font-weight: 700;"><?= htmlspecialchars($p['product_code']) ?></div>
-                                            <div style="font-weight: 600; font-size: 13px;"><?= htmlspecialchars($p['name']) ?></div>
-                                        </td>
-                                        <td style="font-size: 12px;"><?= htmlspecialchars($p['category_name']) ?></td>
-                                        <td>
-                                            <span style="font-size: 11px; font-weight: 700; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">
-                                                <?= htmlspecialchars($p['offer_tag_type']) ?>
-                                            </span>
-                                        </td>
-                                        <td style="font-weight: 700; font-size: 13px;"><?= number_format($p['price'], 2) ?> BHD</td>
-                                        <td>
-                                            <a href="<?= BASE_URL ?>/admin/product/edit/<?= $p['id'] ?>" style="color: var(--color-primary); font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>
-                                            <a href="<?= BASE_URL ?>/admin/product/delete/<?= $p['id'] ?>" onclick="return confirm('Delete this product?')" style="color: #e53e3e; font-size: 12px; font-weight: 600;">Delete</a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
+                    <!-- jQuery and DataTables -->
+                    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+                    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+                    <script>
+                        $(document).ready(function() {
+                            $('#productsTable').DataTable({
+                                "ajax": "<?= BASE_URL ?>/admin/products/ajax",
+                                "processing": true,
+                                "pageLength": 10,
+                                "ordering": false,
+                                "language": {
+                                    "search": "Search Products:",
+                                    "lengthMenu": "Show _MENU_ products per page"
+                                }
+                            });
+                        });
+                    </script>
                 </div>
 
                 <!-- Add Product Form -->

@@ -141,6 +141,39 @@ class AdminController extends Controller {
     }
 
 
+        public function ajaxProducts() {
+        $this->requireAuth();
+        $productModel = new Product();
+        $products = $productModel->getAll();
+        
+        $data = [];
+        foreach ($products as $p) {
+            $imageHtml = '<img src="' . htmlspecialchars($p['image']) . '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">';
+            $infoHtml = '<div style="font-size: 11px; color: #c5a059; font-weight: 700;">' . htmlspecialchars($p['product_code']) . '</div>' .
+                        '<div style="font-weight: 600; font-size: 13px;">' . htmlspecialchars($p['name']) . '</div>';
+            $categoryHtml = '<span style="font-size: 12px;">' . htmlspecialchars($p['category_name']) . '</span>';
+            $tagHtml = '<span style="font-size: 11px; font-weight: 700; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">' . htmlspecialchars($p['offer_tag_type']) . '</span>';
+            $priceHtml = '<span style="font-weight: 700; font-size: 13px;">' . number_format($p['price'], 2) . ' BHD</span>';
+            $actionsHtml = '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>' .
+                           '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="return confirm(\'Delete this product?\')" style="color: #e53e3e; font-size: 12px; font-weight: 600;">Delete</a>';
+            
+            $data[] = [
+                $imageHtml,
+                $infoHtml,
+                $categoryHtml,
+                $tagHtml,
+                $priceHtml,
+                $actionsHtml
+            ];
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode([
+            "data" => $data
+        ]);
+        exit;
+    }
+
     public function editProduct($id) {
         $this->requireAuth();
         $productModel = new Product();
