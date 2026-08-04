@@ -115,11 +115,92 @@
                             </div>
 
                             <!-- VARIANT OPTIONS: COLORS & COMBINATIONS -->
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABLE COLORS & COMBINATIONS (Comma Separated)</label>
-                                <input type="text" name="colors" value="Black, Red, Green & Red, Blue & Gray, Beige" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="e.g. Black, Red, Green & Red, Blue & Gray">
-                                <span style="font-size: 11px; color: #718096;">Tip: Enter single colors or combinations like 'Green & Red', 'Blue & Gray'</span>
+                                                        <div style="margin-bottom: 14px;">
+                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABLE COLORS / COMBINATIONS</label>
+                                <div id="colorBuilderContainer" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 4px;">
+                                    <div id="colorRows"></div>
+                                    <button type="button" onclick="addColorRow()" style="margin-top: 10px; background: #fff; border: 1px dashed #cbd5e0; padding: 6px 12px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: 600; color: #4a5568;">+ Add Color Option</button>
+                                </div>
+                                <input type="hidden" name="colors" id="colorsJsonOutput" value="Black, Red, Green & Red, Blue & Gray, Beige">
                             </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const colorsJsonOutput = document.getElementById('colorsJsonOutput');
+    const colorRowsContainer = document.getElementById('colorRows');
+    if(!colorsJsonOutput || !colorRowsContainer) return;
+    
+    let initialData = [];
+    try {
+        let raw = colorsJsonOutput.value;
+        if (raw.startsWith('[') || raw.startsWith('{')) {
+            initialData = JSON.parse(raw);
+        } else {
+            // Fallback for comma separated
+            let parts = raw.split(',').map(s => s.trim()).filter(s => s);
+            parts.forEach(p => {
+                initialData.push({ name: p, color1: '#181818' });
+            });
+        }
+    } catch(e) {}
+    
+    if (initialData.length === 0) {
+        initialData.push({ name: 'Black', color1: '#181818' });
+    }
+    
+    initialData.forEach(item => addColorRow(item.name, item.color1, item.color2, item.color3));
+    
+    // Bind form submit to update JSON
+    const form = colorsJsonOutput.closest('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const rows = colorRowsContainer.querySelectorAll('.color-row');
+            let result = [];
+            rows.forEach(row => {
+                let name = row.querySelector('.c-name').value.trim();
+                let count = parseInt(row.querySelector('.c-count').value);
+                let c1 = row.querySelector('.c-1').value;
+                let c2 = row.querySelector('.c-2').value;
+                let c3 = row.querySelector('.c-3').value;
+                if (name) {
+                    let obj = { name: name, color1: c1 };
+                    if (count >= 2) obj.color2 = c2;
+                    if (count === 3) obj.color3 = c3;
+                    result.push(obj);
+                }
+            });
+            colorsJsonOutput.value = JSON.stringify(result);
+        });
+    }
+});
+
+function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
+    const container = document.getElementById('colorRows');
+    const numColors = (c3) ? 3 : (c2 ? 2 : 1);
+    
+    const div = document.createElement('div');
+    div.className = 'color-row';
+    div.style.display = 'flex';
+    div.style.gap = '8px';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '8px';
+    
+    div.innerHTML = `
+        <input type="text" class="c-name" placeholder="Color Name (e.g. Green & Red)" value="${name}" style="flex: 1; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 12px;">
+        <select class="c-count" onchange="const v=parseInt(this.value); this.parentElement.querySelector('.c-2').style.display=(v>=2)?'inline-block':'none'; this.parentElement.querySelector('.c-3').style.display=(v===3)?'inline-block':'none';" style="padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 12px;">
+            <option value="1" ${numColors===1?'selected':''}>1 Color</option>
+            <option value="2" ${numColors===2?'selected':''}>2 Colors</option>
+            <option value="3" ${numColors===3?'selected':''}>3 Colors</option>
+        </select>
+        <input type="color" class="c-1" value="${c1}" title="Color 1" style="width: 32px; height: 32px; padding: 0; border: none; cursor: pointer;">
+        <input type="color" class="c-2" value="${c2 || '#ffffff'}" title="Color 2" style="width: 32px; height: 32px; padding: 0; border: none; cursor: pointer; display: ${numColors >= 2 ? 'inline-block' : 'none'};">
+        <input type="color" class="c-3" value="${c3 || '#ffffff'}" title="Color 3" style="width: 32px; height: 32px; padding: 0; border: none; cursor: pointer; display: ${numColors === 3 ? 'inline-block' : 'none'};">
+        <button type="button" onclick="this.parentElement.remove()" style="background: #fed7d7; border: none; color: #c53030; cursor: pointer; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-weight: bold;">X</button>
+    `;
+    
+    container.appendChild(div);
+}
+</script>
 
                             <!-- VARIANT OPTIONS: SIZES -->
                             <div style="margin-bottom: 14px;">

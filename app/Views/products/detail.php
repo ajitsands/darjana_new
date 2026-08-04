@@ -174,9 +174,11 @@ if (empty($mediaItems)) {
                         foreach ($parsedColors as $pc) {
                             $colorsList[] = [
                                 'name' => $pc['name'],
-                                'style' => isset($pc['color2']) && !empty($pc['color2']) 
-                                    ? "background: linear-gradient(135deg, {$pc['color1']} 50%, {$pc['color2']} 50%); border: 1px solid rgba(0,0,0,0.2);"
-                                    : "background-color: {$pc['color1']}; border: 1px solid rgba(0,0,0,0.15);"
+                                'style' => isset($pc['color3']) && !empty($pc['color3'])
+                                    ? "background: linear-gradient(135deg, {$pc['color1']} 33%, {$pc['color2']} 33% 66%, {$pc['color3']} 66%); border: 1px solid rgba(0,0,0,0.2);"
+                                    : (isset($pc['color2']) && !empty($pc['color2']) 
+                                        ? "background: linear-gradient(135deg, {$pc['color1']} 50%, {$pc['color2']} 50%); border: 1px solid rgba(0,0,0,0.2);"
+                                        : "background-color: {$pc['color1']}; border: 1px solid rgba(0,0,0,0.15);")
                             ];
                         }
                     } else {
