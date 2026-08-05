@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        let html = '';
         cart.forEach(item => {
             const metaParts = [`Code: ${item.product_code}`];
             if (item.color) metaParts.push(`Color: ${item.color}`);

@@ -13,12 +13,14 @@ CREATE TABLE IF NOT EXISTS products (
     category_id INTEGER NOT NULL,
     product_code VARCHAR(100) NOT NULL,
     name VARCHAR(255) NOT NULL,
+    name_ar VARCHAR(500) DEFAULT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
     price DECIMAL(10, 2) NOT NULL,
     sale_price DECIMAL(10, 2) DEFAULT NULL,
     image VARCHAR(500) NOT NULL,
     secondary_image VARCHAR(500) DEFAULT '',
     description TEXT,
+    description_ar TEXT,
     sizes VARCHAR(255) DEFAULT '52,54,56,58,60',
     is_featured TINYINT(1) DEFAULT 0,
     stock INTEGER DEFAULT 50,
@@ -36,16 +38,27 @@ CREATE TABLE IF NOT EXISTS orders (
     city VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
+    vat_amount DECIMAL(10, 2) DEFAULT 0.00,
+    vat_type VARCHAR(20) DEFAULT 'exclusive',
     status VARCHAR(50) DEFAULT 'Pending',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+    setting_key VARCHAR(100) PRIMARY KEY,
+    setting_value TEXT
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     order_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
+    product_code VARCHAR(100),
     product_name VARCHAR(255) NOT NULL,
     size VARCHAR(20) DEFAULT '54',
+    color VARCHAR(100),
+    length VARCHAR(20),
+    note TEXT,
     price DECIMAL(10, 2) NOT NULL,
     quantity INTEGER NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id)
@@ -56,6 +69,12 @@ CREATE TABLE IF NOT EXISTS subscribers (
     email VARCHAR(255) NOT NULL UNIQUE,
     subscribed_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Seed Settings
+INSERT IGNORE INTO settings (setting_key, setting_value) VALUES 
+('vat_percentage', '5'),
+('vat_type', 'exclusive'),
+('timezone', 'Asia/Bahrain');
 
 -- Seed Categories
 INSERT IGNORE INTO categories (id, name, slug, image, description) VALUES

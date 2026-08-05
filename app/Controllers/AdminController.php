@@ -3,8 +3,70 @@ require_once __DIR__ . '/../../core/Controller.php';
 require_once __DIR__ . '/../Models/Order.php';
 require_once __DIR__ . '/../Models/Product.php';
 require_once __DIR__ . '/../Models/Category.php';
+require_once __DIR__ . '/../Models/Setting.php';
 
 class AdminController extends Controller {
+
+    public function settings() {
+        $this->requireAuth();
+        $settingModel = new Setting();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $vatPercentage = $_POST['vat_percentage'] ?? '0';
+            $vatType = $_POST['vat_type'] ?? 'exclusive';
+            $timezone = $_POST['timezone'] ?? 'Asia/Bahrain';
+            
+            $settingModel->set('vat_percentage', $vatPercentage);
+            $settingModel->set('vat_type', $vatType);
+            $settingModel->set('timezone', $timezone);
+            
+            if (isset($_POST['size_guide_chest'])) {
+                $settingModel->set('size_guide_chest', $_POST['size_guide_chest']);
+            }
+            if (isset($_POST['size_guide_length'])) {
+                $settingModel->set('size_guide_length', $_POST['size_guide_length']);
+            }
+            if (isset($_POST['size_guide_desc_en'])) {
+                $settingModel->set('size_guide_desc_en', $_POST['size_guide_desc_en']);
+            }
+            if (isset($_POST['size_guide_desc_ar'])) {
+                $settingModel->set('size_guide_desc_ar', $_POST['size_guide_desc_ar']);
+            }
+            
+            // Payment Gateway Settings
+            $afsEnabled = isset($_POST['afs_gateway_enabled']) ? '1' : '0';
+            $settingModel->set('afs_gateway_enabled', $afsEnabled);
+            
+            if (isset($_POST['afs_gateway_name'])) {
+                $settingModel->set('afs_gateway_name', $_POST['afs_gateway_name']);
+            }
+            if (isset($_POST['afs_api_endpoint'])) {
+                $settingModel->set('afs_api_endpoint', rtrim($_POST['afs_api_endpoint'], '/'));
+            }
+            if (isset($_POST['afs_entity_id'])) {
+                $settingModel->set('afs_entity_id', trim($_POST['afs_entity_id']));
+            }
+            if (isset($_POST['afs_access_token'])) {
+                $settingModel->set('afs_access_token', trim($_POST['afs_access_token']));
+            }
+            if (isset($_POST['afs_currency'])) {
+                $settingModel->set('afs_currency', strtoupper(trim($_POST['afs_currency'])));
+            }
+            
+            $this->logActivity('UPDATE_SETTINGS', "Updated store settings (VAT: $vatPercentage%, Type: $vatType, TZ: $timezone)");
+            $_SESSION['admin_success'] = 'Settings updated successfully.';
+            $this->redirect(BASE_URL . '/admin/settings');
+        }
+        
+        $settings = $settingModel->getAll();
+        
+        $data = [
+            'pageTitle' => 'Store Settings | Admin',
+            'settings' => $settings
+        ];
+        
+        $this->render('admin/settings', $data, 'admin');
+    }
 
     private function requireAuth() {
         if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -69,32 +131,224 @@ class AdminController extends Controller {
         $username = trim($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
         
-        if (!empty($username) && !empty($password)) {
-            $db = Database::getInstance();
-            // Check if exists
-            $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
-            $stmt->execute([$username]);
-            if ($stmt->fetchColumn() == 0) {
-                $hash = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $db->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
-                $stmt->execute([$username, $hash]);
-                $this->logActivity('ADD_USER', "Added new admin user: {$username}");
-            }
+        if (empty($username) || empty($password)) {
+            $_SESSION['admin_error'] = "Please provide both username and password.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
         }
+
+        if (strlen($username) < 3) {
+            $_SESSION['admin_error'] = "Username must be at least 3 characters long.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        if (strlen($password) < 6) {
+            $_SESSION['admin_error'] = "Password must be at least 6 characters long.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        if ($stmt->fetchColumn() > 0) {
+            $_SESSION['admin_error'] = "Username '{$username}' already exists. Please choose a different username.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $db->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
+        $stmt->execute([$username, $hash]);
+        $this->logActivity('ADD_USER', "Added new admin user: {$username}");
+
+        $_SESSION['admin_success'] = "Administrator '{$username}' created successfully.";
+        $this->redirect(BASE_URL . '/admin/users');
+    }
+
+    public function updateUser($id) {
+        $this->requireAuth();
+        $id = (int)$id;
+        $username = trim($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        if (empty($username)) {
+            $_SESSION['admin_error'] = "Username cannot be empty.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        if (strlen($username) < 3) {
+            $_SESSION['admin_error'] = "Username must be at least 3 characters long.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            $_SESSION['admin_error'] = "Administrator account not found.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        // Check if new username conflicts with another user
+        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE username = ? AND id != ?");
+        $stmt->execute([$username, $id]);
+        if ($stmt->fetchColumn() > 0) {
+            $_SESSION['admin_error'] = "Username '{$username}' is already in use by another administrator.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                $_SESSION['admin_error'] = "New password must be at least 6 characters long.";
+                $this->redirect(BASE_URL . '/admin/users');
+                return;
+            }
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $db->prepare("UPDATE users SET username = ?, password_hash = ? WHERE id = ?");
+            $stmt->execute([$username, $hash, $id]);
+            $this->logActivity('UPDATE_USER', "Updated admin username and password for: {$user['username']} -> {$username}");
+        } else {
+            $stmt = $db->prepare("UPDATE users SET username = ? WHERE id = ?");
+            $stmt->execute([$username, $id]);
+            $this->logActivity('UPDATE_USER', "Updated admin username for: {$user['username']} -> {$username}");
+        }
+
+        // If editing self, update current session username
+        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $id) {
+            $_SESSION['username'] = $username;
+        }
+
+        $_SESSION['admin_success'] = "Administrator '{$username}' updated successfully.";
+        $this->redirect(BASE_URL . '/admin/users');
+    }
+
+    public function resetPassword($id) {
+        $this->requireAuth();
+        $id = (int)$id;
+        $password = $_POST['new_password'] ?? '';
+
+        if (empty($password)) {
+            $_SESSION['admin_error'] = "Please enter a new password.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        if (strlen($password) < 6) {
+            $_SESSION['admin_error'] = "Password must be at least 6 characters long.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            $_SESSION['admin_error'] = "Administrator account not found.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $db->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+        $stmt->execute([$hash, $id]);
+        $this->logActivity('RESET_PASSWORD', "Reset password for administrator: {$user['username']}");
+
+        $_SESSION['admin_success'] = "Password reset successfully for '{$user['username']}'.";
+        $this->redirect(BASE_URL . '/admin/users');
+    }
+
+    public function deleteUser($id) {
+        $this->requireAuth();
+        $id = (int)$id;
+
+        // Prevent deleting own logged in account
+        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $id) {
+            $_SESSION['admin_error'] = "You cannot delete your own active administrator account.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        $db = Database::getInstance();
+        
+        // Count total admins to ensure at least one remains
+        $count = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        if ($count <= 1) {
+            $_SESSION['admin_error'] = "Cannot delete the last remaining administrator account.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            $_SESSION['admin_error'] = "Administrator account not found.";
+            $this->redirect(BASE_URL . '/admin/users');
+            return;
+        }
+
+        // Unlink foreign key in activity logs to preserve logs safely
+        $stmt = $db->prepare("UPDATE activity_logs SET user_id = NULL WHERE user_id = ?");
+        $stmt->execute([$id]);
+
+        // Delete user
+        $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+
+        $this->logActivity('DELETE_USER', "Deleted administrator account: {$user['username']}");
+
+        $_SESSION['admin_success'] = "Administrator '{$user['username']}' deleted successfully.";
         $this->redirect(BASE_URL . '/admin/users');
     }
 
     public function history() {
         $this->requireAuth();
         $db = Database::getInstance();
-        $logs = $db->query("
+        
+        $startDate = $_GET['start_date'] ?? '';
+        $endDate = $_GET['end_date'] ?? '';
+        
+        $query = "
             SELECT a.*, u.username 
             FROM activity_logs a 
             LEFT JOIN users u ON a.user_id = u.id 
-            ORDER BY a.created_at DESC 
-            LIMIT 100
-        ")->fetchAll();
-        $this->render('admin/history', ['pageTitle' => 'Activity History', 'logs' => $logs], 'admin');
+            WHERE 1=1
+        ";
+        $params = [];
+        
+        if (!empty($startDate)) {
+            $query .= " AND DATE(a.created_at) >= ?";
+            $params[] = $startDate;
+        }
+        
+        if (!empty($endDate)) {
+            $query .= " AND DATE(a.created_at) <= ?";
+            $params[] = $endDate;
+        }
+        
+        $query .= " ORDER BY a.created_at DESC";
+        
+        $stmt = $db->prepare($query);
+        $stmt->execute($params);
+        $logs = $stmt->fetchAll();
+        
+        $this->render('admin/history', [
+            'pageTitle' => 'Activity History', 
+            'logs' => $logs,
+            'startDate' => $startDate,
+            'endDate' => $endDate
+        ], 'admin');
     }
 
     public function index() {
@@ -130,32 +384,77 @@ class AdminController extends Controller {
         $this->requireAuth();
         $orderModel = new Order();
         
-        $orders = $orderModel->getAllOrders();
+        $startDate = $_GET['start_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? null;
+
+        $orders = $orderModel->getAllOrders($startDate, $endDate);
 
         $data = [
             'pageTitle' => 'Customer Orders | Dar Jana Fashion',
-            'orders' => $orders
+            'orders' => $orders,
+            'startDate' => $startDate,
+            'endDate' => $endDate
         ];
 
         $this->render('admin/orders', $data, 'admin');
     }
 
+    public function orderDetail($id) {
+        $this->requireAuth();
+        $orderModel = new Order();
+        
+        $order = $orderModel->getOrderById($id);
+        if (!$order) {
+            $_SESSION['admin_error'] = 'Order not found.';
+            $this->redirect(BASE_URL . '/admin/orders');
+        }
 
-        public function ajaxProducts() {
+        $items = $orderModel->getOrderItems($id);
+
+        $data = [
+            'pageTitle' => 'Order Details | Dar Jana Fashion',
+            'order' => $order,
+            'items' => $items
+        ];
+
+        $this->render('admin/order_detail', $data, 'admin');
+    }
+
+    public function updateStatus($id) {
+        $this->requireAuth();
+        $orderModel = new Order();
+        
+        $order = $orderModel->getOrderById($id);
+        if (!$order) {
+            $_SESSION['admin_error'] = 'Order not found.';
+            $this->redirect(BASE_URL . '/admin/orders');
+        }
+
+        $orderStatus = $_POST['status'] ?? 'New';
+        $paymentStatus = $_POST['payment_status'] ?? 'Pending';
+
+        $orderModel->updateOrderStatuses($id, $orderStatus, $paymentStatus);
+        
+        $_SESSION['admin_success'] = 'Order statuses updated successfully.';
+        $this->redirect(BASE_URL . '/admin/order/' . $id);
+    }
+
+    public function ajaxProducts() {
         $this->requireAuth();
         $productModel = new Product();
-        $products = $productModel->getAll();
+        $products = $productModel->getAll(null, 0, 'featured', null, null, false);
         
         $data = [];
         foreach ($products as $p) {
             $imageHtml = '<img src="' . htmlspecialchars($p['image']) . '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">';
+            $activeBadge = (isset($p['is_active']) && $p['is_active'] == 0) ? ' <span style="color: #e53e3e; font-size: 10px; font-weight: 700;">(Inactive)</span>' : '';
             $infoHtml = '<div style="font-size: 11px; color: #c5a059; font-weight: 700;">' . htmlspecialchars($p['product_code']) . '</div>' .
-                        '<div style="font-weight: 600; font-size: 13px;">' . htmlspecialchars($p['name']) . '</div>';
+                        '<div style="font-weight: 600; font-size: 13px;">' . htmlspecialchars($p['name']) . $activeBadge . '</div>';
             $categoryHtml = '<span style="font-size: 12px;">' . htmlspecialchars($p['category_name']) . '</span>';
             $tagHtml = '<span style="font-size: 11px; font-weight: 700; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">' . htmlspecialchars($p['offer_tag_type']) . '</span>';
             $priceHtml = '<span style="font-weight: 700; font-size: 13px;">' . number_format($p['price'], 2) . ' BHD</span>';
             $actionsHtml = '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>' .
-                           '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="return confirm(\'Delete this product?\')" style="color: #e53e3e; font-size: 12px; font-weight: 600;">Delete</a>';
+                           '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="confirmDelete(event, this.href, \'Delete this product?\')" style="color: #e53e3e; font-size: 12px; font-weight: 600;">Delete</a>';
             
             $data[] = [
                 $imageHtml,
@@ -206,8 +505,11 @@ class AdminController extends Controller {
         }
 
         $name = trim($_POST['name'] ?? '');
+        $nameAr = trim($_POST['name_ar'] ?? '');
         $code = trim($_POST['product_code'] ?? '');
-        $categoryId = (int)($_POST['category_id'] ?? 1);
+                $categoryIds = $_POST['category_id'] ?? [1];
+        if (!is_array($categoryIds)) $categoryIds = [$categoryIds];
+        $categoryId = implode(',', array_map('intval', $categoryIds));
         $price = (float)($_POST['price'] ?? 0);
         $salePrice = !empty($_POST['sale_price']) ? (float)$_POST['sale_price'] : null;
         $offerTagType = $_POST['offer_tag_type'] ?? 'percentage';
@@ -272,6 +574,7 @@ class AdminController extends Controller {
             'category_id' => $categoryId,
             'product_code' => $code,
             'name' => $name,
+            'name_ar' => $nameAr,
             'slug' => $slug,
             'price' => $price,
             'sale_price' => $salePrice,
@@ -284,6 +587,7 @@ class AdminController extends Controller {
             'sizes' => $sizes,
             'lengths' => $lengths,
             'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+            'is_active' => isset($_POST['is_active']) ? 1 : 0,
             'stock' => (int)($_POST['stock'] ?? 50),
             'media' => json_encode($mediaArray)
         ]);
@@ -308,8 +612,11 @@ class AdminController extends Controller {
     public function addProduct() {
         $this->requireAuth();
         $name = trim($_POST['name'] ?? '');
+        $nameAr = trim($_POST['name_ar'] ?? '');
         $code = trim($_POST['product_code'] ?? '');
-        $categoryId = (int)($_POST['category_id'] ?? 1);
+                $categoryIds = $_POST['category_id'] ?? [1];
+        if (!is_array($categoryIds)) $categoryIds = [$categoryIds];
+        $categoryId = implode(',', array_map('intval', $categoryIds));
         $price = (float)($_POST['price'] ?? 0);
         $salePrice = !empty($_POST['sale_price']) ? (float)$_POST['sale_price'] : null;
         $offerTagType = $_POST['offer_tag_type'] ?? 'percentage';
@@ -373,6 +680,7 @@ class AdminController extends Controller {
             'category_id' => $categoryId,
             'product_code' => $code,
             'name' => $name,
+            'name_ar' => $nameAr,
             'slug' => $slug,
             'price' => $price,
             'sale_price' => $salePrice,
@@ -385,6 +693,7 @@ class AdminController extends Controller {
             'sizes' => $sizes,
             'lengths' => $lengths,
             'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+            'is_active' => isset($_POST['is_active']) ? 1 : 0,
             'stock' => (int)($_POST['stock'] ?? 50),
             'media' => json_encode($mediaArray)
         ]);

@@ -127,7 +127,11 @@ if (empty($mediaItems)) {
         <!-- Product Details Info Column -->
         <div class="product-info-column">
             <div class="product-code" style="font-size: 13px; margin-bottom: 8px;">PRODUCT CODE: <?= htmlspecialchars($product['product_code']) ?></div>
-            <h1 style="font-size: 26px; font-weight: 400; line-height: 1.3; margin-bottom: 16px; color: var(--color-primary);"><?= htmlspecialchars($product['name']) ?></h1>
+            <?php
+                $currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
+                $displayName = ($currentLang === 'ar' && !empty($product['name_ar'])) ? $product['name_ar'] : $product['name'];
+            ?>
+            <h1 style="font-size: 26px; font-weight: 400; line-height: 1.3; margin-bottom: 16px; color: var(--color-primary);"><?= htmlspecialchars($displayName) ?></h1>
             
             <div class="product-price-wrap" style="margin-bottom: 20px;">
                 <?php if ($product['sale_price']): ?>
@@ -141,23 +145,24 @@ if (empty($mediaItems)) {
             <!-- THIN SEPARATOR LINE AFTER PRICE -->
             <div style="border-top: 1px solid var(--color-border); margin-bottom: 20px;"></div>
 
-            <!-- PRODUCT DETAILS & DESCRIPTION (ARABIC FIRST IF AVAILABLE, THEN ENGLISH) -->
+            <!-- PRODUCT DETAILS & DESCRIPTION -->
             <div style="margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border);">
-                <?php if (!empty($product['description_ar'])): ?>
-                    <p dir="rtl" style="color: var(--color-primary); font-size: 15px; line-height: 1.9; margin: 0 0 14px 0; font-family: 'Noto Naskh Arabic', 'Arial', sans-serif; text-align: right;">
+                <?php if ($currentLang === 'ar' && !empty($product['description_ar'])): ?>
+                    <p dir="rtl" style="color: var(--color-primary); font-size: 15px; line-height: 1.9; margin: 0; font-family: 'Noto Naskh Arabic', 'Arial', sans-serif; text-align: right;">
                         <?= nl2br(htmlspecialchars($product['description_ar'])) ?>
                     </p>
-                    <?php if (!empty($product['description'])): ?>
-                        <hr style="border: none; border-top: 1px dashed var(--color-border); margin: 14px 0;">
-                        <p style="color: var(--color-text-muted); font-size: 14px; line-height: 1.7; margin: 0;">
-                            <?= nl2br(htmlspecialchars($product['description'])) ?>
-                        </p>
-                    <?php endif; ?>
                 <?php else: ?>
                     <p style="color: var(--color-text-muted); font-size: 14.5px; line-height: 1.7; margin: 0;">
                         <?= nl2br(htmlspecialchars($product['description'])) ?>
                     </p>
                 <?php endif; ?>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <button type="button" onclick="openSizeGuide()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: #f8f8f8; border: 1px solid #dcdcdc; border-radius: 4px; font-family: var(--heading-font-family); font-size: 13px; letter-spacing: 0.1em; font-weight: 600; cursor: pointer; color: var(--color-primary); transition: all 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    SIZE GUIDE
+                </button>
             </div>
 
             <!-- COLOR & MULTI-COLOR COMBINATION SELECTOR WITH SWATCH DOTS -->
@@ -728,5 +733,96 @@ if (empty($mediaItems)) {
                 }
             }
         }
+    }
+</script>
+
+<!-- SIZE GUIDE OFFCANVAS -->
+<?php
+$chestData = isset($settings['size_guide_chest']) ? json_decode($settings['size_guide_chest'], true) : [
+    ['size' => 'S', 'chest' => '20.00', 'shoulder' => '27.00'],
+    ['size' => 'M', 'chest' => '23.00', 'shoulder' => '28.00'],
+    ['size' => 'L', 'chest' => '24.00', 'shoulder' => '29.00'],
+    ['size' => 'XL', 'chest' => '25.00', 'shoulder' => '29.50'],
+    ['size' => 'XXL', 'chest' => '26.00', 'shoulder' => '30.50']
+];
+$lengthData = isset($settings['size_guide_length']) ? json_decode($settings['size_guide_length'], true) : [
+    ['length' => '49.00', 'height' => '150'],
+    ['length' => '50.00', 'height' => '151'],
+    ['length' => '50.00', 'height' => '152'],
+    ['length' => '51.00', 'height' => '153'],
+    ['length' => '51.00', 'height' => '154'],
+    ['length' => '52.00', 'height' => '155'],
+    ['length' => '52.00', 'height' => '156']
+];
+?>
+<div id="sizeGuideOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;" onclick="closeSizeGuide()"></div>
+<div id="sizeGuideCanvas" style="position: fixed; top: 0; right: -500px; width: 100%; max-width: 500px; height: 100vh; background: #fff; z-index: 9999; overflow-y: auto; transition: right 0.3s ease; box-shadow: -5px 0 15px rgba(0,0,0,0.1);">
+    <div style="padding: 24px; position: relative;">
+        <button onclick="closeSizeGuide()" style="position: absolute; top: 20px; right: 24px; background: none; border: none; font-size: 24px; cursor: pointer; color: #1a1a1a;">&times;</button>
+        
+        <!-- SECTION 1 -->
+        <h2 style="font-family: var(--heading-font-family); font-size: 16px; letter-spacing: 0.1em; color: #1a1a1a; margin-top: 20px; margin-bottom: 20px; text-transform: uppercase;">Size Guide - Chest & Shoulder<br><span style="font-size: 13px; color: #718096; font-weight: 400; text-transform: none;">دليل المقاسات - الصدر والكتف</span></h2>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
+            <thead>
+                <tr style="background: #2d2d2d; color: #fff;">
+                    <th style="padding: 12px; text-align: left; border: 1px solid #444;">SIZE /<br>المقاسات</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #444;">CHEST (INCH) /<br>الصدر</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #444;">SHOULDER (INCH) /<br>الكتف</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach($chestData as $row): ?>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; color: #4a5568;"><?= htmlspecialchars($row['size']) ?></td>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; color: #4a5568;"><?= htmlspecialchars($row['chest']) ?></td>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; color: #4a5568;"><?= htmlspecialchars($row['shoulder']) ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <!-- SECTION 2 -->
+        <h2 style="font-family: var(--heading-font-family); font-size: 16px; letter-spacing: 0.1em; color: #1a1a1a; margin-bottom: 10px; text-transform: uppercase;">Find Your Abaya Length by Height<br><span style="font-size: 13px; color: #718096; font-weight: 400; text-transform: none;">جدول طول العباءة حسب الطول</span></h2>
+        <p style="font-size: 13px; color: #718096; line-height: 1.6; margin-bottom: 20px;">
+            <?= nl2br(htmlspecialchars($settings['size_guide_desc_en'] ?? 'This chart shows the recommended length based on height. Please double-check with your own measurement to be sure of your perfect fit.')) ?><br><br>
+            <?= nl2br(htmlspecialchars($settings['size_guide_desc_ar'] ?? 'هذا الجدول يوضح الطول الموصى به حسب طولك. يُرجى التأكد بالمتر لقياسك الشخصي للحصول على المقاس الأنسب لكِ.')) ?>
+        </p>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
+            <thead>
+                <tr style="background: #2d2d2d; color: #fff;">
+                    <th style="padding: 12px; text-align: left; border: 1px solid #444;">ABAYA LENGTH (INCH)</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #444;">YOUR HEIGHT (CM)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach($lengthData as $row): ?>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; color: #4a5568;"><?= htmlspecialchars($row['length']) ?></td>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; color: #4a5568;"><?= htmlspecialchars($row['height']) ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <!-- MEASUREMENT TIPS -->
+        <div style="background: #f8f8f8; padding: 20px; border-radius: 4px; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">💡</span>
+            <span style="font-family: var(--heading-font-family); font-weight: 600; letter-spacing: 0.1em; font-size: 14px;">MEASUREMENT TIPS</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openSizeGuide() {
+        document.getElementById('sizeGuideOverlay').style.opacity = '1';
+        document.getElementById('sizeGuideOverlay').style.pointerEvents = 'auto';
+        document.getElementById('sizeGuideCanvas').style.right = '0';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSizeGuide() {
+        document.getElementById('sizeGuideOverlay').style.opacity = '0';
+        document.getElementById('sizeGuideOverlay').style.pointerEvents = 'none';
+        document.getElementById('sizeGuideCanvas').style.right = '-500px';
+        document.body.style.overflow = 'auto';
     }
 </script>

@@ -26,7 +26,12 @@
                                     <img src="<?= $item['image'] ?>" style="width: 70px; height: 90px; object-fit: cover;">
                                     <div>
                                         <a href="<?= BASE_URL ?>/product/<?= $item['slug'] ?>" style="font-weight: 600; color: var(--color-primary); display: block;"><?= htmlspecialchars($item['name']) ?></a>
-                                        <div style="font-size: 12px; color: var(--color-text-muted);">Code: <?= htmlspecialchars($item['product_code']) ?> | Size: <?= htmlspecialchars($item['size']) ?></div>
+                                        <div style="font-size: 12px; color: var(--color-text-muted);">
+                                            Code: <?= htmlspecialchars($item['product_code'] ?? 'N/A') ?> | 
+                                            Size: <?= htmlspecialchars($item['size']) ?> | 
+                                            Color: <?= htmlspecialchars($item['color'] ?? 'N/A') ?> | 
+                                            Length: <?= htmlspecialchars($item['length'] ?? 'N/A') ?>"
+                                        </div>
                                     </div>
                                 </td>
                                 <td style="padding: 20px 0; font-weight: 600;"><?= number_format($item['price'], 2) ?> BHD</td>

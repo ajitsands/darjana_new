@@ -126,7 +126,14 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
                         <!-- Clean Minimalist Product Info Below Image -->
                         <div class="product-info-minimal">
                             <h3 class="product-title-minimal">
-                                <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>"><?= htmlspecialchars($product['name']) ?> <?= htmlspecialchars($product['product_code']) ?></a>
+                                <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>">
+                                    <?php if(isset($currentLang) && $currentLang === 'ar' && !empty($product['name_ar'])): ?>
+                                        <?= htmlspecialchars($product['name_ar']) ?>
+                                    <?php else: ?>
+                                        <?= htmlspecialchars($product['name']) ?>
+                                    <?php endif; ?>
+                                    <?= htmlspecialchars($product['product_code']) ?>
+                                </a>
                             </h3>
                             <div class="product-price-minimal">
                                 <?php if ($product['sale_price']): ?>
@@ -200,20 +207,23 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
                                 let offerBadgeHtml = '';
                                 let priceHtml = '';
 
-                                if (p.sale_price) {
+                                const priceNum = parseFloat(p.price) || 0;
+                                const salePriceNum = p.sale_price ? parseFloat(p.sale_price) : null;
+
+                                if (salePriceNum) {
                                     if (p.offer_tag_type === 'amount') {
-                                        const saveAmt = ((p.price - p.sale_price)).toFixed(3);
-                                        offerBadgeHtml = `<span class="product-offer-tag" data-save-bhd="${p.price - p.sale_price}">SAVE ${saveAmt} BHD</span>`;
+                                        const saveAmt = (priceNum - salePriceNum).toFixed(3);
+                                        offerBadgeHtml = `<span class="product-offer-tag" data-save-bhd="${priceNum - salePriceNum}">SAVE ${saveAmt} BHD</span>`;
                                     } else {
-                                        const discountPct = Math.round(((p.price - p.sale_price) / p.price) * 100);
+                                        const discountPct = Math.round(((priceNum - salePriceNum) / priceNum) * 100);
                                         offerBadgeHtml = `<span class="product-offer-tag">${discountPct}% OFF</span>`;
                                     }
 
                                     priceHtml = `
-                                        <span class="product-price sale" data-price-bhd="${p.sale_price}">${(p.sale_price).toFixed(3)} BHD</span>
-                                        <span style="text-decoration: line-through; color: #999; font-size: 11px; margin-left: 6px;" data-price-bhd="${p.price}">${(p.price).toFixed(3)} BHD</span>`;
+                                        <span class="product-price sale" data-price-bhd="${salePriceNum}">${salePriceNum.toFixed(3)} BHD</span>
+                                        <span style="text-decoration: line-through; color: #999; font-size: 11px; margin-left: 6px;" data-price-bhd="${priceNum}">${priceNum.toFixed(3)} BHD</span>`;
                                 } else {
-                                    priceHtml = `<span class="product-price" data-price-bhd="${p.price}">${(p.price).toFixed(3)} BHD</span>`;
+                                    priceHtml = `<span class="product-price" data-price-bhd="${priceNum}">${priceNum.toFixed(3)} BHD</span>`;
                                 }
 
                                 const cardHtml = `

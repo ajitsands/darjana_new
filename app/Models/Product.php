@@ -48,10 +48,15 @@ class Product extends Model {
         }
     }
 
-    public function getAll($limit = null, $offset = 0, $sort = 'featured', $minPrice = null, $maxPrice = null) {
-        $sql = "SELECT p.*, c.name as category_name, c.slug as category_slug 
+    public function getAll($limit = null, $offset = 0, $sort = 'featured', $minPrice = null, $maxPrice = null, $activeOnly = true) {
+        $sql = "SELECT p.*, GROUP_CONCAT(c.name SEPARATOR ', ') as category_name, GROUP_CONCAT(c.slug SEPARATOR ',') as category_slug 
                 FROM products p 
-                LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1";
+                LEFT JOIN categories c ON FIND_IN_SET(c.id, p.category_id) WHERE 1=1";
+        
+        if ($activeOnly) {
+            $sql .= " AND p.is_active = 1";
+        }
+        $sql .= " GROUP BY p.id";
         
         $params = [];
         if ($minPrice !== null && $minPrice !== '') {
@@ -76,23 +81,30 @@ class Product extends Model {
 
     public function getFeatured() {
         return $this->fetchAll(
-            "SELECT p.*, c.name as category_name, c.slug as category_slug 
+            "SELECT p.*, GROUP_CONCAT(c.name SEPARATOR ', ') as category_name, GROUP_CONCAT(c.slug SEPARATOR ',') as category_slug 
              FROM products p 
-             LEFT JOIN categories c ON p.category_id = c.id 
-             WHERE p.is_featured = 1 
-             ORDER BY p.id DESC"
+             LEFT JOIN categories c ON FIND_IN_SET(c.id, p.category_id) 
+             WHERE p.is_featured = 1 AND p.is_active = 1
+             GROUP BY p.id ORDER BY p.id DESC"
         );
     }
 
-    public function getByCategorySlug($slug, $limit = null, $offset = 0, $sort = 'featured', $minPrice = null, $maxPrice = null) {
+    public function getByCategorySlug($slug, $limit = null, $offset = 0, $sort = 'featured', $minPrice = null, $maxPrice = null, $activeOnly = true) {
         if ($slug === 'all-abaya' || $slug === 'all-dresses') {
-            return $this->getAll($limit, $offset, $sort, $minPrice, $maxPrice);
+            return $this->getAll($limit, $offset, $sort, $minPrice, $maxPrice, $activeOnly);
         }
 
-        $sql = "SELECT p.*, c.name as category_name, c.slug as category_slug 
+        $sql = "SELECT p.*, GROUP_CONCAT(c2.name SEPARATOR ', ') as category_name, GROUP_CONCAT(c2.slug SEPARATOR ',') as category_slug 
                 FROM products p 
-                JOIN categories c ON p.category_id = c.id 
+                JOIN categories c ON FIND_IN_SET(c.id, p.category_id) 
+                LEFT JOIN categories c2 ON FIND_IN_SET(c2.id, p.category_id) 
                 WHERE c.slug = ?";
+        
+        if ($activeOnly) {
+            $sql .= " AND p.is_active = 1";
+        }
+        
+        $sql .= " GROUP BY p.id";
         
         $params = [$slug];
 
@@ -116,12 +128,18 @@ class Product extends Model {
         return $this->fetchAll($sql, $params);
     }
 
-    public function countByCategorySlug($slug, $minPrice = null, $maxPrice = null) {
+    public function countByCategorySlug($slug, $minPrice = null, $maxPrice = null, $activeOnly = true) {
         if ($slug === 'all-abaya' || $slug === 'all-dresses') {
             $sql = "SELECT COUNT(*) as total FROM products p WHERE 1=1";
+            if ($activeOnly) {
+                $sql .= " AND p.is_active = 1";
+            }
             $params = [];
         } else {
-            $sql = "SELECT COUNT(*) as total FROM products p JOIN categories c ON p.category_id = c.id WHERE c.slug = ?";
+            $sql = "SELECT COUNT(DISTINCT p.id) as total FROM products p JOIN categories c ON FIND_IN_SET(c.id, p.category_id) WHERE c.slug = ?";
+            if ($activeOnly) {
+                $sql .= " AND p.is_active = 1";
+            }
             $params = [$slug];
         }
 
@@ -166,10 +184,10 @@ class Product extends Model {
 
     public function getBySlug($slug) {
         return $this->fetchOne(
-            "SELECT p.*, c.name as category_name, c.slug as category_slug 
+            "SELECT p.*, GROUP_CONCAT(c.name SEPARATOR ', ') as category_name, GROUP_CONCAT(c.slug SEPARATOR ',') as category_slug 
              FROM products p 
-             LEFT JOIN categories c ON p.category_id = c.id 
-             WHERE p.slug = ?",
+             LEFT JOIN categories c ON FIND_IN_SET(c.id, p.category_id) 
+             WHERE p.slug = ? GROUP BY p.id",
             [$slug]
         );
     }
@@ -178,25 +196,29 @@ class Product extends Model {
         return $this->fetchOne("SELECT * FROM products WHERE id = ?", [$id]);
     }
 
-    public function search($term) {
+    public function search($term, $activeOnly = true) {
         $likeTerm = '%' . $term . '%';
-        return $this->fetchAll(
-            "SELECT p.*, c.name as category_name 
+        $sql = "SELECT p.*, GROUP_CONCAT(c.name SEPARATOR ', ') as category_name 
              FROM products p 
-             LEFT JOIN categories c ON p.category_id = c.id 
-             WHERE p.name LIKE ? OR p.product_code LIKE ? OR p.description LIKE ?
-             ORDER BY p.id DESC",
-            [$likeTerm, $likeTerm, $likeTerm]
-        );
+             LEFT JOIN categories c ON FIND_IN_SET(c.id, p.category_id) 
+             WHERE (p.name LIKE ? OR p.product_code LIKE ? OR p.description LIKE ?)";
+        
+        if ($activeOnly) {
+            $sql .= " AND p.is_active = 1";
+        }
+        $sql .= " GROUP BY p.id ORDER BY p.id DESC";
+
+        return $this->fetchAll($sql, [$likeTerm, $likeTerm, $likeTerm]);
     }
 
     public function create($data) {
-        $sql = "INSERT INTO products (category_id, product_code, name, slug, price, sale_price, image, secondary_image, description, description_ar, offer_tag_type, colors, sizes, lengths, is_featured, stock, media) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO products (category_id, product_code, name, name_ar, slug, price, sale_price, image, secondary_image, description, description_ar, offer_tag_type, colors, sizes, lengths, is_featured, is_active, stock, media) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $this->query($sql, [
             $data['category_id'],
             $data['product_code'],
             $data['name'],
+            $data['name_ar'] ?? null,
             $data['slug'],
             $data['price'],
             $data['sale_price'] ?: null,
@@ -209,6 +231,7 @@ class Product extends Model {
             $data['sizes'] ?? 'S,M,L,XL,XXL',
             $data['lengths'] ?? '52,54,55,56,57,58,60',
             $data['is_featured'] ?? 0,
+            $data['is_active'] ?? 1,
             $data['stock'] ?? 50,
             $data['media'] ?? '[]'
         ]);
@@ -225,15 +248,16 @@ class Product extends Model {
 
     public function update($id, $data) {
         $sql = "UPDATE products SET 
-                category_id = ?, product_code = ?, name = ?, slug = ?, price = ?, 
+                category_id = ?, product_code = ?, name = ?, name_ar = ?, slug = ?, price = ?, 
                 sale_price = ?, image = ?, secondary_image = ?, description = ?, description_ar = ?, 
-                offer_tag_type = ?, colors = ?, sizes = ?, lengths = ?, is_featured = ?, stock = ?, media = ? 
+                offer_tag_type = ?, colors = ?, sizes = ?, lengths = ?, is_featured = ?, is_active = ?, stock = ?, media = ? 
                 WHERE id = ?";
         
         $this->query($sql, [
             $data['category_id'],
             $data['product_code'],
             $data['name'],
+            $data['name_ar'] ?? null,
             $data['slug'],
             $data['price'],
             $data['sale_price'] ?: null,
@@ -246,13 +270,13 @@ class Product extends Model {
             $data['sizes'] ?? 'S,M,L,XL,XXL',
             $data['lengths'] ?? '52,54,55,56,57,58,60',
             $data['is_featured'] ?? 0,
+            $data['is_active'] ?? 1,
             $data['stock'] ?? 50,
             $data['media'] ?? '[]',
             $id
         ]);
         return true;
     }
-
     public function delete($id) {
         $this->query("DELETE FROM products WHERE id = ?", [$id]);
         return true;

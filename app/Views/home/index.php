@@ -27,7 +27,7 @@
         <!-- Single Row Sliding Carousel Wrapper with Left & Right Arrow Navigation -->
         <div class="featured-slider-wrapper">
             <!-- Left Arrow Button -->
-            <button class="slider-arrow-btn prev-btn" id="featuredPrevBtn" title="Slide Left">
+            <button class="slider-arrow-btn prev-btn" id="featuredPrevBtn" title="Slide Left" aria-label="Previous Product">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
             </button>
 
@@ -53,8 +53,8 @@
                                 <?php endif; ?>
 
                                 <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>">
-                                    <img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img">
-                                    <img src="<?= $product['secondary_image'] ?: $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="secondary-img">
+                                    <img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img" loading="lazy" width="400" height="600">
+                                    <img src="<?= $product['secondary_image'] ?: $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="secondary-img" loading="lazy" width="400" height="600">
                                 </a>
 
                                 <!-- Small Corner '+' Box -->
@@ -64,12 +64,19 @@
                             <!-- Clean Minimalist Product Info Below Image -->
                             <div class="product-info-minimal">
                                 <h3 class="product-title-minimal">
-                                    <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>"><?= htmlspecialchars($product['name']) ?> <?= htmlspecialchars($product['product_code']) ?></a>
+                                    <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>">
+                                        <?php if(isset($currentLang) && $currentLang === 'ar' && !empty($product['name_ar'])): ?>
+                                            <?= htmlspecialchars($product['name_ar']) ?>
+                                        <?php else: ?>
+                                            <?= htmlspecialchars($product['name']) ?>
+                                        <?php endif; ?>
+                                        <?= htmlspecialchars($product['product_code']) ?>
+                                    </a>
                                 </h3>
                                 <div class="product-price-minimal">
                                     <?php if ($product['sale_price']): ?>
                                         <span class="product-price sale" data-price-bhd="<?= $product['sale_price'] ?>"><?= number_format($product['sale_price'], 3) ?> BHD</span>
-                                        <span style="text-decoration: line-through; color: #999; font-size: 11px; margin-left: 6px;" data-price-bhd="<?= $product['price'] ?>"><?= number_format($product['price'], 3) ?> BHD</span>
+                                        <span style="text-decoration: line-through; color: #64748b; font-size: 11px; margin-left: 6px;" data-price-bhd="<?= $product['price'] ?>"><?= number_format($product['price'], 3) ?> BHD</span>
                                     <?php else: ?>
                                         <span class="product-price" data-price-bhd="<?= $product['price'] ?>"><?= number_format($product['price'], 3) ?> BHD</span>
                                     <?php endif; ?>
@@ -81,7 +88,7 @@
             </div>
 
             <!-- Right Arrow Button -->
-            <button class="slider-arrow-btn next-btn" id="featuredNextBtn" title="Slide Right">
+            <button class="slider-arrow-btn next-btn" id="featuredNextBtn" title="Slide Right" aria-label="Next Product">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
             </button>
         </div>
@@ -104,7 +111,7 @@
         <div class="category-grid">
             <?php foreach ($categories as $cat): ?>
                 <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="category-card">
-                    <img src="<?= $cat['image'] ?>" alt="<?= htmlspecialchars($cat['name']) ?>">
+                    <img src="<?= $cat['image'] ?>" alt="<?= htmlspecialchars($cat['name']) ?>" loading="lazy" width="600" height="800">
                     <div class="category-card-overlay">
                         <h3 class="category-card-title"><?= htmlspecialchars($cat['name']) ?></h3>
                         <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.15em; color: var(--color-accent); text-transform: uppercase;">View Products →</span>

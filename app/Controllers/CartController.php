@@ -38,6 +38,7 @@ class CartController extends Controller {
 
         $cartKey = $productId . '_' . md5($color . '_' . $size . '_' . $length . '_' . $note);
         $price = $product['sale_price'] ? (float)$product['sale_price'] : (float)$product['price'];
+        $isDiscounted = ($product['sale_price'] > 0 && $product['sale_price'] < $product['price']) ? true : false;
 
         if (isset($_SESSION['cart'][$cartKey])) {
             $_SESSION['cart'][$cartKey]['quantity'] += $quantity;
@@ -52,6 +53,7 @@ class CartController extends Controller {
                 'name' => $product['name'],
                 'slug' => $product['slug'],
                 'price' => $price,
+                'is_discounted' => $isDiscounted,
                 'image' => $product['image'],
                 'color' => $color,
                 'size' => $size,

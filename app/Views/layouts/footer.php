@@ -19,10 +19,10 @@
                     <div style="margin-bottom: 20px;">
                         <img src="<?= BASE_URL ?>/assets/images/web_logo_menu.png" alt="Dar Jana Fashion" style="height: 52px; object-fit: contain;">
                     </div>
-                    <p style="color: #999999; font-size: 14px; line-height: 1.7; max-width: 380px; margin-bottom: 20px;">
+                    <p style="color: #64748b; font-size: 14px; line-height: 1.7; max-width: 380px; margin-bottom: 20px;">
                         Dar Jana Fashion represents luxury, elegance, and modern modest couture. Designing exclusive abayas, sets, and luxury blazers across the GCC region.
                     </p>
-                    <p style="color: #888888; font-size: 13px;">
+                    <p style="color: #64748b; font-size: 13px;">
                         <strong>Customer Support:</strong> +973 3330 0160<br>
                         <strong>Email:</strong> care@darjanafashion.com
                     </p>
@@ -57,7 +57,7 @@
                 <!-- Column 4: Contact & Social (Left Aligned) -->
                 <div class="footer-column" style="text-align: left;">
                     <h4>FOLLOW OUR JOURNEY</h4>
-                    <p style="color: #999999; font-size: 13.5px; margin-bottom: 16px;">
+                    <p style="color: #64748b; font-size: 13.5px; margin-bottom: 16px;">
                         Connect with us on our social platforms for daily styling inspiration and behind-the-scenes.
                     </p>
                     <div style="display: flex; gap: 14px; margin-top: 10px;">
@@ -83,53 +83,53 @@
 
     <!-- Interactive Floating Country Multi-Currency Switcher Pill (Fixed Bottom-Left Corner) -->
     <div class="currency-floating-trigger" id="currencyFloatingTrigger" title="Click to Change Currency">
-        <img src="<?= BASE_URL ?>/assets/images/flags/bh.png" alt="Bahrain Flag" class="currency-flag-img" id="activeCurrencyFlagImg">
+        <img src="<?= BASE_URL ?>/assets/images/flags/bh.png" alt="Bahrain Flag" class="currency-flag-img" loading="lazy" width="20" height="15" id="activeCurrencyFlagImg">
         <span id="activeCurrencyCode">BHD</span>
-        <span style="font-size: 10px; color: #888;">▴</span>
+        <span style="font-size: 10px; color: #64748b;">▴</span>
     </div>
 
     <!-- Currency Selector Popover Menu -->
     <div class="currency-popover" id="currencyPopover">
-        <div style="padding: 12px 18px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: #888; border-bottom: 1px solid #eee; background-color: #fafafa;">
+        <div style="padding: 12px 18px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; border-bottom: 1px solid #eee; background-color: #fafafa;">
             SELECT YOUR CURRENCY
         </div>
         <div class="currency-option-item active" data-code="BHD">
-            <img src="<?= BASE_URL ?>/assets/images/flags/bh.png" alt="Bahrain" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/bh.png" alt="Bahrain" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>Bahraini Dinar</span>
             <span class="currency-code-tag">BHD</span>
         </div>
         <div class="currency-option-item" data-code="KWD">
-            <img src="<?= BASE_URL ?>/assets/images/flags/kw.png" alt="Kuwait" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/kw.png" alt="Kuwait" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>Kuwaiti Dinar</span>
             <span class="currency-code-tag">KWD</span>
         </div>
         <div class="currency-option-item" data-code="SAR">
-            <img src="<?= BASE_URL ?>/assets/images/flags/sa.png" alt="Saudi Arabia" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/sa.png" alt="Saudi Arabia" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>Saudi Riyal</span>
             <span class="currency-code-tag">SAR</span>
         </div>
         <div class="currency-option-item" data-code="AED">
-            <img src="<?= BASE_URL ?>/assets/images/flags/ae.png" alt="UAE" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/ae.png" alt="UAE" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>UAE Dirham</span>
             <span class="currency-code-tag">AED</span>
         </div>
         <div class="currency-option-item" data-code="QAR">
-            <img src="<?= BASE_URL ?>/assets/images/flags/qa.png" alt="Qatar" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/qa.png" alt="Qatar" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>Qatari Riyal</span>
             <span class="currency-code-tag">QAR</span>
         </div>
         <div class="currency-option-item" data-code="OMR">
-            <img src="<?= BASE_URL ?>/assets/images/flags/om.png" alt="Oman" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/om.png" alt="Oman" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>Omani Rial</span>
             <span class="currency-code-tag">OMR</span>
         </div>
         <div class="currency-option-item" data-code="USD">
-            <img src="<?= BASE_URL ?>/assets/images/flags/us.png" alt="United States" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/us.png" alt="United States" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>US Dollar</span>
             <span class="currency-code-tag">$</span>
         </div>
         <div class="currency-option-item" data-code="EUR">
-            <img src="<?= BASE_URL ?>/assets/images/flags/eu.png" alt="Eurozone" class="currency-flag-img">
+            <img src="<?= BASE_URL ?>/assets/images/flags/eu.png" alt="Eurozone" class="currency-flag-img" loading="lazy" width="20" height="15">
             <span>Euro</span>
             <span class="currency-code-tag">€</span>
         </div>

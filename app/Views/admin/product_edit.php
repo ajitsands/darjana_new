@@ -24,6 +24,11 @@
                         <input type="text" name="name" value="<?= htmlspecialchars($product['name']) ?>" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="e.g. Royal Black Velvet Blazer Dress">
                     </div>
 
+                    <div style="margin-bottom: 18px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">اسم المنتج بالعربي (ARABIC PRODUCT NAME - OPTIONAL)</label>
+                        <input type="text" name="name_ar" value="<?= htmlspecialchars($product['name_ar'] ?? '') ?>" dir="rtl" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: 'Noto Naskh Arabic', 'Arial', sans-serif;" placeholder="أدخل اسم المنتج باللغة العربية (اختياري)...">
+                    </div>
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
                         <div>
                             <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">PRODUCT CODE</label>
@@ -31,11 +36,14 @@
                         </div>
                         <div>
                             <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">CATEGORY</label>
-                            <select name="category_id" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; background: #fff;">
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['id'] ?>" <?= $cat['id'] == $product['category_id'] ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
+                            <select name="category_id[]" multiple style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; background: #fff; height: 100px;">
+                                <?php 
+                                $selectedCats = explode(',', $product['category_id'] ?? '');
+                                foreach ($categories as $cat): ?>
+                                    <option value="<?= $cat['id'] ?>" <?= in_array($cat['id'], $selectedCats) ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <div style="font-size: 10.5px; color: #718096; margin-top: 4px;">Hold Ctrl (Win) or Cmd (Mac) to select multiple</div>
                         </div>
                     </div>
 
@@ -216,9 +224,15 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                         <textarea name="description_ar" dir="rtl" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; height: 100px; font-family: 'Noto Naskh Arabic', 'Arial', sans-serif; font-size: 14px;"><?= htmlspecialchars($product['description_ar'] ?? '') ?></textarea>
                     </div>
 
-                    <div style="margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="is_featured" value="1" id="is_featured" <?= $product['is_featured'] ? 'checked' : '' ?>>
-                        <label for="is_featured" style="font-size: 14px;">Show in Home Page Featured Collection</label>
+                    <div style="margin-bottom: 24px; display: flex; align-items: center; gap: 20px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="is_featured" value="1" id="is_featured" <?= $product['is_featured'] ? 'checked' : '' ?>>
+                            <label for="is_featured" style="font-size: 14px;">Show in Home Page Featured Collection</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="is_active" value="1" id="is_active" <?= (isset($product['is_active']) && $product['is_active']) ? 'checked' : '' ?>>
+                            <label for="is_active" style="font-size: 14px; font-weight: bold; color: var(--color-primary);">Display on Website (Product Available)</label>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; border-radius: 4px; font-size: 16px;">Save Changes</button>

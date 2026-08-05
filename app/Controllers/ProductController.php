@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../core/Controller.php';
 require_once __DIR__ . '/../Models/Product.php';
 require_once __DIR__ . '/../Models/Category.php';
+require_once __DIR__ . '/../Models/Setting.php';
 
 class ProductController extends Controller {
     public function index($slug) {
@@ -72,10 +73,14 @@ class ProductController extends Controller {
             fn($p) => $p['id'] !== $product['id']
         );
 
+        $settingModel = new Setting();
+        $settings = $settingModel->getAll();
+
         $data = [
             'pageTitle' => $product['name'] . ' | Dar Jana Fashion',
             'product' => $product,
-            'relatedProducts' => $relatedProducts
+            'relatedProducts' => $relatedProducts,
+            'settings' => $settings
         ];
 
         $this->render('products/detail', $data);

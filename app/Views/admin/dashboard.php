@@ -84,6 +84,11 @@
                                 <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="e.g. Royal Black Velvet Blazer Dress">
                             </div>
 
+                            <div style="margin-bottom: 14px;">
+                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">اسم المنتج بالعربي (ARABIC PRODUCT NAME - OPTIONAL)</label>
+                                <input type="text" name="name_ar" dir="rtl" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: 'Noto Naskh Arabic', 'Arial', sans-serif;" placeholder="أدخل اسم المنتج باللغة العربية (اختياري)...">
+                            </div>
+
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                                 <div>
                                     <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">PRODUCT CODE</label>
@@ -91,11 +96,12 @@
                                 </div>
                                 <div>
                                     <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">CATEGORY</label>
-                                    <select name="category_id" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; background: #fff;">
+                                    <select name="category_id[]" multiple style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; background: #fff; height: 80px;">
                                         <?php foreach ($categories as $cat): ?>
                                             <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <div style="font-size: 10.5px; color: #718096; margin-top: 4px;">Hold Ctrl (Win) or Cmd (Mac) to select multiple</div>
                                 </div>
                             </div>
 
@@ -257,9 +263,15 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                                 <span style="font-size: 11px; color: #718096;">If entered, Arabic description will appear above the English description on the product page.</span>
                             </div>
 
-                            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" name="is_featured" value="1" id="is_featured" checked>
-                                <label for="is_featured" style="font-size: 13px;">Show in Home Page Featured Collection</label>
+                            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 20px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" name="is_featured" value="1" id="is_featured" checked>
+                                    <label for="is_featured" style="font-size: 13px;">Show in Home Page Featured Collection</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" name="is_active" value="1" id="is_active" checked>
+                                    <label for="is_active" style="font-size: 13px; font-weight: bold; color: var(--color-primary);">Display on Website (Product Available)</label>
+                                </div>
                             </div>
 
                             <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 4px;">Publish Product</button>

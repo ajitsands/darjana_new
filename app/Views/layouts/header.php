@@ -2,14 +2,20 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($title) ? htmlspecialchars($title) . ' | Dar Jana Fashion' : 'Dar Jana Fashion | Luxury Abayas & Modest Couture' ?></title>
     
     <!-- Meta SEO -->
     <meta name="description" content="Discover luxury abayas, couture dresses, sets, and blazers at Dar Jana Fashion. Premium GCC delivery to Bahrain, Kuwait, Saudi Arabia, UAE, Qatar, and Oman.">
     <meta name="theme-color" content="#f3f3f3">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/web_logo_menu.png">
+
     <!-- Fonts & Core Stylesheet -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="<?= BASE_URL ?>/assets/css/style.css" as="style">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
     
     <!-- Base URL definition for JS engines -->
@@ -58,8 +64,13 @@
 
                 <!-- Header Actions (English, Account, Search, Cart Drawer) -->
                 <div class="header-actions">
-                    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--color-primary); cursor: pointer;" class="desktop-only-action">
-                        ENGLISH ˅
+                    <?php
+                        $currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
+                        $langDisplay = $currentLang === 'ar' ? 'العربية' : 'ENGLISH';
+                        $switchLangTo = $currentLang === 'ar' ? 'en' : 'ar';
+                    ?>
+                    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--color-primary); cursor: pointer; position: relative;" class="desktop-only-action" onclick="window.location.href='<?= BASE_URL ?>/lang/<?= $switchLangTo ?>'">
+                        <?= $langDisplay ?> ˅
                     </div>
 
                     <!-- Search Modal Trigger -->
@@ -104,8 +115,8 @@
             </ul>
         </div>
         <div class="mobile-menu-footer">
-            <div style="font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.15em;">
-                LANGUAGE: <span style="color: var(--color-accent);">ENGLISH</span>
+            <div style="font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.15em; cursor: pointer;" onclick="window.location.href='<?= BASE_URL ?>/lang/<?= $switchLangTo ?>'">
+                LANGUAGE: <span style="color: var(--color-accent);"><?= $langDisplay ?></span>
             </div>
             <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 6px;">
                 Customer Support: +973 3330 0160
