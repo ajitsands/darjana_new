@@ -63,8 +63,16 @@ if (!empty($product['media'])) {
         }
     }
 }
-$mediaItems = array_map("unserialize", array_unique(array_map("serialize", $mediaItems)));
-$mediaItems = array_values($mediaItems);
+$uniqueMedia = [];
+$seenUrls = [];
+foreach ($mediaItems as $item) {
+    $url = $item['high'] ?? $item['url'] ?? '';
+    if (!in_array($url, $seenUrls)) {
+        $seenUrls[] = $url;
+        $uniqueMedia[] = $item;
+    }
+}
+$mediaItems = $uniqueMedia;
 if (empty($mediaItems)) {
     $mediaItems[] = ['type' => 'image', 'thumb' => BASE_URL . '/public/assets/images/placeholder.jpg', 'high' => BASE_URL . '/public/assets/images/placeholder.jpg'];
 }
@@ -403,7 +411,7 @@ if (empty($mediaItems)) {
 </div>
 
 <script>
-    const mediaItems = <?= json_encode($mediaItems) ?>;
+    const mediaItems = <?= json_encode($mediaItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '[]' ?>;
 
     let currentImgIndex = 0;
     let currentZoomScale = 1.0;
