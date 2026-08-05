@@ -822,7 +822,7 @@ class AdminController extends Controller {
 
         $this->logActivity('ADD_PRODUCT', "Added new product: {$name} ({$code})");
 
-        $this->redirect(BASE_URL . '/admin?success=1');
+        $this->redirect(BASE_URL . '/admin/products?success=1');
     }
 
     public function generateTinyThumbnails() {
