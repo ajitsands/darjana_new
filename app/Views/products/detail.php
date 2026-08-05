@@ -736,7 +736,12 @@ if (empty($mediaItems)) {
             }
             if (mainImg) {
                 mainImg.style.display = 'block';
-                if (media.thumb) {
+                if (media.thumb && mainImg.src !== media.thumb) {
+                    mainImg.style.opacity = '0.4';
+                    mainImg.style.transition = 'opacity 0.3s ease';
+                    mainImg.onload = function() {
+                        mainImg.style.opacity = '1';
+                    };
                     mainImg.src = media.thumb;
                 }
             }
