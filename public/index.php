@@ -49,10 +49,12 @@ $router->add('POST', '/admin/login', 'AdminController@processLogin');
 $router->add('GET', '/admin/logout', 'AdminController@logout');
 
 $router->add('GET', '/admin', 'AdminController@index');
+$router->add('GET', '/admin/products', 'AdminController@products');
 $router->add('GET', '/admin/categories', 'AdminController@categories');
 $router->add('POST', '/admin/categories/add', 'AdminController@addCategory');
 $router->add('GET', '/admin/category/edit/{id}', 'AdminController@editCategory');
 $router->add('POST', '/admin/category/edit/{id}', 'AdminController@updateCategory');
+$router->add('POST', '/admin/category/toggle/{id}', 'AdminController@toggleCategoryStatus');
 $router->add('GET', '/admin/users', 'AdminController@users');
 $router->add('POST', '/admin/users/add', 'AdminController@addUser');
 $router->add('POST', '/admin/users/update/{id}', 'AdminController@updateUser');

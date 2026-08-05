@@ -16,7 +16,8 @@
                             <thead>
                                 <tr>
                                     <th>IMAGE</th>
-                                    <th>NAME & SLUG</th>
+                                    <th>NAME &amp; SLUG</th>
+                                    <th>STATUS</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
@@ -35,12 +36,25 @@
                                             <div style="font-size: 11px; color: var(--color-accent); font-weight: 700; margin-top: 2px;">/collections/<?= htmlspecialchars($c['slug']) ?></div>
                                         </td>
                                         <td>
+                                            <?php $isActive = $c['is_active'] ?? 1; ?>
+                                            <form action="<?= BASE_URL ?>/admin/category/toggle/<?= $c['id'] ?>" method="POST" style="display:inline;">
+                                                <button type="submit" style="
+                                                    border: none; cursor: pointer; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+                                                    letter-spacing: 0.05em; transition: all 0.2s;
+                                                    background: <?= $isActive ? '#22c55e' : '#ef4444' ?>;
+                                                    color: #fff;
+                                                " title="Click to <?= $isActive ? 'Deactivate' : 'Activate' ?>">
+                                                    <?= $isActive ? '● ACTIVE' : '● INACTIVE' ?>
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td>
                                             <a href="<?= BASE_URL ?>/admin/category/edit/<?= $c['id'] ?>" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px; text-decoration: none;">Edit</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <?php if (empty($categories)): ?>
-                                    <tr><td colspan="3" style="text-align: center; color: #718096; padding: 20px;">No categories found.</td></tr>
+                                    <tr><td colspan="4" style="text-align: center; color: #718096; padding: 20px;">No categories found.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>

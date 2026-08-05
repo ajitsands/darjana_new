@@ -79,7 +79,7 @@
                     </button>
 
                     <!-- Account / User Login -->
-                    <a href="<?= BASE_URL ?>/account" class="icon-btn" title="Account Login" aria-label="Account">
+                    <a href="<?= BASE_URL ?>/account" class="icon-btn" title="Account Login" aria-label="Account" style="display: none;">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </a>
 

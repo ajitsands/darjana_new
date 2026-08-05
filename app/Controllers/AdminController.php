@@ -353,32 +353,149 @@ class AdminController extends Controller {
 
     public function index() {
         $this->requireAuth();
-        $orderModel = new Order();
+        $orderModel  = new Order();
         $productModel = new Product();
-        $categoryModel = new Category();
+        $db = Database::getInstance();
 
-        $orders = $orderModel->getAllOrders();
-        $products = $productModel->getAll();
-        $categories = $categoryModel->getAll();
+        // --- Date filter ---
+        $startDate = $_GET['start_date'] ?? '';
+        $endDate   = $_GET['end_date']   ?? '';
 
-        // Calculate sales metrics
+        // Fetch orders filtered by date if provided
+        $orders = $orderModel->getAllOrders(
+            $startDate ?: null,
+            $endDate   ?: null,
+            0   // 0 = no limit
+        );
+
+        // --- KPI Stats ---
         $totalRevenue = 0;
+        $paidRevenue  = 0;
+        $pendingCount = 0;
+        $paidCount    = 0;
+        $failedCount  = 0;
         foreach ($orders as $order) {
             $totalRevenue += (float)$order['total_amount'];
+            $ps = strtolower($order['payment_status'] ?? 'pending');
+            if ($ps === 'paid') {
+                $paidRevenue += (float)$order['total_amount'];
+                $paidCount++;
+            } elseif ($ps === 'failed') {
+                $failedCount++;
+            } else {
+                $pendingCount++;
+            }
         }
 
+        // --- Revenue chart: group by day if ≤31 days, else by month ---
+        $chartData = [];
+        if ($startDate && $endDate) {
+            $diffDays = (int)((strtotime($endDate) - strtotime($startDate)) / 86400) + 1;
+            if ($diffDays <= 31) {
+                // Daily grouping within the range
+                $d = new DateTime($startDate);
+                $end = new DateTime($endDate);
+                while ($d <= $end) {
+                    $chartData[$d->format('Y-m-d')] = 0;
+                    $d->modify('+1 day');
+                }
+                foreach ($orders as $o) {
+                    $day = substr($o['created_at'] ?? '', 0, 10);
+                    if (isset($chartData[$day])) $chartData[$day] += (float)$o['total_amount'];
+                }
+            } else {
+                // Monthly grouping
+                $d = new DateTime($startDate);
+                $end = new DateTime($endDate);
+                $d->modify('first day of this month');
+                $end->modify('first day of next month');
+                while ($d < $end) {
+                    $chartData[$d->format('Y-m')] = 0;
+                    $d->modify('+1 month');
+                }
+                foreach ($orders as $o) {
+                    $month = substr($o['created_at'] ?? '', 0, 7);
+                    if (isset($chartData[$month])) $chartData[$month] += (float)$o['total_amount'];
+                }
+            }
+        } else {
+            // Default: last 6 months
+            for ($i = 5; $i >= 0; $i--) {
+                $chartData[date('Y-m', strtotime("-$i months"))] = 0;
+            }
+            foreach ($orders as $o) {
+                $month = substr($o['created_at'] ?? '', 0, 7);
+                if (isset($chartData[$month])) $chartData[$month] += (float)$o['total_amount'];
+            }
+        }
+
+        // --- Chart labels: format nicely ---
+        $chartLabels = array_map(function($k) {
+            if (strlen($k) === 10) return date('d M', strtotime($k));     // daily
+            return date('M Y', strtotime($k . '-01'));                      // monthly
+        }, array_keys($chartData));
+
+        // --- Top 5 products filtered by date ---
+        $topProducts = [];
+        try {
+            $tpSql = "SELECT oi.product_name, SUM(oi.quantity) as total_qty, SUM(oi.price * oi.quantity) as total_revenue
+                      FROM order_items oi
+                      JOIN orders o ON oi.order_id = o.id";
+            $tpParams = [];
+            if ($startDate && $endDate) {
+                $tpSql .= " WHERE DATE(o.created_at) >= ? AND DATE(o.created_at) <= ?";
+                $tpParams = [$startDate, $endDate];
+            }
+            $tpSql .= " GROUP BY oi.product_name ORDER BY total_qty DESC LIMIT 5";
+            $stmt = $db->prepare($tpSql);
+            $stmt->execute($tpParams);
+            $topProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {}
+
+        // --- Recent 5 orders (from filtered set) ---
+        $recentOrders = array_slice($orders, 0, 5);
+
+        // --- Total products (always all) ---
+        $totalProductsCount = count($productModel->getAll());
+
         $data = [
-            'pageTitle' => 'Admin Dashboard | Dar Jana Fashion',
-            'orders' => $orders,
-            'products' => $products,
-            'categories' => $categories,
-            'totalRevenue' => number_format($totalRevenue, 2, '.', ''),
-            'totalOrdersCount' => count($orders),
-            'totalProductsCount' => count($products)
+            'pageTitle'          => 'Admin Dashboard | Dar Jana Fashion',
+            'totalRevenue'       => number_format($totalRevenue, 3, '.', ','),
+            'paidRevenue'        => number_format($paidRevenue,  3, '.', ','),
+            'totalOrdersCount'   => count($orders),
+            'totalProductsCount' => $totalProductsCount,
+            'pendingCount'       => $pendingCount,
+            'paidCount'          => $paidCount,
+            'failedCount'        => $failedCount,
+            'chartLabels'        => $chartLabels,
+            'chartData'          => array_values($chartData),
+            'topProducts'        => $topProducts,
+            'recentOrders'       => $recentOrders,
+            'startDate'          => $startDate,
+            'endDate'            => $endDate,
         ];
 
         $this->render('admin/dashboard', $data, 'admin');
     }
+
+    public function products() {
+        $this->requireAuth();
+        $productModel = new Product();
+        $categoryModel = new Category();
+
+        $products = $productModel->getAll();
+        $categories = $categoryModel->getAll();
+
+        $data = [
+            'pageTitle'  => 'Products | Admin Dashboard',
+            'products'   => $products,
+            'categories' => $categories,
+            'totalProductsCount' => count($products),
+        ];
+
+        $this->render('admin/products', $data, 'admin');
+    }
+
 
     public function orders() {
         $this->requireAuth();
@@ -874,6 +991,22 @@ class AdminController extends Controller {
                 $stmt->execute([$name, $slug, $description, $imagePath, $id]);
                 $this->logActivity('CATEGORY_EDIT', "Updated category: $name");
             }
+        }
+        $this->redirect(BASE_URL . '/admin/categories');
+    }
+
+    public function toggleCategoryStatus($id) {
+        $this->requireAuth();
+        $db = Database::getInstance();
+        // Get current status
+        $stmt = $db->prepare("SELECT is_active FROM categories WHERE id = ?");
+        $stmt->execute([$id]);
+        $cat = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($cat) {
+            $newStatus = ($cat['is_active'] ?? 1) ? 0 : 1;
+            $stmt = $db->prepare("UPDATE categories SET is_active = ? WHERE id = ?");
+            $stmt->execute([$newStatus, $id]);
+            $this->logActivity('CATEGORY_TOGGLE', "Set category ID $id is_active = $newStatus");
         }
         $this->redirect(BASE_URL . '/admin/categories');
     }

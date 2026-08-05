@@ -1,325 +1,252 @@
 <?php include __DIR__ . '/header.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <div class="admin-main">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <div>
                     <h1 style="font-size: 26px;">Store Performance Dashboard</h1>
-                    <p style="color: #718096; font-size: 14px;">Manage orders, product catalog, and sales revenue for Dar Jana Fashion</p>
+                    <p style="color: #718096; font-size: 14px;">Analytics overview for Dar Jana Fashion</p>
+                </div>
+                <div style="font-size: 13px; color: #718096;"><?= date('l, d F Y') ?></div>
+            </div>
+
+            <!-- ===== DATE RANGE FILTER BAR ===== -->
+            <form method="GET" action="" id="dateFilterForm" style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px; margin-bottom:28px; display:flex; flex-wrap:wrap; align-items:center; gap:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <!-- Quick preset buttons -->
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <?php
+                        $presets = [
+                            'today'      => ['Today',       date('Y-m-d'),                          date('Y-m-d')],
+                            'this_week'  => ['This Week',   date('Y-m-d', strtotime('monday this week')), date('Y-m-d')],
+                            'this_month' => ['This Month',  date('Y-m-01'),                         date('Y-m-d')],
+                            'last_month' => ['Last Month',  date('Y-m-01', strtotime('first day of last month')), date('Y-m-t', strtotime('last month'))],
+                            'this_year'  => ['This Year',   date('Y-01-01'),                        date('Y-m-d')],
+                        ];
+                    ?>
+                    <?php foreach ($presets as $key => [$label, $ps, $pe]): ?>
+                        <?php $isActive = ($startDate === $ps && $endDate === $pe); ?>
+                        <button type="button" onclick="setPreset('<?= $ps ?>','<?= $pe ?>')" style="
+                            padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer;
+                            border:1.5px solid <?= $isActive ? '#c5a059' : '#e2e8f0' ?>;
+                            background:<?= $isActive ? '#c5a059' : '#fff' ?>;
+                            color:<?= $isActive ? '#fff' : '#4a5568' ?>;
+                            transition:all 0.15s;
+                        "><?= $label ?></button>
+                    <?php endforeach; ?>
+                    <?php if (!$startDate && !$endDate): ?>
+                        <button type="button" style="padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid #c5a059; background:#c5a059; color:#fff; cursor:default;">All Time</button>
+                    <?php else: ?>
+                        <button type="button" onclick="clearFilter()" style="padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid #e2e8f0; background:#fff; color:#4a5568; cursor:pointer;">All Time</button>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Divider -->
+                <div style="width:1px; height:30px; background:#e2e8f0;"></div>
+
+                <!-- Custom date inputs -->
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <label style="font-size:12px; font-weight:600; color:#718096;">FROM</label>
+                    <input type="date" id="start_date" name="start_date" value="<?= htmlspecialchars($startDate) ?>" style="padding:7px 10px; border:1px solid #e2e8f0; border-radius:6px; font-size:13px; color:#181818;">
+                    <label style="font-size:12px; font-weight:600; color:#718096;">TO</label>
+                    <input type="date" id="end_date" name="end_date" value="<?= htmlspecialchars($endDate) ?>" style="padding:7px 10px; border:1px solid #e2e8f0; border-radius:6px; font-size:13px; color:#181818;">
+                    <button type="submit" style="padding:7px 20px; background:#181818; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;">Apply</button>
+                </div>
+
+                <?php if ($startDate && $endDate): ?>
+                    <div style="font-size:12px; color:#c5a059; font-weight:600; margin-left:auto;">
+                        Showing: <?= date('d M Y', strtotime($startDate)) ?> – <?= date('d M Y', strtotime($endDate)) ?>
+                    </div>
+                <?php endif; ?>
+            </form>
+
+            <script>
+            function setPreset(start, end) {
+                document.getElementById('start_date').value = start;
+                document.getElementById('end_date').value = end;
+                document.getElementById('dateFilterForm').submit();
+            }
+            function clearFilter() {
+                document.getElementById('start_date').value = '';
+                document.getElementById('end_date').value = '';
+                document.getElementById('dateFilterForm').submit();
+            }
+            </script>
+
+            <!-- KPI Cards Row -->
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 32px;">
+                <div class="stat-card" style="border-left: 4px solid #c5a059;">
+                    <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">TOTAL REVENUE</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #c5a059;"><?= $totalRevenue ?> <span style="font-size:13px;">BHD</span></div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #22c55e;">
+                    <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">PAID REVENUE</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #22c55e;"><?= $paidRevenue ?> <span style="font-size:13px;">BHD</span></div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #181818;">
+                    <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">TOTAL ORDERS</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #181818;"><?= $totalOrdersCount ?></div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #f97316;">
+                    <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">PENDING ORDERS</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #f97316;"><?= $pendingCount ?></div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #3b82f6;">
+                    <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">PRODUCTS IN CATALOG</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #181818;"><?= $totalProductsCount ?></div>
                 </div>
             </div>
 
-            <!-- Stats Metric Cards -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px;">
-                <div class="stat-card">
-                    <div style="font-size: 12px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em;">TOTAL SALES REVENUE</div>
-                    <div style="font-size: 28px; font-weight: 700; color: var(--color-accent); margin-top: 6px;"><?= $totalRevenue ?> BHD</div>
+            <!-- Order Status Badges Row -->
+            <div style="display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap;">
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px 20px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                    <span style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block;"></span>
+                    <span style="font-size: 13px; font-weight: 600;">Paid: <strong style="color:#22c55e;"><?= $paidCount ?></strong></span>
                 </div>
-                <div class="stat-card">
-                    <div style="font-size: 12px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em;">TOTAL ORDERS</div>
-                    <div style="font-size: 28px; font-weight: 700; color: #181818; margin-top: 6px;"><?= $totalOrdersCount ?></div>
+                <div style="background: #fff7ed; border: 1px solid #fed7aa; padding: 12px 20px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                    <span style="width: 10px; height: 10px; background: #f97316; border-radius: 50%; display: inline-block;"></span>
+                    <span style="font-size: 13px; font-weight: 600;">Pending: <strong style="color:#f97316;"><?= $pendingCount ?></strong></span>
                 </div>
-                <div class="stat-card">
-                    <div style="font-size: 12px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em;">PRODUCTS IN CATALOG</div>
-                    <div style="font-size: 28px; font-weight: 700; color: #181818; margin-top: 6px;"><?= $totalProductsCount ?></div>
+                <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 12px 20px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                    <span style="width: 10px; height: 10px; background: #ef4444; border-radius: 50%; display: inline-block;"></span>
+                    <span style="font-size: 13px; font-weight: 600;">Failed: <strong style="color:#ef4444;"><?= $failedCount ?></strong></span>
+                </div>
+                <a href="<?= BASE_URL ?>/admin/orders" style="background: #181818; color: #fff; padding: 12px 22px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                    View All Orders →
+                </a>
+            </div>
+
+            <!-- Charts Row -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+
+                <!-- Revenue Chart -->
+                <div style="background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                    <div style="font-size: 14px; font-weight: 700; color: #181818; margin-bottom: 18px; font-family: var(--heading-font-family); letter-spacing: 0.05em;">REVENUE – LAST 6 MONTHS (BHD)</div>
+                    <canvas id="revenueChart" height="120"></canvas>
+                </div>
+
+                <!-- Order Status Doughnut -->
+                <div style="background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="font-size: 14px; font-weight: 700; color: #181818; margin-bottom: 18px; font-family: var(--heading-font-family); letter-spacing: 0.05em; align-self: flex-start;">ORDER STATUS BREAKDOWN</div>
+                    <canvas id="statusChart" style="max-width: 200px; max-height: 200px;"></canvas>
+                    <div style="margin-top: 16px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;">
+                        <span style="font-size: 12px; font-weight: 600; color: #22c55e;">● Paid (<?= $paidCount ?>)</span>
+                        <span style="font-size: 12px; font-weight: 600; color: #f97316;">● Pending (<?= $pendingCount ?>)</span>
+                        <span style="font-size: 12px; font-weight: 600; color: #ef4444;">● Failed (<?= $failedCount ?>)</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- Bottom Row: Top Products + Recent Orders -->
+            <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px;">
 
-            <!-- Add Product Form & Catalog List -->
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px;">
-                <!-- Product List -->
-                <div>
-                    <h3 style="font-size: 18px; margin-bottom: 16px;">Product Catalog</h3>
-                    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-                    <style>
-                        /* Custom DataTable Styling for Dar Jana Admin */
-                        #productsTable_wrapper { margin-top: 10px; font-size: 13px; }
-                        #productsTable_wrapper .dataTables_filter input { border: 1px solid #cbd5e0; padding: 4px 8px; border-radius: 4px; margin-left: 8px; }
-                        #productsTable_wrapper .dataTables_length select { border: 1px solid #cbd5e0; padding: 4px; border-radius: 4px; }
-                        table.dataTable thead th { border-bottom: 2px solid #e2e8f0; font-size: 12px; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--heading-font-family); padding: 12px; }
-                        table.dataTable tbody td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
-                        table.dataTable.no-footer { border-bottom: 1px solid #e2e8f0; }
-                    </style>
-                    <div class="table-responsive">
-                        <table id="productsTable" class="display" style="width:100%">
-                            <thead>
+                <!-- Top 5 Products -->
+                <div style="background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                    <div style="font-size: 14px; font-weight: 700; color: #181818; margin-bottom: 16px; font-family: var(--heading-font-family); letter-spacing: 0.05em;">TOP SELLING PRODUCTS</div>
+                    <?php if (!empty($topProducts)): ?>
+                        <?php foreach ($topProducts as $i => $tp): ?>
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; <?= $i === count($topProducts) - 1 ? 'border-bottom:none;' : '' ?>">
+                                <div style="width: 28px; height: 28px; background: <?= ['#c5a059','#181818','#3b82f6','#22c55e','#f97316'][$i] ?>; color:#fff; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 12px; font-weight: 700; flex-shrink: 0;"><?= $i + 1 ?></div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= htmlspecialchars($tp['product_name']) ?></div>
+                                    <div style="font-size: 11px; color: #718096;"><?= (int)$tp['total_qty'] ?> units · <?= number_format((float)$tp['total_revenue'], 3) ?> BHD</div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div style="color: #718096; font-size: 13px; text-align: center; padding: 30px 0;">No order data yet.</div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Recent Orders -->
+                <div style="background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 700; color: #181818; font-family: var(--heading-font-family); letter-spacing: 0.05em;">RECENT ORDERS</div>
+                        <a href="<?= BASE_URL ?>/admin/orders" style="font-size: 12px; color: #c5a059; font-weight: 600; text-decoration: none;">View All →</a>
+                    </div>
+                    <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="color: #718096;">
+                                <th style="text-align:left; padding: 6px 10px; font-size: 11px; font-weight: 600; letter-spacing:0.05em; border-bottom: 1px solid #e2e8f0;">ORDER #</th>
+                                <th style="text-align:left; padding: 6px 10px; font-size: 11px; font-weight: 600; letter-spacing:0.05em; border-bottom: 1px solid #e2e8f0;">CUSTOMER</th>
+                                <th style="text-align:left; padding: 6px 10px; font-size: 11px; font-weight: 600; letter-spacing:0.05em; border-bottom: 1px solid #e2e8f0;">AMOUNT</th>
+                                <th style="text-align:left; padding: 6px 10px; font-size: 11px; font-weight: 600; letter-spacing:0.05em; border-bottom: 1px solid #e2e8f0;">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($recentOrders as $ro): ?>
+                                <?php
+                                    $st = strtolower($ro['payment_status'] ?? 'pending');
+                                    $badgeColor = $st === 'paid' ? '#22c55e' : ($st === 'failed' ? '#ef4444' : '#f97316');
+                                    $statusLabel = ucfirst($ro['payment_status'] ?? 'Pending');
+                                ?>
                                 <tr>
-                                    <th>IMAGE</th>
-                                    <th>CODE & NAME</th>
-                                    <th>CATEGORY</th>
-                                    <th>TAG FORMAT</th>
-                                    <th>PRICE</th>
-                                    <th>ACTION</th>
+                                    <td style="padding: 10px 10px; border-bottom: 1px solid #f1f5f9;">
+                                        <a href="<?= BASE_URL ?>/admin/order/<?= $ro['id'] ?>" style="color:#181818; font-weight:600; text-decoration:none;"><?= htmlspecialchars($ro['order_number']) ?></a>
+                                    </td>
+                                    <td style="padding: 10px 10px; border-bottom: 1px solid #f1f5f9;"><?= htmlspecialchars($ro['customer_name']) ?></td>
+                                    <td style="padding: 10px 10px; border-bottom: 1px solid #f1f5f9; font-weight:600;"><?= number_format((float)$ro['total_amount'], 3) ?> BHD</td>
+                                    <td style="padding: 10px 10px; border-bottom: 1px solid #f1f5f9;">
+                                        <span style="background: <?= $badgeColor ?>22; color: <?= $badgeColor ?>; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;"><?= $statusLabel ?></span>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- jQuery and DataTables -->
-                    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-                    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                    <script>
-                        $(document).ready(function() {
-                            $('#productsTable').DataTable({
-                                "ajax": "<?= BASE_URL ?>/admin/products/ajax",
-                                "processing": true,
-                                "pageLength": 20,
-                                "ordering": false,
-                                "language": {
-                                    "search": "Search Products:",
-                                    "lengthMenu": "Show _MENU_ products per page"
-                                }
-                            });
-                        });
-                    </script>
-                </div>
-
-                <!-- Add Product Form -->
-                <div>
-                    <h3 style="font-size: 18px; margin-bottom: 16px;">Add New Dress / Abaya</h3>
-                    <div style="background: #fff; padding: 24px; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <form action="<?= BASE_URL ?>/admin/product/add" method="POST" enctype="multipart/form-data">
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">PRODUCT NAME</label>
-                                <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="e.g. Royal Black Velvet Blazer Dress">
-                            </div>
-
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">اسم المنتج بالعربي (ARABIC PRODUCT NAME - OPTIONAL)</label>
-                                <input type="text" name="name_ar" dir="rtl" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: 'Noto Naskh Arabic', 'Arial', sans-serif;" placeholder="أدخل اسم المنتج باللغة العربية (اختياري)...">
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">PRODUCT CODE</label>
-                                    <input type="text" name="product_code" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="C:6900">
-                                </div>
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">CATEGORY</label>
-                                    <select name="category_id[]" multiple style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; background: #fff; height: 80px;">
-                                        <?php foreach ($categories as $cat): ?>
-                                            <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <div style="font-size: 10.5px; color: #718096; margin-top: 4px;">Hold Ctrl (Win) or Cmd (Mac) to select multiple</div>
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">REGULAR PRICE (BHD)</label>
-                                    <input type="number" step="0.01" id="regular_price" name="price" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="45.00">
-                                </div>
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">SALE PRICE (BHD)</label>
-                                    <input type="number" step="0.01" id="sale_price" name="sale_price" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="Optional">
-                                </div>
-                            </div>
-
-                            <!-- OFFER TAG FORMAT SELECTION (% OFF vs SAVE AMOUNT BHD) -->
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">OFFER TAG DISPLAY FORMAT <span id="offer_tag_preview" style="margin-left: 10px; background: #e53e3e; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; display: none;"></span></label>
-                                <select id="offer_tag_type" name="offer_tag_type" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; background: #fff;">
-                                    <option value="percentage">Percentage Discount (% OFF e.g. 16% OFF)</option>
-                                    <option value="amount">Amount Saved (SAVE BHD e.g. SAVE 10 BHD)</option>
-                                </select>
-                            </div>
-
-                            <!-- VARIANT OPTIONS: COLORS & COMBINATIONS -->
-                                                        <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABLE COLORS / COMBINATIONS</label>
-                                <div id="colorBuilderContainer" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 4px;">
-                                    <div id="colorRows"></div>
-                                    <button type="button" onclick="addColorRow()" style="margin-top: 10px; background: #fff; border: 1px dashed #cbd5e0; padding: 6px 12px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: 600; color: #4a5568;">+ Add Color Option</button>
-                                </div>
-                                <input type="hidden" name="colors" id="colorsJsonOutput" value="Black, Red, Green & Red, Blue & Gray, Beige">
-                            </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const colorsJsonOutput = document.getElementById('colorsJsonOutput');
-    const colorRowsContainer = document.getElementById('colorRows');
-    if(!colorsJsonOutput || !colorRowsContainer) return;
-    
-    let initialData = [];
-    try {
-        let raw = colorsJsonOutput.value;
-        if (raw.startsWith('[') || raw.startsWith('{')) {
-            initialData = JSON.parse(raw);
-        } else {
-            // Fallback for comma separated
-            let parts = raw.split(',').map(s => s.trim()).filter(s => s);
-            parts.forEach(p => {
-                initialData.push({ name: p, color1: '#181818' });
-            });
-        }
-    } catch(e) {}
-    
-    if (initialData.length === 0) {
-        initialData.push({ name: 'Black', color1: '#181818' });
-    }
-    
-    initialData.forEach(item => addColorRow(item.name, item.color1, item.color2, item.color3));
-    
-    // Bind form submit to update JSON
-    const form = colorsJsonOutput.closest('form');
-    if (form) {
-        form.addEventListener('submit', function() {
-            const rows = colorRowsContainer.querySelectorAll('.color-row');
-            let result = [];
-            rows.forEach(row => {
-                let name = row.querySelector('.c-name').value.trim();
-                let count = parseInt(row.querySelector('.c-count').value);
-                let c1 = row.querySelector('.c-1').value;
-                let c2 = row.querySelector('.c-2').value;
-                let c3 = row.querySelector('.c-3').value;
-                if (name) {
-                    let obj = { name: name, color1: c1 };
-                    if (count >= 2) obj.color2 = c2;
-                    if (count === 3) obj.color3 = c3;
-                    result.push(obj);
-                }
-            });
-            colorsJsonOutput.value = JSON.stringify(result);
-        });
-    }
-});
-
-function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
-    const container = document.getElementById('colorRows');
-    const numColors = (c3) ? 3 : (c2 ? 2 : 1);
-    
-    const div = document.createElement('div');
-    div.className = 'color-row';
-    div.style.display = 'flex';
-    div.style.gap = '8px';
-    div.style.alignItems = 'center';
-    div.style.marginBottom = '8px';
-    
-    div.innerHTML = `
-        <input type="text" class="c-name" placeholder="Color Name (e.g. Green & Red)" value="${name}" style="flex: 1; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 12px;">
-        <select class="c-count" onchange="const v=parseInt(this.value); this.parentElement.querySelector('.c-2').style.display=(v>=2)?'inline-block':'none'; this.parentElement.querySelector('.c-3').style.display=(v===3)?'inline-block':'none';" style="padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 12px;">
-            <option value="1" ${numColors===1?'selected':''}>1 Color</option>
-            <option value="2" ${numColors===2?'selected':''}>2 Colors</option>
-            <option value="3" ${numColors===3?'selected':''}>3 Colors</option>
-        </select>
-        <input type="color" class="c-1" value="${c1}" title="Color 1" style="width: 32px; height: 32px; padding: 0; border: none; cursor: pointer;">
-        <input type="color" class="c-2" value="${c2 || '#ffffff'}" title="Color 2" style="width: 32px; height: 32px; padding: 0; border: none; cursor: pointer; display: ${numColors >= 2 ? 'inline-block' : 'none'};">
-        <input type="color" class="c-3" value="${c3 || '#ffffff'}" title="Color 3" style="width: 32px; height: 32px; padding: 0; border: none; cursor: pointer; display: ${numColors === 3 ? 'inline-block' : 'none'};">
-        <button type="button" onclick="this.parentElement.remove()" style="background: #fed7d7; border: none; color: #c53030; cursor: pointer; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-weight: bold;">X</button>
-    `;
-    
-    container.appendChild(div);
-}
-</script>
-
-                            <!-- VARIANT OPTIONS: SIZES -->
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABLE SIZES (Comma Separated)</label>
-                                <input type="text" name="sizes" value="S, M, L, XL, XXL" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="e.g. S, M, L, XL, XXL">
-                            </div>
-
-                            <!-- VARIANT OPTIONS: LENGTHS -->
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABLE LENGTHS IN INCHES (Comma Separated)</label>
-                                <input type="text" name="lengths" value="52, 54, 55, 56, 57, 58, 60" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="e.g. 52, 54, 55, 56, 57, 58, 60">
-                            </div>
-
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">PRIMARY IMAGE</label>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                    <div>
-                                        <label style="display: block; font-size: 11px; margin-bottom: 4px; color: #718096;">Upload Image File (Overrides URL)</label>
-                                        <input type="file" name="primary_image_file" accept="image/*" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
-                                    </div>
-                                    <div>
-                                        <label style="display: block; font-size: 11px; margin-bottom: 4px; color: #718096;">Or Image URL</label>
-                                        <input type="url" name="image" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="https://images.unsplash.com/...">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; background: #f8fafc; padding: 16px; border-radius: 4px; border: 1px solid #e2e8f0;">
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--color-primary);">UPLOAD GALLERY IMAGES</label>
-                                    <input type="file" name="gallery_images[]" multiple accept="image/*" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
-                                    <div style="font-size: 10.5px; color: #64748b; margin-top: 4px;">You can select multiple high-res images. Will be automatically compressed for display.</div>
-                                </div>
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--color-primary);">UPLOAD PRODUCT VIDEO</label>
-                                    <input type="file" name="product_video" accept="video/mp4,video/webm" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
-                                    <div style="font-size: 10.5px; color: #e53e3e; margin-top: 4px; font-weight: 600;">Max Size: 5.5 MB (MP4/WebM)</div>
-                                </div>
-                            </div>
-
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">DESCRIPTION (ENGLISH)</label>
-                                <textarea name="description" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; height: 70px;" placeholder="Describe fabric, cut, and embellishments..."></textarea>
-                            </div>
-
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">الوصف بالعربي (ARABIC DESCRIPTION - OPTIONAL)</label>
-                                <textarea name="description_ar" dir="rtl" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; height: 70px; font-family: 'Noto Naskh Arabic', 'Arial', sans-serif; font-size: 14px;" placeholder="أدخل وصف المنتج باللغة العربية (اختياري)..."></textarea>
-                                <span style="font-size: 11px; color: #718096;">If entered, Arabic description will appear above the English description on the product page.</span>
-                            </div>
-
-                            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 20px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" name="is_featured" value="1" id="is_featured" checked>
-                                    <label for="is_featured" style="font-size: 13px;">Show in Home Page Featured Collection</label>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" name="is_active" value="1" id="is_active" checked>
-                                    <label for="is_active" style="font-size: 13px; font-weight: bold; color: var(--color-primary);">Display on Website (Product Available)</label>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 4px;">Publish Product</button>
-                        </form>
-                    </div>
+                            <?php endforeach; ?>
+                            <?php if (empty($recentOrders)): ?>
+                                <tr><td colspan="4" style="text-align: center; padding: 20px; color: #718096;">No orders yet.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
         </div>
     </div>
 
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const regPriceInput = document.getElementById('regular_price');
-    const salePriceInput = document.getElementById('sale_price');
-    const tagTypeSelect = document.getElementById('offer_tag_type');
-    const previewSpan = document.getElementById('offer_tag_preview');
+// --- Revenue Line Chart ---
+const revenueLabels = <?= json_encode($chartLabels) ?>;
+const revenueData   = <?= json_encode($chartData) ?>;
 
-    function updatePreview() {
-        if (!regPriceInput || !salePriceInput || !tagTypeSelect || !previewSpan) return;
-        
-        const regPrice = parseFloat(regPriceInput.value);
-        const salePrice = parseFloat(salePriceInput.value);
-        const tagType = tagTypeSelect.value;
-
-        if (isNaN(regPrice) || isNaN(salePrice) || salePrice >= regPrice || salePrice <= 0) {
-            previewSpan.style.display = 'none';
-            return;
-        }
-
-        previewSpan.style.display = 'inline-block';
-        if (tagType === 'percentage') {
-            const percent = Math.round(((regPrice - salePrice) / regPrice) * 100);
-            previewSpan.textContent = percent + '% OFF';
-        } else {
-            const saved = (regPrice - salePrice).toFixed(2);
-            previewSpan.textContent = 'SAVE ' + saved.replace(/\.00$/, '') + ' BHD';
+new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+        labels: revenueLabels,
+        datasets: [{
+            label: 'Revenue (BHD)',
+            data: revenueData,
+            backgroundColor: 'rgba(197,160,89,0.18)',
+            borderColor: '#c5a059',
+            borderWidth: 2,
+            borderRadius: 6,
+            hoverBackgroundColor: 'rgba(197,160,89,0.35)',
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: v => v + ' BHD' } },
+            x: { grid: { display: false } }
         }
     }
+});
 
-    if (regPriceInput) regPriceInput.addEventListener('input', updatePreview);
-    if (salePriceInput) salePriceInput.addEventListener('input', updatePreview);
-    if (tagTypeSelect) tagTypeSelect.addEventListener('change', updatePreview);
-    
-    updatePreview();
+// --- Status Doughnut Chart ---
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Paid', 'Pending', 'Failed'],
+        datasets: [{
+            data: [<?= $paidCount ?>, <?= $pendingCount ?>, <?= $failedCount ?>],
+            backgroundColor: ['#22c55e', '#f97316', '#ef4444'],
+            borderWidth: 0,
+            hoverOffset: 6
+        }]
+    },
+    options: {
+        cutout: '70%',
+        responsive: true,
+        plugins: { legend: { display: false } }
+    }
 });
 </script>
 </body>
-
 </html>
