@@ -53,8 +53,8 @@ class Database {
             $sql = file_get_contents($schemaFile);
             // Replace MySQL specific syntax for SQLite compatibility
             $sqliteSql = str_replace(
-                ['AUTO_INCREMENT', 'ENGINE=InnoDB', 'DEFAULT CHARSET=utf8mb4', 'VARCHAR(255)', 'VARCHAR(100)', 'TEXT', 'DATETIME DEFAULT CURRENT_TIMESTAMP'],
-                ['AUTOINCREMENT', '', '', 'TEXT', 'TEXT', 'TEXT', 'DATETIME DEFAULT CURRENT_TIMESTAMP'],
+                ['AUTO_INCREMENT', 'ENGINE=InnoDB', 'DEFAULT CHARSET=utf8mb4', 'VARCHAR(255)', 'VARCHAR(100)', 'TEXT', 'DATETIME DEFAULT CURRENT_TIMESTAMP', 'INSERT IGNORE'],
+                ['AUTOINCREMENT', '', '', 'TEXT', 'TEXT', 'TEXT', 'DATETIME DEFAULT CURRENT_TIMESTAMP', 'INSERT OR IGNORE'],
                 $sql
             );
             $this->pdo->exec($sqliteSql);

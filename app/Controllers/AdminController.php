@@ -820,6 +820,91 @@ class AdminController extends Controller {
         $this->redirect(BASE_URL . '/admin?success=1');
     }
 
+    public function generateTinyThumbnails() {
+        $this->requireAuth();
+        $db = Database::getInstance();
+        $products = $db->query("SELECT id, name, media FROM products")->fetchAll(PDO::FETCH_ASSOC);
+
+        $uploadDir = __DIR__ . '/../../public/uploads/products/';
+        $thumbDir = $uploadDir . 'thumb/';
+        $highDir = $uploadDir . 'high/';
+        $tinyDir = $uploadDir . 'tiny/';
+
+        if (!is_dir($tinyDir)) {
+            mkdir($tinyDir, 0755, true);
+        }
+
+        $updatedCount = 0;
+
+        foreach ($products as $product) {
+            if (!$product['media']) continue;
+            
+            $media = json_decode($product['media'], true);
+            if (!is_array($media)) continue;
+            
+            $changed = false;
+            
+            foreach ($media as &$item) {
+                if ($item['type'] === 'image') {
+                    if (!isset($item['tiny'])) {
+                        // Extract filename from thumb URL
+                        $thumbUrl = $item['thumb'];
+                        $fileName = basename(parse_url($thumbUrl, PHP_URL_PATH));
+                        
+                        $sourcePath = $highDir . $fileName;
+                        if (!file_exists($sourcePath)) {
+                            $sourcePath = $thumbDir . $fileName;
+                        }
+                        
+                        $tinyPath = $tinyDir . $fileName;
+                        
+                        if (file_exists($sourcePath) && !file_exists($tinyPath)) {
+                            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                            $source = null;
+                            if (in_array($ext, ['jpg', 'jpeg'])) {
+                                $source = @imagecreatefromjpeg($sourcePath);
+                            } elseif ($ext === 'png') {
+                                $source = @imagecreatefrompng($sourcePath);
+                            } elseif ($ext === 'webp') {
+                                $source = @imagecreatefromwebp($sourcePath);
+                            }
+                            
+                            if ($source) {
+                                $width = imagesx($source);
+                                $height = imagesy($source);
+                                $tinyWidth = min($width, 150);
+                                $tinyHeight = ($height / $width) * $tinyWidth;
+                                $tinyImage = imagecreatetruecolor($tinyWidth, $tinyHeight);
+                                imagefill($tinyImage, 0, 0, imagecolorallocate($tinyImage, 255, 255, 255));
+                                imagecopyresampled($tinyImage, $source, 0, 0, 0, 0, $tinyWidth, $tinyHeight, $width, $height);
+                                imagejpeg($tinyImage, $tinyPath, 75);
+                                imagedestroy($tinyImage);
+                                imagedestroy($source);
+                                
+                                $baseUrlStr = substr($thumbUrl, 0, strpos($thumbUrl, '/uploads/products/thumb/'));
+                                $item['tiny'] = $baseUrlStr . '/uploads/products/tiny/' . $fileName;
+                                $changed = true;
+                            }
+                        } elseif (file_exists($tinyPath) && !isset($item['tiny'])) {
+                             $baseUrlStr = substr($thumbUrl, 0, strpos($thumbUrl, '/uploads/products/thumb/'));
+                             $item['tiny'] = $baseUrlStr . '/uploads/products/tiny/' . $fileName;
+                             $changed = true;
+                        }
+                    }
+                }
+            }
+            
+            if ($changed) {
+                $newMediaJson = json_encode($media);
+                $stmt = $db->prepare("UPDATE products SET media = ? WHERE id = ?");
+                $stmt->execute([$newMediaJson, $product['id']]);
+                $updatedCount++;
+            }
+        }
+
+        echo "Done! Generated and updated tiny thumbnails for {$updatedCount} products. You can safely close this page.";
+    }
+
     private function processImageUpload($tmpName, $fileName) {
         $uploadDir = __DIR__ . '/../../public/uploads/products/';
         $thumbDir = $uploadDir . 'thumb/';
@@ -848,6 +933,18 @@ class AdminController extends Controller {
         $width = imagesx($source);
         $height = imagesy($source);
 
+        // Tiny Version (Max 150px width for small gallery icons)
+        $tinyDir = $uploadDir . 'tiny/';
+        if (!is_dir($tinyDir)) mkdir($tinyDir, 0755, true);
+        $tinyPath = $tinyDir . $newName;
+        $tinyWidth = min($width, 150);
+        $tinyHeight = ($height / $width) * $tinyWidth;
+        $tinyImage = imagecreatetruecolor($tinyWidth, $tinyHeight);
+        imagefill($tinyImage, 0, 0, imagecolorallocate($tinyImage, 255, 255, 255));
+        imagecopyresampled($tinyImage, $source, 0, 0, 0, 0, $tinyWidth, $tinyHeight, $width, $height);
+        imagejpeg($tinyImage, $tinyPath, 75);
+        imagedestroy($tinyImage);
+
         // Thumb Version (Max 800px width)
         $thumbWidth = min($width, 800);
         $thumbHeight = ($height / $width) * $thumbWidth;
@@ -870,6 +967,7 @@ class AdminController extends Controller {
 
         return [
             'type' => 'image',
+            'tiny' => BASE_URL . '/uploads/products/tiny/' . $newName,
             'thumb' => BASE_URL . '/uploads/products/thumb/' . $newName,
             'high' => BASE_URL . '/uploads/products/high/' . $newName
         ];

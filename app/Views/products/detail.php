@@ -113,7 +113,7 @@ if (empty($mediaItems)) {
                                 <video style="width:100%; height:100%; object-fit:cover; opacity:0.6;"><source src="<?= $item['url'] ?>"></video>
                             </div>
                         <?php else: ?>
-                            <img src="<?= $item['thumb'] ?>" class="gallery-thumb-img <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>" onclick="switchProductMedia(this, <?= $index ?>)">
+                            <img src="<?= $item['tiny'] ?? $item['thumb'] ?>" class="gallery-thumb-img <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>" onclick="switchProductMedia(this, <?= $index ?>)">
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
