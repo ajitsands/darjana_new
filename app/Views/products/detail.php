@@ -63,16 +63,8 @@ if (!empty($product['media'])) {
         }
     }
 }
-$uniqueMedia = [];
-$seenUrls = [];
-foreach ($mediaItems as $item) {
-    $url = $item['high'] ?? $item['url'] ?? '';
-    if (!in_array($url, $seenUrls)) {
-        $seenUrls[] = $url;
-        $uniqueMedia[] = $item;
-    }
-}
-$mediaItems = $uniqueMedia;
+$mediaItems = array_map("unserialize", array_unique(array_map("serialize", $mediaItems)));
+$mediaItems = array_values($mediaItems);
 if (empty($mediaItems)) {
     $mediaItems[] = ['type' => 'image', 'thumb' => BASE_URL . '/public/assets/images/placeholder.jpg', 'high' => BASE_URL . '/public/assets/images/placeholder.jpg'];
 }
@@ -121,7 +113,7 @@ if (empty($mediaItems)) {
                                 <video style="width:100%; height:100%; object-fit:cover; opacity:0.6;"><source src="<?= $item['url'] ?>"></video>
                             </div>
                         <?php else: ?>
-                            <img src="<?= $item['tiny'] ?? $item['thumb'] ?>" class="gallery-thumb-img <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>" onclick="switchProductMedia(this, <?= $index ?>)">
+                            <img src="<?= $item['thumb'] ?>" class="gallery-thumb-img <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>" onclick="switchProductMedia(this, <?= $index ?>)">
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
@@ -309,7 +301,7 @@ if (empty($mediaItems)) {
                         <div style="flex: 0 0 280px; min-width: 280px;">
                             <div style="position: relative; width: 100%; padding-top: 135%; overflow: hidden; background-color: #e5e5e5;">
                                 <a href="<?= BASE_URL ?>/product/<?= $relProduct['slug'] ?>" style="position: absolute; inset: 0; display: block;">
-                                    <img src="<?= str_replace('/uploads/products/high/', '/uploads/products/thumb/', $relProduct['image']) ?>"
+                                    <img src="<?= $relProduct['image'] ?>"
                                          alt="<?= htmlspecialchars($relProduct['name']) ?>"
                                          loading="lazy"
                                          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease;"
@@ -411,7 +403,7 @@ if (empty($mediaItems)) {
 </div>
 
 <script>
-    const mediaItems = <?= json_encode($mediaItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '[]' ?>;
+    const mediaItems = <?= json_encode($mediaItems) ?>;
 
     let currentImgIndex = 0;
     let currentZoomScale = 1.0;
@@ -736,12 +728,7 @@ if (empty($mediaItems)) {
             }
             if (mainImg) {
                 mainImg.style.display = 'block';
-                if (media.thumb && mainImg.src !== media.thumb) {
-                    mainImg.style.opacity = '0.4';
-                    mainImg.style.transition = 'opacity 0.3s ease';
-                    mainImg.onload = function() {
-                        mainImg.style.opacity = '1';
-                    };
+                if (media.thumb) {
                     mainImg.src = media.thumb;
                 }
             }
