@@ -728,6 +728,10 @@ class AdminController extends Controller {
 
     public function addProduct() {
         $this->requireAuth();
+        // Check if POST data is empty but content length > 0 (usually means post_max_size was exceeded)
+        if (empty($_POST) && empty($_FILES) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+            $this->redirect(BASE_URL . '/admin/products?error=file_too_large');
+        }
         $name = trim($_POST['name'] ?? '');
         $nameAr = trim($_POST['name_ar'] ?? '');
         $code = trim($_POST['product_code'] ?? '');
@@ -753,7 +757,8 @@ class AdminController extends Controller {
         }
 
         if (empty($name) || empty($code) || $price <= 0 || empty($image)) {
-            $this->redirect(BASE_URL . '/admin?error=1');
+            if (isset($_POST['ajax'])) { header('Content-Type: application/json'); echo json_encode(['success' => false, 'error' => 'Please fill out all required fields.']); exit; }
+            $this->redirect(BASE_URL . '/admin/products?error=missing_fields');
         }
 
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name), '-')) . '-' . rand(100, 999);
@@ -822,17 +827,23 @@ class AdminController extends Controller {
 
     public function generateTinyThumbnails() {
         $this->requireAuth();
-        $db = Database::getInstance();
-        $products = $db->query("SELECT id, name, media FROM products")->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Prevent timeout and memory exhaustion on server
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '512M');
+        
+        try {
+            $db = Database::getInstance();
+            $products = $db->query("SELECT id, name, media FROM products")->fetchAll(PDO::FETCH_ASSOC);
 
-        $uploadDir = __DIR__ . '/../../public/uploads/products/';
-        $thumbDir = $uploadDir . 'thumb/';
-        $highDir = $uploadDir . 'high/';
-        $tinyDir = $uploadDir . 'tiny/';
+            $uploadDir = __DIR__ . '/../../public/uploads/products/';
+            $thumbDir = $uploadDir . 'thumb/';
+            $highDir = $uploadDir . 'high/';
+            $tinyDir = $uploadDir . 'tiny/';
 
-        if (!is_dir($tinyDir)) {
-            mkdir($tinyDir, 0755, true);
-        }
+            if (!is_dir($tinyDir)) {
+                @mkdir($tinyDir, 0755, true);
+            }
 
         $updatedCount = 0;
         $missingFilesCount = 0;
@@ -913,6 +924,12 @@ class AdminController extends Controller {
             echo "<p style='color:red;'>Note: Skipped {$missingFilesCount} images because the original physical files were missing from the server (uploads/products/high/ or thumb/ directory).</p>";
         }
         echo "<br>You can safely close this page and return to the dashboard.";
+        
+        } catch (Exception $e) {
+            echo "<h2>Error Occurred</h2>";
+            echo "<p style='color:red;'>An error occurred during thumbnail generation: " . $e->getMessage() . "</p>";
+            echo "<p>Please ensure the server has proper write permissions to the 'public/uploads/products/tiny' directory.</p>";
+        }
     }
 
     private function processImageUpload($tmpName, $fileName) {

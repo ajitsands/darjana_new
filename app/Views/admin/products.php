@@ -7,6 +7,24 @@
                 </div>
             </div>
 
+            
+            <?php if (isset($_GET['success'])): ?>
+                <div id="toast" style="background-color: #38a169; color: white; padding: 15px 25px; border-radius: 4px; position: fixed; top: 20px; right: 20px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: 600;">
+                    Product Added Successfully!
+                </div>
+                <script>setTimeout(() => { document.getElementById('toast').style.display = 'none'; }, 4000);</script>
+            <?php endif; ?>
+            
+            <?php if (isset($_GET['error'])): ?>
+                <div id="errorToast" style="background-color: #e53e3e; color: white; padding: 15px 25px; border-radius: 4px; position: fixed; top: 20px; right: 20px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: 600;">
+                    <?php 
+                        if ($_GET['error'] === 'file_too_large') echo "Error: Uploaded files exceed the server limit (post_max_size). Try fewer images.";
+                        else if ($_GET['error'] === 'missing_fields') echo "Error: Please fill out all required fields.";
+                        else echo "An error occurred.";
+                    ?>
+                </div>
+                <script>setTimeout(() => { document.getElementById('errorToast').style.display = 'none'; }, 6000);</script>
+            <?php endif; ?>
             <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px;">
                 <!-- Product List -->
                 <div>
@@ -218,7 +236,7 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 4px;">Publish Product</button>
+                            <button type="submit" id="publishBtn" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 4px;" onclick="this.innerHTML='<span style=\'display:inline-block;animation:spin 1s linear infinite;\'>⏳</span> Uploading... Please Wait'; this.style.opacity='0.7'; this.style.pointerEvents='none'; this.form.submit();">Publish Product</button>
                         </form>
                     </div>
                 </div>
