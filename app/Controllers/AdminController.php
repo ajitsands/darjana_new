@@ -835,6 +835,7 @@ class AdminController extends Controller {
         }
 
         $updatedCount = 0;
+        $missingFilesCount = 0;
 
         foreach ($products as $product) {
             if (!$product['media']) continue;
@@ -889,6 +890,10 @@ class AdminController extends Controller {
                              $baseUrlStr = substr($thumbUrl, 0, strpos($thumbUrl, '/uploads/products/thumb/'));
                              $item['tiny'] = $baseUrlStr . '/uploads/products/tiny/' . $fileName;
                              $changed = true;
+                        } else {
+                            if (!file_exists($sourcePath)) {
+                                $missingFilesCount++;
+                            }
                         }
                     }
                 }
@@ -902,7 +907,12 @@ class AdminController extends Controller {
             }
         }
 
-        echo "Done! Generated and updated tiny thumbnails for {$updatedCount} products. You can safely close this page.";
+        echo "<h2>Optimization Complete</h2>";
+        echo "Done! Generated and updated tiny thumbnails for <b>{$updatedCount}</b> products.<br><br>";
+        if ($missingFilesCount > 0) {
+            echo "<p style='color:red;'>Note: Skipped {$missingFilesCount} images because the original physical files were missing from the server (uploads/products/high/ or thumb/ directory).</p>";
+        }
+        echo "<br>You can safely close this page and return to the dashboard.";
     }
 
     private function processImageUpload($tmpName, $fileName) {
