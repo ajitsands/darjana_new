@@ -309,7 +309,7 @@ if (empty($mediaItems)) {
                         <div style="flex: 0 0 280px; min-width: 280px;">
                             <div style="position: relative; width: 100%; padding-top: 135%; overflow: hidden; background-color: #e5e5e5;">
                                 <a href="<?= BASE_URL ?>/product/<?= $relProduct['slug'] ?>" style="position: absolute; inset: 0; display: block;">
-                                    <img src="<?= $relProduct['image'] ?>"
+                                    <img src="<?= str_replace('/uploads/products/high/', '/uploads/products/thumb/', $relProduct['image']) ?>"
                                          alt="<?= htmlspecialchars($relProduct['name']) ?>"
                                          loading="lazy"
                                          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease;"
