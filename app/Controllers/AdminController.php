@@ -563,7 +563,8 @@ class AdminController extends Controller {
         
         $data = [];
         foreach ($products as $p) {
-            $imageHtml = '<img src="' . htmlspecialchars($p['image']) . '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">';
+            $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $p['image']);
+            $imageHtml = '<img src="' . htmlspecialchars($tinyImg) . '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">';
             $activeBadge = (isset($p['is_active']) && $p['is_active'] == 0) ? ' <span style="color: #e53e3e; font-size: 10px; font-weight: 700;">(Inactive)</span>' : '';
             $infoHtml = '<div style="font-size: 11px; color: #c5a059; font-weight: 700;">' . htmlspecialchars($p['product_code']) . '</div>' .
                         '<div style="font-weight: 600; font-size: 13px;">' . htmlspecialchars($p['name']) . $activeBadge . '</div>';
