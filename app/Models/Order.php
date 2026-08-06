@@ -93,10 +93,10 @@ class Order extends Model {
         return $this->query("DELETE FROM orders WHERE id = ?", [$orderId]);
     }
 
-    public function updateOrderStatuses($orderId, $orderStatus, $paymentStatus) {
+    public function updateOrderStatuses($orderId, $orderStatus, $paymentStatus, $trackingNumber = null, $shippingProvider = null, $shippingAttachment = null) {
         return $this->query(
-            "UPDATE orders SET status = ?, payment_status = ? WHERE id = ?", 
-            [$orderStatus, $paymentStatus, $orderId]
+            "UPDATE orders SET status = ?, payment_status = ?, tracking_number = ?, shipping_provider = ?, shipping_attachment = ? WHERE id = ?", 
+            [$orderStatus, $paymentStatus, $trackingNumber, $shippingProvider, $shippingAttachment, $orderId]
         );
     }
 }

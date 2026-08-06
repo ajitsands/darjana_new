@@ -50,7 +50,7 @@
                         <li><a href="#">Returns & Exchanges</a></li>
                         <li><a href="#">Terms & Conditions</a></li>
                         <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Track Order</a></li>
+                        <li><a href="<?= BASE_URL ?>/track-order">Track Order</a></li>
                     </ul>
                 </div>
 

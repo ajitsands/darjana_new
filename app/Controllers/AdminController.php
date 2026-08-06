@@ -549,8 +549,30 @@ class AdminController extends Controller {
 
         $orderStatus = $_POST['status'] ?? 'New';
         $paymentStatus = $_POST['payment_status'] ?? 'Pending';
+        
+        $trackingNumber = $_POST['tracking_number'] ?? '';
+        $shippingProvider = $_POST['shipping_provider'] ?? '';
+        $shippingAttachment = $order['shipping_attachment'] ?? '';
 
-        $orderModel->updateOrderStatuses($id, $orderStatus, $paymentStatus);
+        if ($orderStatus === 'Shipped') {
+            // Handle file upload
+            if (isset($_FILES['shipping_attachment']) && $_FILES['shipping_attachment']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = __DIR__ . '/../../public/uploads/shipping/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                $ext = strtolower(pathinfo($_FILES['shipping_attachment']['name'], PATHINFO_EXTENSION));
+                $allowed = ['jpg', 'jpeg', 'png', 'pdf', 'webp'];
+                if (in_array($ext, $allowed)) {
+                    $fileName = 'shipping_' . $order['order_number'] . '_' . time() . '.' . $ext;
+                    if (move_uploaded_file($_FILES['shipping_attachment']['tmp_name'], $uploadDir . $fileName)) {
+                        $shippingAttachment = $fileName;
+                    }
+                }
+            }
+        }
+
+        $orderModel->updateOrderStatuses($id, $orderStatus, $paymentStatus, $trackingNumber, $shippingProvider, $shippingAttachment);
         
         $_SESSION['admin_success'] = 'Order statuses updated successfully.';
         $this->redirect(BASE_URL . '/admin/order/' . $id);

@@ -29,6 +29,7 @@ $router->add('GET', '/', 'HomeController@index');
 $router->add('GET', '/collections/{slug}', 'ProductController@index');
 $router->add('GET', '/product/{slug}', 'ProductController@detail');
 $router->add('GET', '/search', 'ProductController@search');
+$router->add('GET', '/track-order', 'TrackController@index');
 
 $router->add('GET', '/cart', 'CartController@index');
 $router->add('POST', '/cart/add', 'CartController@add');

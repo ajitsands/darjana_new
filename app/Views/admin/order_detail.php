@@ -129,7 +129,7 @@
                         </div>
                         
                         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border);">
-                            <form method="POST" action="<?= BASE_URL ?>/admin/order/update-status/<?= $order['id'] ?>">
+                            <form method="POST" action="<?= BASE_URL ?>/admin/order/update-status/<?= $order['id'] ?>" enctype="multipart/form-data">
                                 <div style="margin-bottom: 12px;">
                                     <label for="payment_status" style="display: block; font-size: 12px; color: #718096; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Payment Status</label>
                                     <select name="payment_status" id="payment_status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
@@ -142,19 +142,42 @@
                                 
                                 <div style="margin-bottom: 16px;">
                                     <label for="status" style="display: block; font-size: 12px; color: #718096; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Order Status</label>
-                                    <select name="status" id="status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+                                    <select name="status" id="status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" onchange="toggleShippingFields()">
                                         <option value="New" <?= $order['status'] === 'New' ? 'selected' : '' ?>>New</option>
                                         <option value="Processing" <?= $order['status'] === 'Processing' ? 'selected' : '' ?>>Processing</option>
                                         <option value="Shipped" <?= $order['status'] === 'Shipped' ? 'selected' : '' ?>>Shipped</option>
                                         <option value="Delivered" <?= $order['status'] === 'Delivered' ? 'selected' : '' ?>>Delivered</option>
                                         <option value="Canceled" <?= $order['status'] === 'Canceled' ? 'selected' : '' ?>>Canceled</option>
-                                        <!-- Keep Pending for older orders -->
                                         <?php if($order['status'] === 'Pending'): ?>
                                             <option value="Pending" selected>Pending</option>
                                         <?php endif; ?>
                                     </select>
                                 </div>
                                 
+                                <!-- Hidden Tracking Fields -->
+                                <div id="shippingFields" style="display: <?= $order['status'] === 'Shipped' ? 'block' : 'none' ?>; margin-bottom: 20px; padding: 15px; background: #f9fafb; border: 1px solid #e2e8f0; border-radius: 6px;">
+                                    <label style="display: block; font-size: 12px; color: #718096; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Shipping Provider (e.g. DHL)</label>
+                                    <input type="text" name="shipping_provider" value="<?= htmlspecialchars($order['shipping_provider'] ?? '') ?>" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 12px;">
+
+                                    <label style="display: block; font-size: 12px; color: #718096; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Tracking Number</label>
+                                    <input type="text" name="tracking_number" value="<?= htmlspecialchars($order['tracking_number'] ?? '') ?>" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 12px;">
+
+                                    <label style="display: block; font-size: 12px; color: #718096; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Shipping Attachment (Receipt/Waybill)</label>
+                                    <?php if (!empty($order['shipping_attachment'])): ?>
+                                        <div style="margin-bottom: 8px; font-size: 12px;">
+                                            <a href="<?= BASE_URL ?>/public/uploads/shipping/<?= htmlspecialchars($order['shipping_attachment']) ?>" target="_blank" style="color: var(--color-primary); font-weight: 600;">View Current Attachment</a>
+                                        </div>
+                                    <?php endif; ?>
+                                    <input type="file" name="shipping_attachment" style="width: 100%; font-size: 13px;">
+                                </div>
+                                
+                                <script>
+                                    function toggleShippingFields() {
+                                        const status = document.getElementById('status').value;
+                                        document.getElementById('shippingFields').style.display = (status === 'Shipped') ? 'block' : 'none';
+                                    }
+                                </script>
+
                                 <button type="submit" style="width: 100%; padding: 10px; background-color: var(--color-accent); color: #fff; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; font-size: 12px;">Update Statuses</button>
                             </form>
                         </div>
