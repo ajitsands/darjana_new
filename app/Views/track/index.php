@@ -1,12 +1,28 @@
+<style>
+    .track-container { padding: 40px; }
+    .track-form-group { display: flex; gap: 10px; }
+    .shipping-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .order-details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    
+    @media (max-width: 600px) {
+        .track-container { padding: 20px; }
+        .track-form-group { flex-direction: column; }
+        .track-form-group button { width: 100%; }
+        .shipping-grid { grid-template-columns: 1fr; }
+        .order-details-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .order-details-header > div:last-child { text-align: left !important; }
+    }
+</style>
+
 <main class="main-content" style="padding-top: 100px; padding-bottom: 80px; background-color: #fcfbfa; min-height: 80vh;">
-    <div class="full-width-container" style="max-width: 700px; margin: 0 auto;">
+    <div class="full-width-container" style="max-width: 700px; margin: 0 auto; padding: 0 15px;">
         
         <h1 style="font-family: var(--heading-font-family); font-size: 28px; text-align: center; margin-bottom: 30px; letter-spacing: 0.1em; color: var(--color-primary);">TRACK YOUR ORDER</h1>
         
-        <div style="background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 40px;">
+        <div class="track-container" style="background: #fff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 40px;">
             <p style="text-align: center; color: #718096; margin-bottom: 24px; font-size: 15px;">Enter your Dar Jana Fashion order number to check its current status.</p>
             
-            <form action="<?= BASE_URL ?>/track-order" method="GET" style="display: flex; gap: 10px;">
+            <form action="<?= BASE_URL ?>/track-order" method="GET" class="track-form-group">
                 <input type="text" name="order_number" value="<?= htmlspecialchars($orderNumber) ?>" placeholder="e.g., DJF-A1B2C3" required style="flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 16px; font-family: var(--body-font-family);">
                 <button type="submit" class="btn-primary" style="padding: 12px 24px; font-size: 15px; letter-spacing: 0.1em;">TRACK</button>
             </form>
@@ -19,10 +35,10 @@
         </div>
 
         <?php if ($order): ?>
-            <div style="background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <div class="track-container" style="background: #fff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
                 <h2 style="font-family: var(--heading-font-family); font-size: 20px; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">ORDER DETAILS: <?= htmlspecialchars($order['order_number']) ?></h2>
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div class="order-details-header">
                     <div>
                         <div style="font-size: 12px; color: #718096; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">Order Date</div>
                         <div style="font-size: 15px; font-weight: 600;"><?= date('M d, Y - h:i A', strtotime($order['created_at'])) ?></div>
@@ -48,7 +64,7 @@
                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 20px; margin-bottom: 24px;">
                         <h3 style="font-family: var(--heading-font-family); font-size: 16px; margin-bottom: 16px; color: var(--color-accent); letter-spacing: 0.05em;">SHIPPING INFORMATION</h3>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="shipping-grid">
                             <div>
                                 <div style="font-size: 12px; color: #718096; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Provider</div>
                                 <div style="font-size: 15px; font-weight: 600;"><?= htmlspecialchars($order['shipping_provider'] ?: 'Standard Shipping') ?></div>
