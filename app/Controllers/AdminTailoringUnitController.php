@@ -10,6 +10,14 @@ class AdminTailoringUnitController extends Controller {
         }
     }
 
+    private function logActivity($actionType, $description) {
+        if (isset($_SESSION['user_id'])) {
+            $db = Database::getInstance();
+            $stmt = $db->prepare("INSERT INTO activity_logs (user_id, action_type, description) VALUES (?, ?, ?)");
+            $stmt->execute([$_SESSION['user_id'], $actionType, $description]);
+        }
+    }
+
     public function index() {
         $this->requireAuth();
         $unitModel = new TailoringUnit();
