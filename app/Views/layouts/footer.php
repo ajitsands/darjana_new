@@ -31,15 +31,14 @@
                 <!-- Column 2: Quick Links (Left Aligned) -->
                 <div class="footer-column" style="text-align: left;">
                     <h4>SHOP COLLECTIONS</h4>
-                    <ul class="footer-links">
-                        <?php 
-                        $footerCats = $headerCategories ?? [];
-                        if (empty($footerCats)) {
-                            require_once __DIR__ . '/../../../core/Database.php';
-                            $footerCats = Database::getInstance()->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
-                        }
-                        ?>
-                        <li><a href="<?= BASE_URL ?>/collections/all-abaya">All Abaya</a></li>
+                    <?php 
+                    $footerCats = $headerCategories ?? [];
+                    if (empty($footerCats)) {
+                        require_once __DIR__ . '/../../../core/Database.php';
+                        $footerCats = Database::getInstance()->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+                    }
+                    ?>
+                    <ul class="footer-links" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px;">
                         <?php foreach($footerCats as $cat): ?>
                             <li><a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>"><?= htmlspecialchars($cat['name']) ?></a></li>
                         <?php endforeach; ?>
