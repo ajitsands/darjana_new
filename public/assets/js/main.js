@@ -6,6 +6,42 @@
 document.addEventListener('DOMContentLoaded', function () {
     const baseUrl = window.BASE_URL || '';
 
+    // Global Toast Notification Utility
+    window.showToast = function(message, isSuccess = true) {
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toastContainer';
+            toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;';
+            document.body.appendChild(toastContainer);
+        }
+        const toast = document.createElement('div');
+        toast.style.background = isSuccess ? '#c6f6d5' : '#fed7d7';
+        toast.style.color = isSuccess ? '#2f855a' : '#c53030';
+        toast.style.padding = '12px 20px';
+        toast.style.borderRadius = '4px';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        toast.style.fontWeight = 'bold';
+        toast.style.fontSize = '14px';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+        toast.style.transition = 'all 0.3s ease';
+        toast.innerHTML = message;
+        
+        toastContainer.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 10);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-20px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+
     // Multi-Currency Exchange Rates relative to base KWD
     const currencies = {
         'BHD': { symbol: 'BHD', name: 'Bahraini Dinar', rate: 1.0, decimals: 3, flagSrc: baseUrl + '/assets/images/flags/bh.png' },
@@ -412,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(res => res.json())
             .then(data => {
-                alert(data.message);
+                window.showToast(data.message, data.success);
                 if (data.success) newsletterForm.reset();
             });
         });
