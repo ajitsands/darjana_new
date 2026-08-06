@@ -566,12 +566,17 @@ class AdminController extends Controller {
 
         if ($quantity <= 0) {
             $_SESSION['admin_error'] = 'Quantity must be at least 1.';
-            $this->redirect(BASE_URL . '/admin/order/' . $orderId);
+            $this->redirect(BASE_URL . '/admin/order/' . $id);
             return;
         }
 
-        // Generate process number: PR-{ORDER_ID}-TU{UNIT_ID}-{RANDOM}
-        $processNumber = 'PR-' . $order['order_number'] . '-U' . $unitId . '-' . rand(100, 999);
+        require_once __DIR__ . '/../Models/TailoringUnit.php';
+        $unitModel = new TailoringUnit();
+        $unit = $unitModel->getUnitById($unitId);
+        $unitCode = $unit ? $unit['unique_unit_code'] : 'U' . $unitId;
+
+        // Generate process number: PR-{ORDER_ID}-{UNIT_CODE}-{RANDOM}
+        $processNumber = 'PR-' . $order['order_number'] . '-' . strtoupper($unitCode) . '-' . rand(100, 999);
 
         $orderModel->addAssignment($id, $orderItemId, $unitId, $quantity, $processNumber);
         
