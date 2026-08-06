@@ -549,10 +549,10 @@ class AdminController extends Controller {
         $this->render('admin/order_detail', $data, 'admin');
     }
 
-    public function assignItem($orderId) {
+    public function assignItem($id) {
         $this->requireAuth();
         $orderModel = new Order();
-        $order = $orderModel->getOrderById($orderId);
+        $order = $orderModel->getOrderById($id);
         
         if (!$order) {
             $_SESSION['admin_error'] = 'Order not found.';
@@ -573,19 +573,19 @@ class AdminController extends Controller {
         // Generate process number: PR-{ORDER_ID}-TU{UNIT_ID}-{RANDOM}
         $processNumber = 'PR-' . $order['order_number'] . '-U' . $unitId . '-' . rand(100, 999);
 
-        $orderModel->addAssignment($orderId, $orderItemId, $unitId, $quantity, $processNumber);
+        $orderModel->addAssignment($id, $orderItemId, $unitId, $quantity, $processNumber);
         
         $_SESSION['admin_success'] = "Item successfully assigned.";
-        $this->redirect(BASE_URL . '/admin/order/' . $orderId);
+        $this->redirect(BASE_URL . '/admin/order/' . $id);
     }
 
-    public function removeAssignment($assignmentId) {
+    public function removeAssignment($id) {
         $this->requireAuth();
         $orderId = (int)($_GET['order_id'] ?? 0);
         $orderModel = new Order();
         
         if ($orderId > 0) {
-            $orderModel->removeAssignment($assignmentId);
+            $orderModel->removeAssignment($id);
             $_SESSION['admin_success'] = "Assignment removed.";
             $this->redirect(BASE_URL . '/admin/order/' . $orderId);
         } else {
@@ -593,17 +593,17 @@ class AdminController extends Controller {
         }
     }
 
-    public function printProcessRequests($orderId) {
+    public function printProcessRequests($id) {
         $this->requireAuth();
         $orderModel = new Order();
-        $order = $orderModel->getOrderById($orderId);
+        $order = $orderModel->getOrderById($id);
         
         if (!$order) {
             die('Order not found');
         }
 
-        $items = $orderModel->getOrderItems($orderId);
-        $assignments = $orderModel->getItemAssignments($orderId);
+        $items = $orderModel->getOrderItems($id);
+        $assignments = $orderModel->getItemAssignments($id);
 
         if (empty($assignments)) {
             die('No assignments found for this order.');
