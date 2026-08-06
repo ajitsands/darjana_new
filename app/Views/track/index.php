@@ -1,7 +1,5 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
-
 <main class="main-content" style="padding-top: 100px; padding-bottom: 80px; background-color: #fcfbfa; min-height: 80vh;">
-    <div class="full-width-container" style="max-width: 700px;">
+    <div class="full-width-container" style="max-width: 700px; margin: 0 auto;">
         
         <h1 style="font-family: var(--heading-font-family); font-size: 28px; text-align: center; margin-bottom: 30px; letter-spacing: 0.1em; color: var(--color-primary);">TRACK YOUR ORDER</h1>
         
@@ -95,5 +93,3 @@
 
     </div>
 </main>
-
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
