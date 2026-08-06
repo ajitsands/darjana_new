@@ -61,19 +61,29 @@ class Order extends Model {
         }
     }
 
-    public function getAllOrders($startDate = null, $endDate = null, $limit = 30) {
-        $sql = "SELECT * FROM orders";
+    public function getAllOrders($startDate = null, $endDate = null, $orderStatus = null, $paymentStatus = null, $limit = 30) {
+        $sql = "SELECT * FROM orders WHERE 1=1";
         $params = [];
         
         if ($startDate && $endDate) {
-            $sql .= " WHERE DATE(created_at) >= ? AND DATE(created_at) <= ?";
+            $sql .= " AND DATE(created_at) >= ? AND DATE(created_at) <= ?";
             $params[] = $startDate;
             $params[] = $endDate;
+        }
+
+        if ($orderStatus && $orderStatus !== 'All') {
+            $sql .= " AND status = ?";
+            $params[] = $orderStatus;
+        }
+
+        if ($paymentStatus && $paymentStatus !== 'All') {
+            $sql .= " AND payment_status = ?";
+            $params[] = $paymentStatus;
         }
         
         $sql .= " ORDER BY id DESC";
         
-        if (!$startDate && !$endDate && $limit > 0) {
+        if (!$startDate && !$endDate && !$orderStatus && !$paymentStatus && $limit > 0) {
             $sql .= " LIMIT " . (int)$limit;
         }
 

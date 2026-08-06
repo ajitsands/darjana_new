@@ -503,14 +503,18 @@ class AdminController extends Controller {
         
         $startDate = $_GET['start_date'] ?? null;
         $endDate = $_GET['end_date'] ?? null;
+        $orderStatus = $_GET['order_status'] ?? null;
+        $paymentStatus = $_GET['payment_status'] ?? null;
 
-        $orders = $orderModel->getAllOrders($startDate, $endDate);
+        $orders = $orderModel->getAllOrders($startDate, $endDate, $orderStatus, $paymentStatus);
 
         $data = [
             'pageTitle' => 'Customer Orders | Dar Jana Fashion',
             'orders' => $orders,
             'startDate' => $startDate,
-            'endDate' => $endDate
+            'endDate' => $endDate,
+            'orderStatusFilter' => $orderStatus,
+            'paymentStatusFilter' => $paymentStatus
         ];
 
         $this->render('admin/orders', $data, 'admin');

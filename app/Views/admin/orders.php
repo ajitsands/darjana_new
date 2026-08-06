@@ -45,6 +45,26 @@
                         <input type="date" id="end_date" name="end_date" value="<?= htmlspecialchars($endDate ?? '') ?>" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                     </div>
                     <div>
+                        <label for="order_status" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #4a5568;">Order Status</label>
+                        <select id="order_status" name="order_status" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff;">
+                            <option value="All" <?= ($orderStatusFilter ?? 'All') === 'All' ? 'selected' : '' ?>>All Statuses</option>
+                            <option value="Pending" <?= ($orderStatusFilter ?? '') === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                            <option value="Processing" <?= ($orderStatusFilter ?? '') === 'Processing' ? 'selected' : '' ?>>Processing</option>
+                            <option value="Shipped" <?= ($orderStatusFilter ?? '') === 'Shipped' ? 'selected' : '' ?>>Shipped</option>
+                            <option value="Delivered" <?= ($orderStatusFilter ?? '') === 'Delivered' ? 'selected' : '' ?>>Delivered</option>
+                            <option value="Canceled" <?= ($orderStatusFilter ?? '') === 'Canceled' ? 'selected' : '' ?>>Canceled</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="payment_status" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #4a5568;">Payment</label>
+                        <select id="payment_status" name="payment_status" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff;">
+                            <option value="All" <?= ($paymentStatusFilter ?? 'All') === 'All' ? 'selected' : '' ?>>All Payments</option>
+                            <option value="Pending" <?= ($paymentStatusFilter ?? '') === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                            <option value="Paid" <?= ($paymentStatusFilter ?? '') === 'Paid' ? 'selected' : '' ?>>Paid</option>
+                            <option value="Failed" <?= ($paymentStatusFilter ?? '') === 'Failed' ? 'selected' : '' ?>>Failed</option>
+                        </select>
+                    </div>
+                    <div>
                         <button type="submit" style="padding: 9px 16px; background-color: var(--color-accent); color: #fff; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">Filter</button>
                         <a href="<?= BASE_URL ?>/admin/orders" style="display: inline-block; padding: 9px 16px; background-color: #e2e8f0; color: #4a5568; text-decoration: none; border-radius: 4px; font-weight: 600; margin-left: 10px;">Reset</a>
                     </div>
