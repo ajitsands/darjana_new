@@ -17,9 +17,9 @@
         <form method="POST" action="<?= BASE_URL ?>/admin/tailoring-units/update/<?= $unit['id'] ?>" id="tailoringUnitForm">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
-                    <label for="unique_unit_code">Unique Unit Code *</label>
-                    <input type="text" id="unique_unit_code" name="unique_unit_code" required value="<?= htmlspecialchars($unit['unique_unit_code']) ?>">
-                    <span id="code_error" style="color: #e53e3e; font-size: 12px; font-weight: 600; display: none; margin-top: 5px;">This code is already in use by another unit!</span>
+                    <label for="unique_unit_code">Unique Unit Code</label>
+                    <input type="text" id="unique_unit_code" name="unique_unit_code" required value="<?= htmlspecialchars($unit['unique_unit_code']) ?>" readonly style="background-color: #f3f4f6; cursor: not-allowed; color: #718096;">
+                    <span style="font-size: 12px; color: #718096; margin-top: 5px; display: inline-block;">Unit code cannot be changed once created.</span>
                 </div>
                 <div class="form-group">
                     <label for="unit_name">Unit Name *</label>
@@ -46,29 +46,5 @@
         </form>
     </div>
 </div>
-
-<script>
-    document.getElementById('unique_unit_code').addEventListener('blur', function() {
-        const code = this.value.trim();
-        const currentId = <?= (int)$unit['id'] ?>;
-        if (!code) return;
-        
-        fetch('<?= BASE_URL ?>/admin/tailoring-units/check-code?code=' + encodeURIComponent(code) + '&exclude_id=' + currentId)
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    document.getElementById('code_error').style.display = 'block';
-                    document.getElementById('submitBtn').disabled = true;
-                    document.getElementById('submitBtn').style.opacity = '0.5';
-                    document.getElementById('unique_unit_code').style.borderColor = '#e53e3e';
-                } else {
-                    document.getElementById('code_error').style.display = 'none';
-                    document.getElementById('submitBtn').disabled = false;
-                    document.getElementById('submitBtn').style.opacity = '1';
-                    document.getElementById('unique_unit_code').style.borderColor = '#e2e8f0';
-                }
-            });
-    });
-</script>
 
 <?php include __DIR__ . '/footer.php'; ?>

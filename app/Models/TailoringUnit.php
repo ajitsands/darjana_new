@@ -23,13 +23,12 @@ class TailoringUnit extends Model {
     }
 
     public function updateUnit($id, $data) {
-        $sql = "UPDATE tailoring_units SET unit_name = ?, contact_person = ?, contact_number = ?, email_id = ?, unique_unit_code = ? WHERE id = ?";
+        $sql = "UPDATE tailoring_units SET unit_name = ?, contact_person = ?, contact_number = ?, email_id = ? WHERE id = ?";
         return $this->query($sql, [
             $data['unit_name'],
             $data['contact_person'] ?? null,
             $data['contact_number'] ?? null,
             $data['email_id'] ?? null,
-            $data['unique_unit_code'],
             $id
         ]);
     }

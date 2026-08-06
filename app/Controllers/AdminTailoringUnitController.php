@@ -99,19 +99,13 @@ class AdminTailoringUnitController extends Controller {
                 'unique_unit_code' => trim($_POST['unique_unit_code'] ?? '')
             ];
 
-            if (empty($data['unit_name']) || empty($data['unique_unit_code'])) {
-                $_SESSION['admin_error'] = "Unit Name and Unique Code are required.";
+            if (empty($data['unit_name'])) {
+                $_SESSION['admin_error'] = "Unit Name is required.";
                 $this->redirect(BASE_URL . '/admin/tailoring-units/edit/' . $id);
                 return;
             }
 
             try {
-                if ($unitModel->checkCodeExists($data['unique_unit_code'], $id)) {
-                    $_SESSION['admin_error'] = "The Unique Unit Code '{$data['unique_unit_code']}' is already used by another unit. Please choose a different code.";
-                    $this->redirect(BASE_URL . '/admin/tailoring-units/edit/' . $id);
-                    return;
-                }
-                
                 $unitModel->updateUnit($id, $data);
                 $_SESSION['admin_success'] = "Tailoring Unit updated successfully.";
                 $this->redirect(BASE_URL . '/admin/tailoring-units');
