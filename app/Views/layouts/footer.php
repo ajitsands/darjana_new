@@ -32,12 +32,17 @@
                 <div class="footer-column" style="text-align: left;">
                     <h4>SHOP COLLECTIONS</h4>
                     <ul class="footer-links">
+                        <?php 
+                        $footerCats = $headerCategories ?? [];
+                        if (empty($footerCats)) {
+                            require_once __DIR__ . '/../../../core/Database.php';
+                            $footerCats = Database::getInstance()->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+                        }
+                        ?>
                         <li><a href="<?= BASE_URL ?>/collections/all-abaya">All Abaya</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/black-abaya">Black Abaya</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/colourful-abaya">Colourful Abaya</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/sets">Sets & Suits</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/blazer">Blazers</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/ramadan-collection">Ramadan Collection</a></li>
+                        <?php foreach($footerCats as $cat): ?>
+                            <li><a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>"><?= htmlspecialchars($cat['name']) ?></a></li>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
 
