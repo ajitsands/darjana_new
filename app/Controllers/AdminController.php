@@ -501,8 +501,9 @@ class AdminController extends Controller {
         $this->requireAuth();
         $orderModel = new Order();
         
-        $startDate = $_GET['start_date'] ?? null;
-        $endDate = $_GET['end_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? date('Y-m-d');
+        $startDate = $_GET['start_date'] ?? date('Y-m-d', strtotime('-20 days'));
+        
         $orderStatus = $_GET['order_status'] ?? null;
         $paymentStatus = $_GET['payment_status'] ?? null;
 
