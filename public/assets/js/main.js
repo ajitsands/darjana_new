@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             html += `
                 <div class="cart-item" data-key="${item.key}">
-                    <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+                    <img src="${item.image.replace('/high/', '/tiny/')}" alt="${item.name}" class="cart-item-img">
                     <div class="cart-item-info">
                         <div class="cart-item-name">${item.name}</div>
                         <div class="cart-item-meta">${metaParts.join(' | ')}</div>
@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.products.forEach(p => {
                             html += `
                                 <a href="${baseUrl}/product/${p.slug}" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid #eee; text-align: center;">
-                                    <img src="${p.image}" style="width: 100%; height: 120px; object-fit: cover;">
+                                    <img src="${p.image.replace('/high/', '/tiny/')}" style="width: 100%; height: 120px; object-fit: cover;">
                                     <div>
                                         <div style="font-weight: 600; font-size: 12px; text-transform: uppercase;">${p.name}</div>
                                         <div style="color: #c5a059; font-size: 11.5px; margin-top: 2px;">${p.product_code} - ${formatPrice(p.price)}</div>
