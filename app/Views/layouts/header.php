@@ -47,18 +47,22 @@
                     <img src="<?= BASE_URL ?>/assets/images/web_logo_menu.png" alt="Dar Jana Fashion">
                 </a>
 
-                <!-- Desktop Navigation Menu (9 Category Links) -->
+                <!-- Desktop Navigation Menu (Dynamic Category Links) -->
                 <nav class="header-nav" aria-label="Main Navigation">
+                    <?php
+                        require_once __DIR__ . '/../../../core/Database.php';
+                        $db = Database::getInstance();
+                        $headerCategories = $db->query("SELECT * FROM categories ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+                    ?>
                     <ul class="main-nav">
                         <li><a href="<?= BASE_URL ?>/" class="nav-link <?= empty($activeNav) ? 'active' : '' ?>">HOME</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/all-abaya" class="nav-link <?= $activeNav === 'all-abaya' ? 'active' : '' ?>">ALL ABAYA</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/black-abaya" class="nav-link <?= $activeNav === 'black-abaya' ? 'active' : '' ?>">BLACK ABAYA</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/colourful-abaya" class="nav-link <?= $activeNav === 'colourful-abaya' ? 'active' : '' ?>">COLOURFUL ABAYA</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/sets" class="nav-link <?= $activeNav === 'sets' ? 'active' : '' ?>">SETS</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/blazer" class="nav-link <?= $activeNav === 'blazer' ? 'active' : '' ?>">BLAZER</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/inner" class="nav-link <?= $activeNav === 'inner' ? 'active' : '' ?>">INNER</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/offers" class="nav-link <?= $activeNav === 'offers' ? 'active' : '' ?>">OFFERS</a></li>
-                        <li><a href="<?= BASE_URL ?>/collections/ramadan-collection" class="nav-link <?= $activeNav === 'ramadan-collection' ? 'active' : '' ?>">RAMADAN COLLECTION</a></li>
+                        <?php foreach($headerCategories as $cat): ?>
+                            <li>
+                                <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="nav-link <?= $activeNav === $cat['slug'] ? 'active' : '' ?>">
+                                    <?= htmlspecialchars(strtoupper($cat['name'])) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
                     </ul>
                 </nav>
 
@@ -104,14 +108,13 @@
         <div class="mobile-menu-body">
             <ul class="mobile-nav-list">
                 <li><a href="<?= BASE_URL ?>/" class="mobile-nav-link <?= empty($activeNav) ? 'active' : '' ?>">HOME</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/all-abaya" class="mobile-nav-link <?= $activeNav === 'all-abaya' ? 'active' : '' ?>">ALL ABAYA</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/black-abaya" class="mobile-nav-link <?= $activeNav === 'black-abaya' ? 'active' : '' ?>">BLACK ABAYA</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/colourful-abaya" class="mobile-nav-link <?= $activeNav === 'colourful-abaya' ? 'active' : '' ?>">COLOURFUL ABAYA</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/sets" class="mobile-nav-link <?= $activeNav === 'sets' ? 'active' : '' ?>">SETS</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/blazer" class="mobile-nav-link <?= $activeNav === 'blazer' ? 'active' : '' ?>">BLAZER</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/inner" class="mobile-nav-link <?= $activeNav === 'inner' ? 'active' : '' ?>">INNER</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/offers" class="mobile-nav-link <?= $activeNav === 'offers' ? 'active' : '' ?>">OFFERS</a></li>
-                <li><a href="<?= BASE_URL ?>/collections/ramadan-collection" class="mobile-nav-link <?= $activeNav === 'ramadan-collection' ? 'active' : '' ?>">RAMADAN COLLECTION</a></li>
+                <?php foreach($headerCategories as $cat): ?>
+                    <li>
+                        <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="mobile-nav-link <?= $activeNav === $cat['slug'] ? 'active' : '' ?>">
+                            <?= htmlspecialchars(strtoupper($cat['name'])) ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
             </ul>
         </div>
         <div class="mobile-menu-footer">
