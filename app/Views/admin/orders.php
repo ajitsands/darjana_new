@@ -52,7 +52,7 @@
                             <option value="Processing" <?= ($orderStatusFilter ?? '') === 'Processing' ? 'selected' : '' ?>>Processing</option>
                             <option value="Shipped" <?= ($orderStatusFilter ?? '') === 'Shipped' ? 'selected' : '' ?>>Shipped</option>
                             <option value="Delivered" <?= ($orderStatusFilter ?? '') === 'Delivered' ? 'selected' : '' ?>>Delivered</option>
-                            <option value="Canceled" <?= ($orderStatusFilter ?? '') === 'Canceled' ? 'selected' : '' ?>>Canceled</option>
+                            <option value="Cancelled" <?= ($orderStatusFilter ?? '') === 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>
                         </select>
                     </div>
                     <div>
