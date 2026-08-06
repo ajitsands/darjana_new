@@ -70,6 +70,7 @@ $router->add('POST', '/admin/product/add', 'AdminController@addProduct');
 $router->add('GET', '/admin/product/edit/{id}', 'AdminController@editProduct');
 $router->add('POST', '/admin/product/edit/{id}', 'AdminController@updateProduct');
 $router->add('GET', '/admin/product/delete/{id}', 'AdminController@deleteProduct');
+$router->add('GET', '/admin/product/delete-media/{id}', 'AdminController@deleteProductMedia');
 $router->add('GET', '/admin/order/{id}', 'AdminController@orderDetail');
 $router->add('POST', '/admin/order/assign-item/{id}', 'AdminController@assignItem');
 $router->add('GET', '/admin/order/cancel-item/{id}', 'AdminController@cancelOrderItem');

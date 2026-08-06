@@ -189,13 +189,17 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                             if (empty($mediaArr)) {
                                 echo '<span style="font-size:12px; color:#718096;">No additional media uploaded yet.</span>';
                             }
-                            foreach ($mediaArr as $media): 
+                            foreach ($mediaArr as $index => $media): 
+                                echo '<div style="position: relative; display: inline-block;">';
                                 if (($media['type'] ?? '') === 'video') {
                                     echo '<div style="width: 100px; height: 100px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px;">VIDEO</div>';
                                 } else {
                                     $thumb = $media['thumb'] ?? $media['url'] ?? '';
                                     echo '<img src="'.htmlspecialchars($thumb).'" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e0;">';
                                 }
+                                // Delete button
+                                echo '<a href="#" onclick="confirmDelete(event, \''.BASE_URL.'/admin/product/delete-media/'.$product['id'].'?index='.$index.'\', \'Are you sure you want to delete this media? This will permanently remove the file.\')" style="position: absolute; top: -6px; right: -6px; background: #e53e3e; color: #fff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: bold; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">&times;</a>';
+                                echo '</div>';
                             endforeach; 
                             ?>
                         </div>

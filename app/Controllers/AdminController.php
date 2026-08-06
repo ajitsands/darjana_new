@@ -927,6 +927,83 @@ class AdminController extends Controller {
         $this->redirect(BASE_URL . '/admin?success=deleted');
     }
 
+    public function deleteProductMedia($id) {
+        $this->requireAuth();
+        $index = isset($_GET['index']) ? (int)$_GET['index'] : -1;
+        
+        require_once __DIR__ . '/../Models/Product.php';
+        $productModel = new Product();
+        $product = $productModel->getById($id);
+        
+        if ($product && $index >= 0) {
+            $media = json_decode($product['media'] ?? '[]', true) ?: [];
+            if (isset($media[$index])) {
+                $item = $media[$index];
+                
+                // Physically delete the files
+                if (!empty($item['url'])) {
+                    // Extract path relative to the domain
+                    $parsedUrl = parse_url($item['url']);
+                    if (isset($parsedUrl['path'])) {
+                        // Assuming the path starts with something like /uploads/...
+                        // For localhost like /darjanafashon_new/public/uploads/... we need to map to public dir
+                        $path = ltrim($parsedUrl['path'], '/');
+                        $parts = explode('public/', $path);
+                        if (count($parts) > 1) {
+                            $physicalPath = __DIR__ . '/../../public/' . $parts[1];
+                        } else {
+                            // Fallback if public isn't in URL path (e.g. on production server)
+                            // We look for 'uploads/' directly
+                            $uploadParts = explode('uploads/', $path);
+                            if (count($uploadParts) > 1) {
+                                $physicalPath = __DIR__ . '/../../public/uploads/' . $uploadParts[1];
+                            } else {
+                                $physicalPath = false;
+                            }
+                        }
+                        
+                        if ($physicalPath && file_exists($physicalPath) && is_file($physicalPath)) {
+                            unlink($physicalPath);
+                        }
+                    }
+                }
+                if (!empty($item['thumb'])) {
+                    $parsedUrl = parse_url($item['thumb']);
+                    if (isset($parsedUrl['path'])) {
+                        $path = ltrim($parsedUrl['path'], '/');
+                        $parts = explode('public/', $path);
+                        if (count($parts) > 1) {
+                            $physicalPath = __DIR__ . '/../../public/' . $parts[1];
+                        } else {
+                            $uploadParts = explode('uploads/', $path);
+                            if (count($uploadParts) > 1) {
+                                $physicalPath = __DIR__ . '/../../public/uploads/' . $uploadParts[1];
+                            } else {
+                                $physicalPath = false;
+                            }
+                        }
+                        if ($physicalPath && file_exists($physicalPath) && is_file($physicalPath)) {
+                            unlink($physicalPath);
+                        }
+                    }
+                }
+                
+                // Remove from array and re-index
+                array_splice($media, $index, 1);
+                
+                // Update Database
+                $db = Database::getInstance();
+                $stmt = $db->prepare("UPDATE products SET media = ? WHERE id = ?");
+                $stmt->execute([json_encode($media), $id]);
+                
+                $this->logActivity('DELETE_PRODUCT_MEDIA', "Deleted media at index {$index} for product: {$product['product_code']}");
+                $_SESSION['admin_success'] = "Media file deleted successfully.";
+            }
+        }
+        
+        $this->redirect(BASE_URL . "/admin/product/edit/{$id}");
+    }
+
     public function addProduct() {
         $this->requireAuth();
         // Check if POST data is empty but content length > 0 (usually means post_max_size was exceeded)
