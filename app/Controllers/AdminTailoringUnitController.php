@@ -4,11 +4,14 @@ require_once __DIR__ . '/../Models/TailoringUnit.php';
 
 class AdminTailoringUnitController extends Controller {
 
-    public function __construct() {
-        $this->requireAuth();
+    private function requireAuth() {
+        if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+            $this->redirect(BASE_URL . '/admin/login');
+        }
     }
 
     public function index() {
+        $this->requireAuth();
         $unitModel = new TailoringUnit();
         $units = $unitModel->getAllUnits();
 
@@ -21,6 +24,7 @@ class AdminTailoringUnitController extends Controller {
     }
 
     public function create() {
+        $this->requireAuth();
         $data = [
             'pageTitle' => 'Add Tailoring Unit | Dar Jana Fashion',
         ];
@@ -29,6 +33,7 @@ class AdminTailoringUnitController extends Controller {
     }
 
     public function store() {
+        $this->requireAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $unitModel = new TailoringUnit();
             
@@ -48,7 +53,6 @@ class AdminTailoringUnitController extends Controller {
 
             try {
                 $unitModel->createUnit($data);
-                $this->logActivity('CREATE_TAILORING_UNIT', "Created tailoring unit: " . $data['unit_name']);
                 $_SESSION['admin_success'] = "Tailoring Unit added successfully.";
                 $this->redirect(BASE_URL . '/admin/tailoring-units');
             } catch (Exception $e) {
@@ -59,6 +63,7 @@ class AdminTailoringUnitController extends Controller {
     }
 
     public function edit($id) {
+        $this->requireAuth();
         $unitModel = new TailoringUnit();
         $unit = $unitModel->getUnitById($id);
 
@@ -76,6 +81,7 @@ class AdminTailoringUnitController extends Controller {
     }
 
     public function update($id) {
+        $this->requireAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $unitModel = new TailoringUnit();
             
@@ -95,7 +101,6 @@ class AdminTailoringUnitController extends Controller {
 
             try {
                 $unitModel->updateUnit($id, $data);
-                $this->logActivity('UPDATE_TAILORING_UNIT', "Updated tailoring unit ID: " . $id);
                 $_SESSION['admin_success'] = "Tailoring Unit updated successfully.";
                 $this->redirect(BASE_URL . '/admin/tailoring-units');
             } catch (Exception $e) {
@@ -106,12 +111,12 @@ class AdminTailoringUnitController extends Controller {
     }
 
     public function delete($id) {
+        $this->requireAuth();
         $unitModel = new TailoringUnit();
         $unit = $unitModel->getUnitById($id);
         
         if ($unit) {
             $unitModel->deleteUnit($id);
-            $this->logActivity('DELETE_TAILORING_UNIT', "Deleted tailoring unit: " . $unit['unit_name']);
             $_SESSION['admin_success'] = "Tailoring Unit deleted successfully.";
         }
         $this->redirect(BASE_URL . '/admin/tailoring-units');
