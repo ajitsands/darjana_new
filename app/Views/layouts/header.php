@@ -52,7 +52,7 @@
                     <?php
                         require_once __DIR__ . '/../../../core/Database.php';
                         $db = Database::getInstance();
-                        $headerCategories = $db->query("SELECT * FROM categories ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+                        $headerCategories = $db->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                     <ul class="main-nav">
                         <li><a href="<?= BASE_URL ?>/" class="nav-link <?= empty($activeNav) ? 'active' : '' ?>">HOME</a></li>

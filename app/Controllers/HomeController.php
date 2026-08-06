@@ -10,7 +10,7 @@ class HomeController extends Controller {
         $categoryModel = new Category();
 
         $featuredProducts = $productModel->getFeatured();
-        $allCategories = $categoryModel->getAll();
+        $allCategories = $categoryModel->getAllActive();
         $recentProducts = $productModel->getAll(8);
 
         $data = [

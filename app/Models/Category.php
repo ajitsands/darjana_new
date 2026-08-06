@@ -6,6 +6,10 @@ class Category extends Model {
         return $this->fetchAll("SELECT * FROM categories ORDER BY id ASC");
     }
 
+    public function getAllActive() {
+        return $this->fetchAll("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC");
+    }
+
     public function getBySlug($slug) {
         return $this->fetchOne("SELECT * FROM categories WHERE slug = ?", [$slug]);
     }

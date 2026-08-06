@@ -19,9 +19,15 @@ class ProductController extends Controller {
         $offset = ($page - 1) * $limit;
 
         $category = $categoryModel->getBySlug($slug);
+        
+        // Redirect if category doesn't exist or is deactivated
+        if (!$category || (isset($category['is_active']) && $category['is_active'] == 0)) {
+            $this->redirect(BASE_URL . '/');
+        }
+
         $totalProducts = $productModel->countByCategorySlug($slug, $minPrice, $maxPrice);
         $products = $productModel->getByCategorySlug($slug, $limit, $offset, $sort, $minPrice, $maxPrice);
-        $categories = $categoryModel->getAll();
+        $categories = $categoryModel->getAllActive();
 
         $totalPages = ceil($totalProducts / $limit);
         $hasMore = $page < $totalPages;
