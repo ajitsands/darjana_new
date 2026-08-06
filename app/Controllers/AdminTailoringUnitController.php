@@ -52,11 +52,17 @@ class AdminTailoringUnitController extends Controller {
             }
 
             try {
+                if ($unitModel->checkCodeExists($data['unique_unit_code'])) {
+                    $_SESSION['admin_error'] = "The Unique Unit Code '{$data['unique_unit_code']}' already exists. Please choose a different code.";
+                    $this->redirect(BASE_URL . '/admin/tailoring-units/create');
+                    return;
+                }
+                
                 $unitModel->createUnit($data);
                 $_SESSION['admin_success'] = "Tailoring Unit added successfully.";
                 $this->redirect(BASE_URL . '/admin/tailoring-units');
             } catch (Exception $e) {
-                $_SESSION['admin_error'] = "Error: " . $e->getMessage() . " (Perhaps the code is not unique?)";
+                $_SESSION['admin_error'] = "Error: " . $e->getMessage();
                 $this->redirect(BASE_URL . '/admin/tailoring-units/create');
             }
         }
@@ -100,6 +106,12 @@ class AdminTailoringUnitController extends Controller {
             }
 
             try {
+                if ($unitModel->checkCodeExists($data['unique_unit_code'], $id)) {
+                    $_SESSION['admin_error'] = "The Unique Unit Code '{$data['unique_unit_code']}' is already used by another unit. Please choose a different code.";
+                    $this->redirect(BASE_URL . '/admin/tailoring-units/edit/' . $id);
+                    return;
+                }
+                
                 $unitModel->updateUnit($id, $data);
                 $_SESSION['admin_success'] = "Tailoring Unit updated successfully.";
                 $this->redirect(BASE_URL . '/admin/tailoring-units');
@@ -120,5 +132,23 @@ class AdminTailoringUnitController extends Controller {
             $_SESSION['admin_success'] = "Tailoring Unit deleted successfully.";
         }
         $this->redirect(BASE_URL . '/admin/tailoring-units');
+    }
+    
+    public function checkCode() {
+        $this->requireAuth();
+        header('Content-Type: application/json');
+        
+        $code = $_GET['code'] ?? '';
+        $excludeId = $_GET['exclude_id'] ?? null;
+        
+        if (empty($code)) {
+            echo json_encode(['exists' => false]);
+            return;
+        }
+        
+        $unitModel = new TailoringUnit();
+        $exists = $unitModel->checkCodeExists($code, $excludeId);
+        
+        echo json_encode(['exists' => $exists]);
     }
 }

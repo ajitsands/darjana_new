@@ -89,6 +89,7 @@ $router->add('POST', '/admin/tailoring-units/store', 'AdminTailoringUnitControll
 $router->add('GET', '/admin/tailoring-units/edit/{id}', 'AdminTailoringUnitController@edit');
 $router->add('POST', '/admin/tailoring-units/update/{id}', 'AdminTailoringUnitController@update');
 $router->add('GET', '/admin/tailoring-units/delete/{id}', 'AdminTailoringUnitController@delete');
+$router->add('GET', '/admin/tailoring-units/check-code', 'AdminTailoringUnitController@checkCode');
 
 $router->add('POST', '/checkout/apply-coupon', 'CheckoutController@applyCoupon');
 

@@ -34,6 +34,15 @@ class TailoringUnit extends Model {
         ]);
     }
 
+    public function checkCodeExists($code, $excludeId = null) {
+        if ($excludeId) {
+            $result = $this->fetchOne("SELECT id FROM tailoring_units WHERE unique_unit_code = ? AND id != ?", [$code, $excludeId]);
+        } else {
+            $result = $this->fetchOne("SELECT id FROM tailoring_units WHERE unique_unit_code = ?", [$code]);
+        }
+        return $result ? true : false;
+    }
+
     public function deleteUnit($id) {
         return $this->query("DELETE FROM tailoring_units WHERE id = ?", [$id]);
     }
