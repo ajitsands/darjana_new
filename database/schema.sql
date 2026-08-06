@@ -124,6 +124,20 @@ CREATE TABLE IF NOT EXISTS tailoring_units (
     contact_number VARCHAR(50),
     email_id VARCHAR(255),
     unique_unit_code VARCHAR(100) UNIQUE,
+    is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_item_assignments (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    order_id INTEGER NOT NULL,
+    order_item_id INTEGER NOT NULL,
+    tailoring_unit_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    process_number VARCHAR(100) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (order_item_id) REFERENCES order_items(id),
+    FOREIGN KEY (tailoring_unit_id) REFERENCES tailoring_units(id)
 );

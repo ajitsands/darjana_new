@@ -42,7 +42,8 @@ class AdminTailoringUnitController extends Controller {
                 'contact_person' => $_POST['contact_person'] ?? '',
                 'contact_number' => $_POST['contact_number'] ?? '',
                 'email_id' => $_POST['email_id'] ?? '',
-                'unique_unit_code' => trim($_POST['unique_unit_code'] ?? '')
+                'unique_unit_code' => trim($_POST['unique_unit_code'] ?? ''),
+                'is_active' => isset($_POST['is_active']) ? 1 : 0
             ];
 
             if (empty($data['unit_name']) || empty($data['unique_unit_code'])) {
@@ -96,7 +97,8 @@ class AdminTailoringUnitController extends Controller {
                 'contact_person' => $_POST['contact_person'] ?? '',
                 'contact_number' => $_POST['contact_number'] ?? '',
                 'email_id' => $_POST['email_id'] ?? '',
-                'unique_unit_code' => trim($_POST['unique_unit_code'] ?? '')
+                'unique_unit_code' => trim($_POST['unique_unit_code'] ?? ''),
+                'is_active' => isset($_POST['is_active']) ? 1 : 0
             ];
 
             if (empty($data['unit_name'])) {

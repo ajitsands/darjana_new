@@ -38,7 +38,7 @@
                         $footerCats = Database::getInstance()->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
                     }
                     ?>
-                    <ul class="footer-links" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px;">
+                    <ul class="footer-links" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0px 18px;">
                         <?php foreach($footerCats as $cat): ?>
                             <li><a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>"><?= htmlspecialchars($cat['name']) ?></a></li>
                         <?php endforeach; ?>

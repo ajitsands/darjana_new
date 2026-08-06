@@ -98,6 +98,28 @@ class Order extends Model {
         return $this->fetchAll("SELECT * FROM order_items WHERE order_id = ?", [$orderId]);
     }
 
+    public function getItemAssignments($orderId) {
+        $sql = "SELECT a.*, t.unit_name 
+                FROM order_item_assignments a 
+                JOIN tailoring_units t ON a.tailoring_unit_id = t.id 
+                WHERE a.order_id = ? 
+                ORDER BY a.created_at ASC";
+        return $this->fetchAll($sql, [$orderId]);
+    }
+
+    public function addAssignment($orderId, $orderItemId, $unitId, $quantity, $processNumber) {
+        $sql = "INSERT INTO order_item_assignments (order_id, order_item_id, tailoring_unit_id, quantity, process_number) VALUES (?, ?, ?, ?, ?)";
+        return $this->query($sql, [$orderId, $orderItemId, $unitId, $quantity, $processNumber]);
+    }
+
+    public function getAssignmentById($id) {
+        return $this->fetchOne("SELECT * FROM order_item_assignments WHERE id = ?", [$id]);
+    }
+
+    public function removeAssignment($id) {
+        return $this->query("DELETE FROM order_item_assignments WHERE id = ?", [$id]);
+    }
+
     public function deleteOrder($orderId) {
         $this->query("DELETE FROM order_items WHERE order_id = ?", [$orderId]);
         return $this->query("DELETE FROM orders WHERE id = ?", [$orderId]);

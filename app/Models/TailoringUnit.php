@@ -11,24 +11,30 @@ class TailoringUnit extends Model {
         return $this->fetchOne("SELECT * FROM tailoring_units WHERE id = ?", [$id]);
     }
 
+    public function getActiveUnits() {
+        return $this->fetchAll("SELECT * FROM tailoring_units WHERE is_active = 1 ORDER BY unit_name ASC");
+    }
+
     public function createUnit($data) {
-        $sql = "INSERT INTO tailoring_units (unit_name, contact_person, contact_number, email_id, unique_unit_code) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO tailoring_units (unit_name, contact_person, contact_number, email_id, unique_unit_code, is_active) VALUES (?, ?, ?, ?, ?, ?)";
         return $this->query($sql, [
             $data['unit_name'],
             $data['contact_person'] ?? null,
             $data['contact_number'] ?? null,
             $data['email_id'] ?? null,
-            $data['unique_unit_code']
+            $data['unique_unit_code'],
+            isset($data['is_active']) ? (int)$data['is_active'] : 1
         ]);
     }
 
     public function updateUnit($id, $data) {
-        $sql = "UPDATE tailoring_units SET unit_name = ?, contact_person = ?, contact_number = ?, email_id = ? WHERE id = ?";
+        $sql = "UPDATE tailoring_units SET unit_name = ?, contact_person = ?, contact_number = ?, email_id = ?, is_active = ? WHERE id = ?";
         return $this->query($sql, [
             $data['unit_name'],
             $data['contact_person'] ?? null,
             $data['contact_number'] ?? null,
             $data['email_id'] ?? null,
+            isset($data['is_active']) ? (int)$data['is_active'] : 1,
             $id
         ]);
     }

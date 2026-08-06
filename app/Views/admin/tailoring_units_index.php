@@ -38,6 +38,7 @@
                         <th>CONTACT PERSON</th>
                         <th>PHONE</th>
                         <th>EMAIL</th>
+                        <th>STATUS</th>
                         <th>ACTION</th>
                     </tr>
                 </thead>
@@ -49,6 +50,13 @@
                             <td><?= htmlspecialchars($unit['contact_person']) ?></td>
                             <td><?= htmlspecialchars($unit['contact_number']) ?></td>
                             <td><?= htmlspecialchars($unit['email_id']) ?></td>
+                            <td>
+                                <?php if ($unit['is_active']): ?>
+                                    <span style="background-color: #def7ec; color: #03543f; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Active</span>
+                                <?php else: ?>
+                                    <span style="background-color: #fde8e8; color: #9b1c1c; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Inactive</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <a href="<?= BASE_URL ?>/admin/tailoring-units/edit/<?= $unit['id'] ?>" style="color: #3182ce; text-decoration: none; font-weight: 600; margin-right: 15px;">Edit</a>
                                 <a href="#" onclick="confirmDelete(event, '<?= BASE_URL ?>/admin/tailoring-units/delete/<?= $unit['id'] ?>')" style="color: #e53e3e; text-decoration: none; font-weight: 600;">Delete</a>

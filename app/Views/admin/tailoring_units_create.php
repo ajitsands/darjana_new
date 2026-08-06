@@ -37,6 +37,10 @@
                     <label for="email_id">Email ID</label>
                     <input type="email" id="email_id" name="email_id">
                 </div>
+                <div class="form-group" style="grid-column: 1 / -1; display: flex; align-items: center;">
+                    <input type="checkbox" id="is_active" name="is_active" value="1" checked style="width: auto; margin-right: 10px; margin-bottom: 0;">
+                    <label for="is_active" style="margin-bottom: 0; font-weight: 600;">Active (Available for order assignments)</label>
+                </div>
             </div>
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #edf2f7;">

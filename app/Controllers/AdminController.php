@@ -532,14 +532,118 @@ class AdminController extends Controller {
         }
 
         $items = $orderModel->getOrderItems($id);
+        $assignments = $orderModel->getItemAssignments($id);
+
+        require_once __DIR__ . '/../Models/TailoringUnit.php';
+        $unitModel = new TailoringUnit();
+        $activeUnits = $unitModel->getActiveUnits();
 
         $data = [
             'pageTitle' => 'Order Details | Dar Jana Fashion',
             'order' => $order,
-            'items' => $items
+            'items' => $items,
+            'assignments' => $assignments,
+            'activeUnits' => $activeUnits
         ];
 
         $this->render('admin/order_detail', $data, 'admin');
+    }
+
+    public function assignItem($orderId) {
+        $this->requireAuth();
+        $orderModel = new Order();
+        $order = $orderModel->getOrderById($orderId);
+        
+        if (!$order) {
+            $_SESSION['admin_error'] = 'Order not found.';
+            $this->redirect(BASE_URL . '/admin/orders');
+            return;
+        }
+
+        $orderItemId = (int)$_POST['order_item_id'];
+        $unitId = (int)$_POST['tailoring_unit_id'];
+        $quantity = (int)$_POST['quantity'];
+
+        if ($quantity <= 0) {
+            $_SESSION['admin_error'] = 'Quantity must be at least 1.';
+            $this->redirect(BASE_URL . '/admin/order/' . $orderId);
+            return;
+        }
+
+        // Generate process number: PR-{ORDER_ID}-TU{UNIT_ID}-{RANDOM}
+        $processNumber = 'PR-' . $order['order_number'] . '-U' . $unitId . '-' . rand(100, 999);
+
+        $orderModel->addAssignment($orderId, $orderItemId, $unitId, $quantity, $processNumber);
+        
+        $_SESSION['admin_success'] = "Item successfully assigned.";
+        $this->redirect(BASE_URL . '/admin/order/' . $orderId);
+    }
+
+    public function removeAssignment($assignmentId) {
+        $this->requireAuth();
+        $orderId = (int)($_GET['order_id'] ?? 0);
+        $orderModel = new Order();
+        
+        if ($orderId > 0) {
+            $orderModel->removeAssignment($assignmentId);
+            $_SESSION['admin_success'] = "Assignment removed.";
+            $this->redirect(BASE_URL . '/admin/order/' . $orderId);
+        } else {
+            $this->redirect(BASE_URL . '/admin/orders');
+        }
+    }
+
+    public function printProcessRequests($orderId) {
+        $this->requireAuth();
+        $orderModel = new Order();
+        $order = $orderModel->getOrderById($orderId);
+        
+        if (!$order) {
+            die('Order not found');
+        }
+
+        $items = $orderModel->getOrderItems($orderId);
+        $assignments = $orderModel->getItemAssignments($orderId);
+
+        if (empty($assignments)) {
+            die('No assignments found for this order.');
+        }
+
+        // Group assignments by Process Number (which is essentially by Unit and batch)
+        $groupedRequests = [];
+        foreach ($assignments as $assignment) {
+            $prNumber = $assignment['process_number'];
+            if (!isset($groupedRequests[$prNumber])) {
+                $groupedRequests[$prNumber] = [
+                    'process_number' => $prNumber,
+                    'unit_name' => $assignment['unit_name'],
+                    'items' => []
+                ];
+            }
+
+            // Find item details
+            $itemDetails = null;
+            foreach ($items as $item) {
+                if ($item['id'] == $assignment['order_item_id']) {
+                    $itemDetails = $item;
+                    break;
+                }
+            }
+
+            if ($itemDetails) {
+                $groupedRequests[$prNumber]['items'][] = [
+                    'product_code' => $itemDetails['product_code'],
+                    'product_name' => $itemDetails['product_name'],
+                    'size' => $itemDetails['size'],
+                    'color' => $itemDetails['color'],
+                    'length' => $itemDetails['length'],
+                    'note' => $itemDetails['note'],
+                    'assigned_quantity' => $assignment['quantity']
+                ];
+            }
+        }
+
+        require_once __DIR__ . '/../Views/admin/print_process_requests.php';
     }
 
     public function updateStatus($id) {

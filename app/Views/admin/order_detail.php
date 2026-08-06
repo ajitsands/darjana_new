@@ -12,7 +12,15 @@
                 <!-- Left Column: Items -->
                 <div>
                     <div class="admin-card">
-                        <h3 style="margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px;">Order Items</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 20px;">
+                            <h3 style="margin: 0; font-size: 16px;">Order Items</h3>
+                            <?php if (!empty($assignments)): ?>
+                                <a href="<?= BASE_URL ?>/admin/order/print-process-requests/<?= $order['id'] ?>" target="_blank" class="btn-primary" style="font-size: 12px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 5px;">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                    Print Process Requests
+                                </a>
+                            <?php endif; ?>
+                        </div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
@@ -23,6 +31,7 @@
                                         <th style="text-align: center;">QTY</th>
                                         <th style="text-align: right;">UNIT PRICE</th>
                                         <th style="text-align: right;">TOTAL</th>
+                                        <th>ASSIGNMENTS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,6 +59,47 @@
                                             </td>
                                             <td style="text-align: right; font-weight: 700;">
                                                 <?= number_format($item['price'] * $item['quantity'], 2) ?> BHD
+                                            </td>
+                                            <td style="min-width: 250px;">
+                                                <?php
+                                                $itemAssignments = array_filter($assignments, function($a) use ($item) {
+                                                    return $a['order_item_id'] == $item['id'];
+                                                });
+                                                $assignedQty = array_sum(array_column($itemAssignments, 'quantity'));
+                                                $remainingQty = $item['quantity'] - $assignedQty;
+                                                ?>
+                                                
+                                                <?php if (!empty($itemAssignments)): ?>
+                                                    <div style="margin-bottom: 10px;">
+                                                        <?php foreach ($itemAssignments as $assignment): ?>
+                                                            <div style="font-size: 12px; background: #f7fafc; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                                                                <div>
+                                                                    <strong><?= htmlspecialchars($assignment['unit_name']) ?></strong> (Qty: <?= $assignment['quantity'] ?>)<br>
+                                                                    <span style="color: #718096; font-size: 11px;">PR: <?= htmlspecialchars($assignment['process_number']) ?></span>
+                                                                </div>
+                                                                <a href="#" onclick="if(confirm('Remove this assignment?')) { window.location.href='<?= BASE_URL ?>/admin/order/remove-assignment/<?= $assignment['id'] ?>?order_id=<?= $order['id'] ?>'; }" style="color: #e53e3e; text-decoration: none; font-size: 11px; padding: 2px 5px; border: 1px solid #e53e3e; border-radius: 3px;">Remove</a>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                                <?php if ($order['status'] === 'Processing' && $remainingQty > 0): ?>
+                                                    <form method="POST" action="<?= BASE_URL ?>/admin/order/assign-item/<?= $order['id'] ?>" style="display: flex; gap: 5px; align-items: center; background: #fff; padding: 8px; border-radius: 4px; border: 1px dashed #cbd5e0;">
+                                                        <input type="hidden" name="order_item_id" value="<?= $item['id'] ?>">
+                                                        <select name="tailoring_unit_id" required style="padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; max-width: 120px;">
+                                                            <option value="">Select Unit...</option>
+                                                            <?php foreach ($activeUnits as $unit): ?>
+                                                                <option value="<?= $unit['id'] ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                        <input type="number" name="quantity" min="1" max="<?= $remainingQty ?>" value="<?= $remainingQty ?>" required style="padding: 4px; width: 50px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" title="Quantity">
+                                                        <button type="submit" style="padding: 4px 8px; background: #3182ce; color: #fff; border: none; border-radius: 3px; font-size: 12px; cursor: pointer; font-weight: 600;">Assign</button>
+                                                    </form>
+                                                <?php elseif ($remainingQty <= 0): ?>
+                                                    <span style="font-size: 11px; color: #38a169; font-weight: 600; display: inline-block; padding: 2px 6px; background: #f0fff4; border-radius: 4px; border: 1px solid #9ae6b4;">Fully Assigned</span>
+                                                <?php else: ?>
+                                                    <span style="font-size: 11px; color: #a0aec0; font-style: italic;">Change status to Processing to assign</span>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
