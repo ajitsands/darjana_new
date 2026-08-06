@@ -163,4 +163,5 @@ function confirmComplete(e, url) {
 }
 </script>
 
-<?php include __DIR__ . '/footer.php'; ?>
+</body>
+</html>
