@@ -48,7 +48,7 @@
                         <label for="order_status" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #4a5568;">Order Status</label>
                         <select id="order_status" name="order_status" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff;">
                             <option value="All" <?= ($orderStatusFilter ?? 'All') === 'All' ? 'selected' : '' ?>>All Statuses</option>
-                            <option value="Pending" <?= ($orderStatusFilter ?? '') === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                            <option value="New" <?= ($orderStatusFilter ?? '') === 'New' ? 'selected' : '' ?>>New</option>
                             <option value="Processing" <?= ($orderStatusFilter ?? '') === 'Processing' ? 'selected' : '' ?>>Processing</option>
                             <option value="Shipped" <?= ($orderStatusFilter ?? '') === 'Shipped' ? 'selected' : '' ?>>Shipped</option>
                             <option value="Delivered" <?= ($orderStatusFilter ?? '') === 'Delivered' ? 'selected' : '' ?>>Delivered</option>
