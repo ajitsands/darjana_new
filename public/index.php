@@ -83,6 +83,13 @@ $router->add('GET', '/admin/coupons/edit/{id}', 'AdminCouponController@edit');
 $router->add('POST', '/admin/coupons/update/{id}', 'AdminCouponController@update');
 $router->add('GET', '/admin/coupons/delete/{id}', 'AdminCouponController@delete');
 
+$router->add('GET', '/admin/tailoring-units', 'AdminTailoringUnitController@index');
+$router->add('GET', '/admin/tailoring-units/create', 'AdminTailoringUnitController@create');
+$router->add('POST', '/admin/tailoring-units/store', 'AdminTailoringUnitController@store');
+$router->add('GET', '/admin/tailoring-units/edit/{id}', 'AdminTailoringUnitController@edit');
+$router->add('POST', '/admin/tailoring-units/update/{id}', 'AdminTailoringUnitController@update');
+$router->add('GET', '/admin/tailoring-units/delete/{id}', 'AdminTailoringUnitController@delete');
+
 $router->add('POST', '/checkout/apply-coupon', 'CheckoutController@applyCoupon');
 
 // Dispatch Request

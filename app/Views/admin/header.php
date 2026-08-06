@@ -228,6 +228,7 @@
                 <li><a href="<?= BASE_URL ?>/admin" class="<?= $isAdminHome ? 'active' : '' ?>">Dashboard</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/products" class="<?= strpos($uri, '/admin/products') !== false || strpos($uri, '/admin/product') !== false ? 'active' : '' ?>">Products</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/categories" class="<?= strpos($uri, '/admin/categories') !== false || strpos($uri, '/admin/category') !== false ? 'active' : '' ?>">Categories</a></li>
+                <li><a href="<?= BASE_URL ?>/admin/tailoring-units" class="<?= strpos($uri, '/admin/tailoring-units') !== false ? 'active' : '' ?>">Tailoring Units</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/orders" class="<?= strpos($uri, '/admin/orders') !== false || strpos($uri, '/admin/order') !== false ? 'active' : '' ?>">Customer Orders</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/coupons" class="<?= strpos($uri, '/admin/coupons') !== false ? 'active' : '' ?>">Coupons &amp; Offers</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/settings" class="<?= strpos($uri, '/admin/settings') !== false ? 'active' : '' ?>">Store Settings</a></li>

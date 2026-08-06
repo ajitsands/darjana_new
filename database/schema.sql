@@ -116,3 +116,14 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS tailoring_units (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    unit_name VARCHAR(255) NOT NULL,
+    contact_person VARCHAR(255),
+    contact_number VARCHAR(50),
+    email_id VARCHAR(255),
+    unique_unit_code VARCHAR(100) UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
