@@ -737,7 +737,22 @@ class AdminController extends Controller {
 
         $orderModel->updateOrderStatuses($id, $orderStatus, $paymentStatus, $trackingNumber, $shippingProvider, $shippingAttachment);
         
-        $_SESSION['admin_success'] = 'Order statuses updated successfully.';
+        $orderStatusChanged = ($order['status'] !== $orderStatus);
+        $paymentStatusChanged = (($order['payment_status'] ?? 'Pending') !== $paymentStatus);
+        
+        $messages = [];
+        if ($orderStatusChanged) {
+            $messages[] = 'Order Status updated';
+        }
+        if ($paymentStatusChanged) {
+            $messages[] = 'Payment Status updated';
+        }
+        
+        if (empty($messages)) {
+            $_SESSION['admin_success'] = 'Order details saved.';
+        } else {
+            $_SESSION['admin_success'] = implode(' and ', $messages) . ' successfully.';
+        }
         $this->redirect(BASE_URL . '/admin/order/' . $id);
     }
 
