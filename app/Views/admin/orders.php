@@ -50,6 +50,7 @@
                             <option value="All" <?= ($orderStatusFilter ?? 'All') === 'All' ? 'selected' : '' ?>>All Statuses</option>
                             <option value="New" <?= ($orderStatusFilter ?? '') === 'New' ? 'selected' : '' ?>>New</option>
                             <option value="Processing" <?= ($orderStatusFilter ?? '') === 'Processing' ? 'selected' : '' ?>>Processing</option>
+                            <option value="Ready to Ship" <?= ($orderStatusFilter ?? '') === 'Ready to Ship' ? 'selected' : '' ?>>Ready to Ship</option>
                             <option value="Shipped" <?= ($orderStatusFilter ?? '') === 'Shipped' ? 'selected' : '' ?>>Shipped</option>
                             <option value="Delivered" <?= ($orderStatusFilter ?? '') === 'Delivered' ? 'selected' : '' ?>>Delivered</option>
                             <option value="Cancelled" <?= ($orderStatusFilter ?? '') === 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>

@@ -243,6 +243,7 @@
                                     <select name="status" id="status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" onchange="toggleShippingFields()">
                                         <option value="New" <?= $order['status'] === 'New' ? 'selected' : '' ?>>New</option>
                                         <option value="Processing" <?= $order['status'] === 'Processing' ? 'selected' : '' ?>>Processing</option>
+                                        <option value="Ready to Ship" <?= $order['status'] === 'Ready to Ship' ? 'selected' : '' ?>>Ready to Ship</option>
                                         <option value="Shipped" <?= $order['status'] === 'Shipped' ? 'selected' : '' ?>>Shipped</option>
                                         <option value="Delivered" <?= $order['status'] === 'Delivered' ? 'selected' : '' ?>>Delivered</option>
                                         <option value="Cancelled" <?= $order['status'] === 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>
