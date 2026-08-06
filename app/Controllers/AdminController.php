@@ -933,6 +933,61 @@ class AdminController extends Controller {
         }
     }
 
+    public function optimizeImages() {
+        $this->requireAuth();
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '512M');
+        
+        $uploadDir = __DIR__ . '/../../public/uploads/products/';
+        $thumbDir = $uploadDir . 'thumb/';
+        
+        echo "<h2>Optimizing Thumb Images (Max 800px)</h2>";
+        
+        $optimizedCount = 0;
+        
+        if (is_dir($thumbDir)) {
+            $files = scandir($thumbDir);
+            foreach ($files as $file) {
+                if ($file === '.' || $file === '..') continue;
+                $filePath = $thumbDir . $file;
+                
+                // Only process files larger than 500KB
+                if (is_file($filePath) && filesize($filePath) > 500 * 1024) {
+                    $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                    $source = null;
+                    
+                    if (in_array($ext, ['jpg', 'jpeg'])) $source = @imagecreatefromjpeg($filePath);
+                    elseif ($ext === 'png') $source = @imagecreatefrompng($filePath);
+                    elseif ($ext === 'webp') $source = @imagecreatefromwebp($filePath);
+                    
+                    if ($source) {
+                        $width = imagesx($source);
+                        $height = imagesy($source);
+                        
+                        // Resize to max 800px
+                        $newWidth = min($width, 800);
+                        $newHeight = ($height / $width) * $newWidth;
+                        
+                        $newImage = imagecreatetruecolor($newWidth, $newHeight);
+                        imagefill($newImage, 0, 0, imagecolorallocate($newImage, 255, 255, 255));
+                        imagecopyresampled($newImage, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                        
+                        // Overwrite original file
+                        imagejpeg($newImage, $filePath, 80);
+                        imagedestroy($newImage);
+                        imagedestroy($source);
+                        
+                        $optimizedCount++;
+                        echo "Optimized: {$file}<br>";
+                    }
+                }
+            }
+        }
+        
+        echo "<h3>Done! Optimized {$optimizedCount} large thumb images.</h3>";
+        echo "<p>You can safely close this page.</p>";
+    }
+
     private function processImageUpload($tmpName, $fileName) {
         $uploadDir = __DIR__ . '/../../public/uploads/products/';
         $thumbDir = $uploadDir . 'thumb/';
