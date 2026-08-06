@@ -53,8 +53,8 @@
                                 <?php endif; ?>
 
                                 <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>">
-                                    <img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img" loading="lazy" width="400" height="600">
-                                    <img src="<?= $product['secondary_image'] ?: $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="secondary-img" loading="lazy" width="400" height="600">
+                                    <img src="<?= str_replace('/high/', '/thumb/', $product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img" loading="lazy" width="400" height="600">
+                                    <img src="<?= str_replace('/high/', '/thumb/', $product['secondary_image'] ?: $product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="secondary-img" loading="lazy" width="400" height="600">
                                 </a>
 
                                 <!-- Small Corner '+' Box -->

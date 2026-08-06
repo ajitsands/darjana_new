@@ -23,7 +23,7 @@
                         <?php foreach ($cart as $item): ?>
                             <tr style="border-bottom: 1px solid var(--color-border);">
                                 <td style="padding: 20px 0; display: flex; gap: 16px; align-items: center;">
-                                    <img src="<?= $item['image'] ?>" style="width: 70px; height: 90px; object-fit: cover;">
+                                    <img src="<?= str_replace('/high/', '/thumb/', $item['image']) ?>" style="width: 70px; height: 90px; object-fit: cover;">
                                     <div>
                                         <a href="<?= BASE_URL ?>/product/<?= $item['slug'] ?>" style="font-weight: 600; color: var(--color-primary); display: block;"><?= htmlspecialchars($item['name']) ?></a>
                                         <div style="font-size: 12px; color: var(--color-text-muted);">

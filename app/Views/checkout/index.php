@@ -145,7 +145,7 @@
             <div style="margin-bottom: 20px; max-height: 350px; overflow-y: auto;">
                 <?php foreach ($cart as $item): ?>
                     <div style="display: flex; gap: 14px; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 14px;">
-                        <img src="<?= $item['image'] ?>" style="width: 55px; height: 70px; object-fit: cover;">
+                        <img src="<?= str_replace('/high/', '/thumb/', $item['image']) ?>" style="width: 55px; height: 70px; object-fit: cover;">
                         <div style="flex-grow: 1;">
                             <div style="font-size: 13px; font-weight: 600; line-height: 1.3;"><?= htmlspecialchars($item['name']) ?></div>
                             <div style="font-size: 11px; color: #666;">

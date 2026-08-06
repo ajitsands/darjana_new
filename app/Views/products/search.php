@@ -16,7 +16,7 @@
                 <div class="product-card">
                     <div class="product-image-wrap">
                         <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>">
-                            <img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img">
+                            <img src="<?= str_replace('/high/', '/thumb/', $product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img">
                         </a>
                     </div>
                     <div class="product-info">

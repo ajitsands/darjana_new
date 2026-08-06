@@ -115,8 +115,8 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
                             <?php endif; ?>
 
                             <a href="<?= BASE_URL ?>/product/<?= $product['slug'] ?>">
-                                <img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img">
-                                <img src="<?= $product['secondary_image'] ?: $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="secondary-img">
+                                <img src="<?= str_replace('/high/', '/thumb/', $product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="primary-img">
+                                <img src="<?= str_replace('/high/', '/thumb/', $product['secondary_image'] ?: $product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="secondary-img">
                             </a>
 
                             <!-- Small Corner '+' Box -->
@@ -231,8 +231,8 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
                                         <div class="product-image-wrap">
                                             ${offerBadgeHtml}
                                             <a href="${baseUrl}/product/${p.slug}">
-                                                <img src="${p.image}" alt="${p.name}" class="primary-img">
-                                                <img src="${p.secondary_image || p.image}" alt="${p.name}" class="secondary-img">
+                                                <img src="${p.image.replace('/high/', '/thumb/')}" alt="${p.name}" class="primary-img">
+                                                <img src="${(p.secondary_image || p.image).replace('/high/', '/thumb/')}" alt="${p.name}" class="secondary-img">
                                             </a>
                                             <a href="${baseUrl}/product/${p.slug}" class="quick-plus-btn" title="View Product Details">+</a>
                                         </div>
