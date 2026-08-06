@@ -49,24 +49,38 @@ function getColorSwatchStyle($colorName) {
     <!-- Product Detail Responsive Layout Grid -->
 <?php
 $mediaItems = [];
-if (!empty($product['image'])) {
-    $mediaItems[] = ['type' => 'image', 'thumb' => $product['image'], 'high' => $product['image']];
-}
-if (!empty($product['secondary_image']) && $product['secondary_image'] !== $product['image']) {
-    $mediaItems[] = ['type' => 'image', 'thumb' => $product['secondary_image'], 'high' => $product['secondary_image']];
-}
+$addedUrls = [];
+
+$addImage = function($url) use (&$mediaItems, &$addedUrls) {
+    if (empty($url) || in_array($url, $addedUrls)) return;
+    $high = $url;
+    $thumb = str_replace('/high/', '/thumb/', $url);
+    $tiny = str_replace('/high/', '/tiny/', $url);
+    $mediaItems[] = ['type' => 'image', 'tiny' => $tiny, 'thumb' => $thumb, 'high' => $high];
+    $addedUrls[] = $url;
+};
+
+if (!empty($product['image'])) $addImage($product['image']);
+if (!empty($product['secondary_image'])) $addImage($product['secondary_image']);
+
 if (!empty($product['media'])) {
     $galleryMedia = json_decode($product['media'], true);
     if (is_array($galleryMedia)) {
         foreach ($galleryMedia as $item) {
-            $mediaItems[] = $item;
+            if ($item['type'] === 'image' && !empty($item['high'])) {
+                $addImage($item['high']);
+            } else if ($item['type'] === 'video') {
+                if (!in_array($item['url'], $addedUrls)) {
+                    $mediaItems[] = $item;
+                    $addedUrls[] = $item['url'];
+                }
+            }
         }
     }
 }
-$mediaItems = array_map("unserialize", array_unique(array_map("serialize", $mediaItems)));
-$mediaItems = array_values($mediaItems);
+
 if (empty($mediaItems)) {
-    $mediaItems[] = ['type' => 'image', 'thumb' => BASE_URL . '/public/assets/images/placeholder.jpg', 'high' => BASE_URL . '/public/assets/images/placeholder.jpg'];
+    $mediaItems[] = ['type' => 'image', 'tiny' => BASE_URL . '/public/assets/images/placeholder.jpg', 'thumb' => BASE_URL . '/public/assets/images/placeholder.jpg', 'high' => BASE_URL . '/public/assets/images/placeholder.jpg'];
 }
 ?>
     <div class="product-detail-layout">
@@ -113,7 +127,7 @@ if (empty($mediaItems)) {
                                 <video style="width:100%; height:100%; object-fit:cover; opacity:0.6;"><source src="<?= $item['url'] ?>"></video>
                             </div>
                         <?php else: ?>
-                            <img src="<?= $item['thumb'] ?>" class="gallery-thumb-img <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>" onclick="switchProductMedia(this, <?= $index ?>)">
+                            <img src="<?= $item['tiny'] ?? $item['thumb'] ?>" class="gallery-thumb-img <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>" onclick="switchProductMedia(this, <?= $index ?>)">
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
