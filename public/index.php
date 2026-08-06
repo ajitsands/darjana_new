@@ -74,6 +74,7 @@ $router->add('GET', '/admin/order/{id}', 'AdminController@orderDetail');
 $router->add('POST', '/admin/order/assign-item/{id}', 'AdminController@assignItem');
 $router->add('GET', '/admin/order/remove-assignment/{id}', 'AdminController@removeAssignment');
 $router->add('GET', '/admin/order/print-process-requests/{id}', 'AdminController@printProcessRequests');
+$router->add('GET', '/admin/order/print-assignment-summary/{id}', 'AdminController@printAssignmentSummary');
 $router->add('POST', '/admin/order/update-status/{id}', 'AdminController@updateStatus');
 $router->add('GET', '/admin/order/delete/{id}', 'AdminController@deleteOrder');
 $router->add('GET', '/admin/settings', 'AdminController@settings');

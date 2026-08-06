@@ -651,6 +651,25 @@ class AdminController extends Controller {
         require_once __DIR__ . '/../Views/admin/print_process_requests.php';
     }
 
+    public function printAssignmentSummary($id) {
+        $this->requireAuth();
+        $orderModel = new Order();
+        $order = $orderModel->getOrderById($id);
+        
+        if (!$order) {
+            die('Order not found');
+        }
+
+        $items = $orderModel->getOrderItems($id);
+        $assignments = $orderModel->getItemAssignments($id);
+
+        if (empty($assignments)) {
+            die('No assignments found for this order.');
+        }
+
+        require_once __DIR__ . '/../Views/admin/print_assignment_summary.php';
+    }
+
     public function updateStatus($id) {
         $this->requireAuth();
         $orderModel = new Order();

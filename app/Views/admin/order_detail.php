@@ -15,10 +15,16 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 20px;">
                             <h3 style="margin: 0; font-size: 16px;">Order Items</h3>
                             <?php if (!empty($assignments)): ?>
-                                <a href="<?= BASE_URL ?>/admin/order/print-process-requests/<?= $order['id'] ?>" target="_blank" class="btn-primary" style="font-size: 12px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 5px;">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                                    Print Process Requests
-                                </a>
+                                <div style="display: flex; gap: 10px;">
+                                    <a href="<?= BASE_URL ?>/admin/order/print-assignment-summary/<?= $order['id'] ?>" target="_blank" style="background: #4a5568; color: #fff; text-decoration: none; font-size: 12px; padding: 6px 12px; border-radius: 4px; display: inline-flex; align-items: center; gap: 5px; font-weight: 600;">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        Print Assignment Summary
+                                    </a>
+                                    <a href="<?= BASE_URL ?>/admin/order/print-process-requests/<?= $order['id'] ?>" target="_blank" class="btn-primary" style="font-size: 12px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 5px;">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                        Print Process Requests
+                                    </a>
+                                </div>
                             <?php endif; ?>
                         </div>
                         <div class="table-responsive">
