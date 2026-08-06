@@ -77,7 +77,7 @@
                                                                     <strong><?= htmlspecialchars($assignment['unit_name']) ?></strong> (Qty: <?= $assignment['quantity'] ?>)<br>
                                                                     <span style="color: #718096; font-size: 11px;">PR: <?= htmlspecialchars($assignment['process_number']) ?></span>
                                                                 </div>
-                                                                <a href="#" onclick="if(confirm('Remove this assignment?')) { window.location.href='<?= BASE_URL ?>/admin/order/remove-assignment/<?= $assignment['id'] ?>?order_id=<?= $order['id'] ?>'; }" style="color: #e53e3e; text-decoration: none; font-size: 11px; padding: 2px 5px; border: 1px solid #e53e3e; border-radius: 3px;">Remove</a>
+                                                                <a href="#" onclick="confirmDelete(event, '<?= BASE_URL ?>/admin/order/remove-assignment/<?= $assignment['id'] ?>?order_id=<?= $order['id'] ?>', 'Are you sure you want to remove this assignment?')" style="color: #e53e3e; text-decoration: none; font-size: 11px; padding: 2px 5px; border: 1px solid #e53e3e; border-radius: 3px;">Remove</a>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
