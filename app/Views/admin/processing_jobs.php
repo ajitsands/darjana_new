@@ -77,6 +77,32 @@
         <button class="group-btn" id="btnGroupUnit" onclick="setGrouping(1, this)">Group by Tailoring Unit</button>
     </div>
 
+    <!-- Filter Form -->
+    <div style="background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <form method="GET" action="<?= BASE_URL ?>/admin/tailoring-units/processing-jobs" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4a5568;">Status</label>
+                <select name="status" style="padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; min-width: 150px;">
+                    <option value="">All Jobs</option>
+                    <option value="Processing" <?= ($statusFilter === 'Processing') ? 'selected' : '' ?>>Processing Only</option>
+                    <option value="Completed" <?= ($statusFilter === 'Completed') ? 'selected' : '' ?>>Completed Only</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4a5568;">Start Date</label>
+                <input type="date" name="start_date" value="<?= htmlspecialchars($startDate ?? '') ?>" style="padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4a5568;">End Date</label>
+                <input type="date" name="end_date" value="<?= htmlspecialchars($endDate ?? '') ?>" style="padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;">
+            </div>
+            <div>
+                <button type="submit" class="btn-primary" style="background: var(--color-primary); color: #fff; padding: 9px 20px; border-radius: 4px; border: none; font-weight: 600; cursor: pointer;">Search</button>
+                <a href="<?= BASE_URL ?>/admin/tailoring-units/processing-jobs" class="btn-secondary" style="background: #e2e8f0; color: #4a5568; padding: 9px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; margin-left: 5px; display: inline-block;">Clear</a>
+            </div>
+        </form>
+    </div>
+
     <div class="table-responsive" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <table id="jobsTable" class="display" style="width:100%">
             <thead>

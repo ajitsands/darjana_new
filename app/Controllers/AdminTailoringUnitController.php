@@ -143,18 +143,19 @@ class AdminTailoringUnitController extends Controller {
         require_once __DIR__ . '/../Models/Order.php';
         $orderModel = new Order();
         
-        // Let's get both pending and completed assignments, or pass a filter
-        $filter = $_GET['filter'] ?? 'Processing';
-        if ($filter === 'All') {
-            $assignments = $orderModel->getAllAssignments();
-        } else {
-            $assignments = $orderModel->getAllAssignments($filter);
-        }
+        $statusFilter = $_GET['status'] ?? null;
+        $startDate = $_GET['start_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? null;
+        
+        // Pass filters to the model
+        $assignments = $orderModel->getAllAssignments($statusFilter, $startDate, $endDate);
         
         $data = [
             'pageTitle' => 'Processing Job Orders | Dar Jana Fashion',
             'assignments' => $assignments,
-            'filter' => $filter
+            'statusFilter' => $statusFilter,
+            'startDate' => $startDate,
+            'endDate' => $endDate
         ];
         
         $this->render('admin/processing_jobs', $data, 'admin');

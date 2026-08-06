@@ -142,7 +142,7 @@ class Order extends Model {
         return $this->query("DELETE FROM orders WHERE id = ?", [$orderId]);
     }
 
-    public function getAllAssignments($status = null) {
+    public function getAllAssignments($status = null, $startDate = null, $endDate = null) {
         $sql = "SELECT a.*, t.unit_name, t.unique_unit_code, 
                        o.order_number, o.created_at as order_date,
                        oi.product_name, oi.product_code, oi.size, oi.color, oi.length, oi.note
@@ -152,12 +152,29 @@ class Order extends Model {
                 JOIN order_items oi ON a.order_item_id = oi.id";
                 
         $params = [];
+        $where = [];
+        
         if ($status) {
-            $sql .= " WHERE a.status = ?";
+            $where[] = "a.status = ?";
             $params[] = $status;
         }
         
+        if ($startDate) {
+            $where[] = "DATE(a.created_at) >= ?";
+            $params[] = $startDate;
+        }
+        
+        if ($endDate) {
+            $where[] = "DATE(a.created_at) <= ?";
+            $params[] = $endDate;
+        }
+        
+        if (!empty($where)) {
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+        
         $sql .= " ORDER BY a.created_at DESC";
+        
         return $this->fetchAll($sql, $params);
     }
 
