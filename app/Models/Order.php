@@ -109,6 +109,9 @@ class Order extends Model {
                 $deduction = $item['price'] * $item['quantity'];
                 $newTotal = max(0, $order['total_amount'] - $deduction);
                 $this->query("UPDATE orders SET total_amount = ? WHERE id = ?", [$newTotal, $order['id']]);
+                
+                // Check if remaining items are now all completed
+                $this->checkAndProcessOrderCompletion($order['id']);
             }
             return true;
         }
@@ -179,7 +182,35 @@ class Order extends Model {
     }
 
     public function markAssignmentCompleted($id) {
-        return $this->query("UPDATE order_item_assignments SET status = 'Completed' WHERE id = ?", [$id]);
+        $this->query("UPDATE order_item_assignments SET status = 'Completed' WHERE id = ?", [$id]);
+        
+        // After marking an assignment as completed, check if the whole order is now completed
+        $assignment = $this->getAssignmentById($id);
+        if ($assignment) {
+            $this->checkAndProcessOrderCompletion($assignment['order_id']);
+        }
+        return true;
+    }
+    
+    private function checkAndProcessOrderCompletion($orderId) {
+        // Get total quantity of active items for this order
+        $activeItemsResult = $this->fetchOne(
+            "SELECT SUM(quantity) as total_qty FROM order_items WHERE order_id = ? AND (status IS NULL OR status != 'Cancelled')", 
+            [$orderId]
+        );
+        $totalActiveQty = (int)($activeItemsResult['total_qty'] ?? 0);
+        
+        // Get total quantity of completed assignments for this order
+        $completedAssignmentsResult = $this->fetchOne(
+            "SELECT SUM(quantity) as total_completed FROM order_item_assignments WHERE order_id = ? AND status = 'Completed'",
+            [$orderId]
+        );
+        $totalCompletedQty = (int)($completedAssignmentsResult['total_completed'] ?? 0);
+        
+        // If all active items have been completely processed and completed, mark order as Ready to Ship
+        if ($totalActiveQty > 0 && $totalCompletedQty >= $totalActiveQty) {
+            $this->query("UPDATE orders SET status = 'Ready to Ship' WHERE id = ?", [$orderId]);
+        }
     }
 
     public function updateOrderStatuses($orderId, $orderStatus, $paymentStatus, $trackingNumber = null, $shippingProvider = null, $shippingAttachment = null) {
