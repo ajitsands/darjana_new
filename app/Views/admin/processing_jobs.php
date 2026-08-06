@@ -4,6 +4,8 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <!-- DataTables RowGroup CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.4.0/css/rowGroup.dataTables.min.css">
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 
 <style>
     .dataTables_wrapper .dataTables_filter input { border: 1px solid #ccc; border-radius: 4px; padding: 4px; margin-left: 8px; }
@@ -31,6 +33,24 @@
         background-color: #f8fafc !important;
         font-weight: bold;
         color: var(--color-primary);
+    }
+    
+    .dt-buttons {
+        margin-bottom: 15px;
+        float: left;
+    }
+    .dataTables_filter {
+        float: right;
+        margin-bottom: 15px;
+    }
+    .dt-button.btn-primary {
+        background: var(--color-primary) !important;
+        color: #fff !important;
+        border: none !important;
+        padding: 8px 16px !important;
+        border-radius: 4px !important;
+        font-weight: 600 !important;
+        cursor: pointer;
     }
 </style>
 
@@ -119,6 +139,8 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -130,7 +152,19 @@ $(document).ready(function() {
         "pageLength": 25,
         "rowGroup": {
             dataSrc: 0 // Default group by Order Number (column index 0)
-        }
+        },
+        "dom": '<"top"Bf>rt<"bottom"lip><"clear">', // Add Buttons to the DOM
+        "buttons": [
+            {
+                extend: 'print',
+                text: 'Print Job Orders',
+                className: 'btn-primary',
+                exportOptions: {
+                    columns: [2, 3, 4, 5, 6, 7] // Exclude hidden ID columns (0,1) and ACTION column (8)
+                },
+                title: 'Processing Job Orders'
+            }
+        ]
     });
 });
 
