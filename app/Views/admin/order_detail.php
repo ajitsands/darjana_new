@@ -42,7 +42,7 @@
                                 </thead>
                                 <tbody>
                                     <?php foreach ($items as $item): ?>
-                                        <tr>
+                                        <tr style="<?= ($item['status'] ?? 'Active') === 'Cancelled' ? 'opacity: 0.5; text-decoration: line-through;' : '' ?>">
                                             <td>
                                                 <?php if (!empty($item['product_code'])): ?>
                                                     <div style="font-size: 11px; color: #c5a059; font-weight: 700; margin-bottom: 4px;"><?= htmlspecialchars($item['product_code']) ?></div>
@@ -67,44 +67,53 @@
                                                 <?= number_format($item['price'] * $item['quantity'], 2) ?> BHD
                                             </td>
                                             <td style="min-width: 250px;">
-                                                <?php
-                                                $itemAssignments = array_filter($assignments, function($a) use ($item) {
-                                                    return $a['order_item_id'] == $item['id'];
-                                                });
-                                                $assignedQty = array_sum(array_column($itemAssignments, 'quantity'));
-                                                $remainingQty = $item['quantity'] - $assignedQty;
-                                                ?>
-                                                
-                                                <?php if (!empty($itemAssignments)): ?>
-                                                    <div style="margin-bottom: 10px;">
-                                                        <?php foreach ($itemAssignments as $assignment): ?>
-                                                            <div style="font-size: 12px; background: #f7fafc; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-                                                                <div>
-                                                                    <strong><?= htmlspecialchars($assignment['unit_name']) ?></strong> (Qty: <?= $assignment['quantity'] ?>)<br>
-                                                                    <span style="color: #718096; font-size: 11px;">PR: <?= htmlspecialchars($assignment['process_number']) ?></span>
-                                                                </div>
-                                                                <a href="#" onclick="confirmDelete(event, '<?= BASE_URL ?>/admin/order/remove-assignment/<?= $assignment['id'] ?>?order_id=<?= $order['id'] ?>', 'Are you sure you want to remove this assignment?')" style="color: #e53e3e; text-decoration: none; font-size: 11px; padding: 2px 5px; border: 1px solid #e53e3e; border-radius: 3px;">Remove</a>
-                                                            </div>
-                                                        <?php endforeach; ?>
-                                                    </div>
-                                                <?php endif; ?>
-
-                                                <?php if ($order['status'] === 'Processing' && $remainingQty > 0): ?>
-                                                    <form method="POST" action="<?= BASE_URL ?>/admin/order/assign-item/<?= $order['id'] ?>" style="display: flex; gap: 5px; align-items: center; background: #fff; padding: 8px; border-radius: 4px; border: 1px dashed #cbd5e0;">
-                                                        <input type="hidden" name="order_item_id" value="<?= $item['id'] ?>">
-                                                        <select name="tailoring_unit_id" required style="padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; max-width: 120px;">
-                                                            <option value="">Select Unit...</option>
-                                                            <?php foreach ($activeUnits as $unit): ?>
-                                                                <option value="<?= $unit['id'] ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                        <input type="number" name="quantity" min="1" max="<?= $remainingQty ?>" value="<?= $remainingQty ?>" required style="padding: 4px; width: 50px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" title="Quantity">
-                                                        <button type="submit" style="padding: 4px 8px; background: #3182ce; color: #fff; border: none; border-radius: 3px; font-size: 12px; cursor: pointer; font-weight: 600;">Assign</button>
-                                                    </form>
-                                                <?php elseif ($remainingQty <= 0): ?>
-                                                    <span style="font-size: 11px; color: #38a169; font-weight: 600; display: inline-block; padding: 2px 6px; background: #f0fff4; border-radius: 4px; border: 1px solid #9ae6b4;">Fully Assigned</span>
+                                                <?php if (($item['status'] ?? 'Active') === 'Cancelled'): ?>
+                                                    <span style="display: inline-block; background: #fed7d7; color: #c53030; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">CANCELLED</span>
                                                 <?php else: ?>
-                                                    <span style="font-size: 11px; color: #a0aec0; font-style: italic;">Change status to Processing to assign</span>
+                                                    <?php
+                                                    $itemAssignments = array_filter($assignments, function($a) use ($item) {
+                                                        return $a['order_item_id'] == $item['id'];
+                                                    });
+                                                    $assignedQty = array_sum(array_column($itemAssignments, 'quantity'));
+                                                    $remainingQty = $item['quantity'] - $assignedQty;
+                                                    ?>
+                                                    
+                                                    <?php if (!empty($itemAssignments)): ?>
+                                                        <div style="margin-bottom: 10px;">
+                                                            <?php foreach ($itemAssignments as $assignment): ?>
+                                                                <div style="font-size: 12px; background: #f7fafc; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                                                                    <div>
+                                                                        <strong><?= htmlspecialchars($assignment['unit_name']) ?></strong> (Qty: <?= $assignment['quantity'] ?>)<br>
+                                                                        <span style="color: #718096; font-size: 11px;">PR: <?= htmlspecialchars($assignment['process_number']) ?></span>
+                                                                    </div>
+                                                                    <a href="#" onclick="confirmDelete(event, '<?= BASE_URL ?>/admin/order/remove-assignment/<?= $assignment['id'] ?>?order_id=<?= $order['id'] ?>', 'Are you sure you want to remove this assignment?')" style="color: #e53e3e; text-decoration: none; font-size: 11px; padding: 2px 5px; border: 1px solid #e53e3e; border-radius: 3px;">Remove</a>
+                                                                </div>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    <?php endif; ?>
+
+                                                    <?php if ($order['status'] === 'Processing' && $remainingQty > 0): ?>
+                                                        <form method="POST" action="<?= BASE_URL ?>/admin/order/assign-item/<?= $order['id'] ?>" style="display: flex; gap: 5px; align-items: center; background: #fff; padding: 8px; border-radius: 4px; border: 1px dashed #cbd5e0;">
+                                                            <input type="hidden" name="order_item_id" value="<?= $item['id'] ?>">
+                                                            <select name="tailoring_unit_id" required style="padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; max-width: 120px;">
+                                                                <option value="">Select Unit...</option>
+                                                                <?php foreach ($activeUnits as $unit): ?>
+                                                                    <option value="<?= $unit['id'] ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                            <input type="number" name="quantity" min="1" max="<?= $remainingQty ?>" value="<?= $remainingQty ?>" required style="padding: 4px; width: 50px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" title="Quantity">
+                                                            <button type="submit" class="btn-primary" style="padding: 4px 10px; font-size: 12px;">Assign</button>
+                                                        </form>
+                                                        <?php if (empty($itemAssignments)): ?>
+                                                            <div style="margin-top: 8px; text-align: right;">
+                                                                <a href="#" onclick="confirmDelete(event, '<?= BASE_URL ?>/admin/order/cancel-item/<?= $item['id'] ?>?order_id=<?= $order['id'] ?>', 'Are you sure you want to cancel this line item? This will deduct its value from the total.')" style="color: #e53e3e; text-decoration: none; font-size: 11px; font-weight: 600; padding: 4px 8px; border: 1px solid #fc8181; border-radius: 4px; display: inline-block;">Cancel Item</a>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    <?php elseif ($remainingQty <= 0): ?>
+                                                        <span style="font-size: 11px; color: #38a169; font-weight: 600; display: inline-block; padding: 2px 6px; background: #f0fff4; border-radius: 4px; border: 1px solid #9ae6b4;">Fully Assigned</span>
+                                                    <?php else: ?>
+                                                        <span style="font-size: 11px; color: #a0aec0; font-style: italic;">Change status to Processing to assign</span>
+                                                    <?php endif; ?>
                                                 <?php endif; ?>
                                             </td>
                                         </tr>

@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     note TEXT,
     price DECIMAL(10, 2) NOT NULL,
     quantity INTEGER NOT NULL,
+    status VARCHAR(50) DEFAULT 'Active',
     FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 

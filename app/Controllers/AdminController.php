@@ -584,6 +584,36 @@ class AdminController extends Controller {
         $this->redirect(BASE_URL . '/admin/order/' . $id);
     }
 
+    public function cancelOrderItem($id) {
+        $this->requireAuth();
+        $orderId = (int)($_GET['order_id'] ?? 0);
+        $orderModel = new Order();
+        
+        if ($orderId > 0) {
+            $assignments = $orderModel->getItemAssignments($orderId);
+            $hasAssignments = false;
+            foreach ($assignments as $a) {
+                if ((int)$a['order_item_id'] === (int)$id) {
+                    $hasAssignments = true;
+                    break;
+                }
+            }
+            
+            if ($hasAssignments) {
+                $_SESSION['admin_error'] = "Cannot cancel item. Remove assignments first.";
+            } else {
+                if ($orderModel->cancelOrderItem($id)) {
+                    $_SESSION['admin_success'] = "Item cancelled successfully.";
+                } else {
+                    $_SESSION['admin_error'] = "Item could not be cancelled or is already cancelled.";
+                }
+            }
+            $this->redirect(BASE_URL . '/admin/order/' . $orderId);
+        } else {
+            $this->redirect(BASE_URL . '/admin/orders');
+        }
+    }
+
     public function removeAssignment($id) {
         $this->requireAuth();
         $orderId = (int)($_GET['order_id'] ?? 0);

@@ -98,6 +98,23 @@ class Order extends Model {
         return $this->fetchAll("SELECT * FROM order_items WHERE order_id = ?", [$orderId]);
     }
 
+    public function cancelOrderItem($orderItemId) {
+        $item = $this->fetchOne("SELECT * FROM order_items WHERE id = ?", [$orderItemId]);
+        if ($item && ($item['status'] ?? 'Active') !== 'Cancelled') {
+            $this->query("UPDATE order_items SET status = 'Cancelled' WHERE id = ?", [$orderItemId]);
+            
+            // Deduct from order total
+            $order = $this->getOrderById($item['order_id']);
+            if ($order) {
+                $deduction = $item['price'] * $item['quantity'];
+                $newTotal = max(0, $order['total_amount'] - $deduction);
+                $this->query("UPDATE orders SET total_amount = ? WHERE id = ?", [$newTotal, $order['id']]);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public function getItemAssignments($orderId) {
         $sql = "SELECT a.*, t.unit_name 
                 FROM order_item_assignments a 
