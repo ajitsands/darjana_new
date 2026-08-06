@@ -46,7 +46,7 @@
     <div class="page">
         <div class="header">
             <div class="header-left">
-                <div class="brand">Dar Jana Fashion</div>
+                <div class="brand"><img src="<?= BASE_URL ?>/assets/images/web_logo_menu.png" alt="Dar Jana Fashion" style="max-height: 40px; margin-bottom: 10px;"></div>
                 <div style="font-size: 16px; font-weight: 600; color: #4a5568; margin-bottom: 15px;">Tailoring Process Request</div>
                 
                 <div class="meta"><strong>Tailoring Unit:</strong> <?= htmlspecialchars($request['unit_name']) ?></div>
