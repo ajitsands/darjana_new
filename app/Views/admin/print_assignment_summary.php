@@ -56,7 +56,7 @@
             </div>
             <div class="header-right">
                 <div class="meta"><strong>Date:</strong> <?= date('d M Y, h:i A') ?></div>
-                <div class="meta"><strong>Total Items:</strong> <?= count($items) ?></div>
+                <div class="meta"><strong>Total Line Items:</strong> <?= count($items) ?></div>
             </div>
         </div>
 
