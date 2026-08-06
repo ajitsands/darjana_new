@@ -142,6 +142,29 @@ class Order extends Model {
         return $this->query("DELETE FROM orders WHERE id = ?", [$orderId]);
     }
 
+    public function getAllAssignments($status = null) {
+        $sql = "SELECT a.*, t.unit_name, t.unique_unit_code, 
+                       o.order_number, o.created_at as order_date,
+                       oi.product_name, oi.product_code, oi.size, oi.color, oi.length, oi.note
+                FROM order_item_assignments a 
+                JOIN tailoring_units t ON a.tailoring_unit_id = t.id 
+                JOIN orders o ON a.order_id = o.id
+                JOIN order_items oi ON a.order_item_id = oi.id";
+                
+        $params = [];
+        if ($status) {
+            $sql .= " WHERE a.status = ?";
+            $params[] = $status;
+        }
+        
+        $sql .= " ORDER BY a.created_at DESC";
+        return $this->fetchAll($sql, $params);
+    }
+
+    public function markAssignmentCompleted($id) {
+        return $this->query("UPDATE order_item_assignments SET status = 'Completed' WHERE id = ?", [$id]);
+    }
+
     public function updateOrderStatuses($orderId, $orderStatus, $paymentStatus, $trackingNumber = null, $shippingProvider = null, $shippingAttachment = null) {
         return $this->query(
             "UPDATE orders SET status = ?, payment_status = ?, tracking_number = ?, shipping_provider = ?, shipping_attachment = ? WHERE id = ?", 

@@ -122,12 +122,49 @@ class AdminTailoringUnitController extends Controller {
         $this->requireAuth();
         $unitModel = new TailoringUnit();
         $unit = $unitModel->getUnitById($id);
-        
         if ($unit) {
             $unitModel->deleteUnit($id);
-            $_SESSION['admin_success'] = "Tailoring Unit deleted successfully.";
+            $this->logActivity('DELETE_TAILORING_UNIT', "Deleted Tailoring Unit: {$unit['unit_name']} ({$unit['unique_unit_code']})");
+            $_SESSION['admin_success'] = "Tailoring Unit '{$unit['unit_name']}' deleted successfully.";
         }
         $this->redirect(BASE_URL . '/admin/tailoring-units');
+    }
+
+    public function processingJobs() {
+        $this->requireAuth();
+        require_once __DIR__ . '/../Models/Order.php';
+        $orderModel = new Order();
+        
+        // Let's get both pending and completed assignments, or pass a filter
+        $filter = $_GET['filter'] ?? 'Processing';
+        if ($filter === 'All') {
+            $assignments = $orderModel->getAllAssignments();
+        } else {
+            $assignments = $orderModel->getAllAssignments($filter);
+        }
+        
+        $data = [
+            'pageTitle' => 'Processing Job Orders | Dar Jana Fashion',
+            'assignments' => $assignments,
+            'filter' => $filter
+        ];
+        
+        $this->render('admin/processing_jobs', $data, 'admin');
+    }
+
+    public function completeJob($id) {
+        $this->requireAuth();
+        require_once __DIR__ . '/../Models/Order.php';
+        $orderModel = new Order();
+        
+        $assignment = $orderModel->getAssignmentById($id);
+        if ($assignment) {
+            $orderModel->markAssignmentCompleted($id);
+            $this->logActivity('COMPLETE_JOB', "Marked job order assignment PR: {$assignment['process_number']} as Completed.");
+            $_SESSION['admin_success'] = "Job marked as Completed successfully.";
+        }
+        
+        $this->redirect(BASE_URL . '/admin/tailoring-units/processing-jobs');
     }
     
     public function checkCode() {

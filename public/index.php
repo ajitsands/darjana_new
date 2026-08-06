@@ -90,6 +90,8 @@ $router->add('POST', '/admin/coupons/update/{id}', 'AdminCouponController@update
 $router->add('GET', '/admin/coupons/delete/{id}', 'AdminCouponController@delete');
 
 $router->add('GET', '/admin/tailoring-units', 'AdminTailoringUnitController@index');
+$router->add('GET', '/admin/tailoring-units/processing-jobs', 'AdminTailoringUnitController@processingJobs');
+$router->add('GET', '/admin/tailoring-units/complete-job/{id}', 'AdminTailoringUnitController@completeJob');
 $router->add('GET', '/admin/tailoring-units/create', 'AdminTailoringUnitController@create');
 $router->add('POST', '/admin/tailoring-units/store', 'AdminTailoringUnitController@store');
 $router->add('GET', '/admin/tailoring-units/edit/{id}', 'AdminTailoringUnitController@edit');

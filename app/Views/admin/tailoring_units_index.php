@@ -16,7 +16,10 @@
             <h1 style="font-size: 26px;">Tailoring Units</h1>
             <p style="color: #718096; font-size: 14px;">Manage the tailoring units</p>
         </div>
-        <a href="<?= BASE_URL ?>/admin/tailoring-units/create" class="btn-primary">+ Add Tailoring Unit</a>
+        <div style="display: flex; gap: 10px;">
+            <a href="<?= BASE_URL ?>/admin/tailoring-units/processing-jobs" class="btn-secondary" style="background: #4a5568; color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600;">Processing Job Orders</a>
+            <a href="<?= BASE_URL ?>/admin/tailoring-units/create" class="btn-primary" style="background: var(--color-primary); color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600;">+ Add Tailoring Unit</a>
+        </div>
     </div>
 
     <?php if (isset($_SESSION['admin_success'])): ?>

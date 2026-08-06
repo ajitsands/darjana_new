@@ -1,3 +1,7 @@
 scratch/
 .idea/
 .vscode/
+public/uploads/
+*.zip
+*.sql
+check_schema_first_upload/
