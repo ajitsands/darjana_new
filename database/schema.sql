@@ -41,6 +41,9 @@ CREATE TABLE IF NOT EXISTS orders (
     vat_amount DECIMAL(10, 2) DEFAULT 0.00,
     vat_type VARCHAR(20) DEFAULT 'exclusive',
     status VARCHAR(50) DEFAULT 'Pending',
+    tracking_number VARCHAR(100) DEFAULT NULL,
+    shipping_provider VARCHAR(100) DEFAULT NULL,
+    shipping_attachment VARCHAR(255) DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
