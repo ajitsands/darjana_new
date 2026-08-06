@@ -1,5 +1,38 @@
 <?php include __DIR__ . '/header.php'; ?>
         <div class="admin-main">
+            <?php if (isset($_SESSION['admin_success'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: <?= json_encode($_SESSION['admin_success']) ?>,
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    });
+                </script>
+                <?php unset($_SESSION['admin_success']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['admin_error'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: <?= json_encode($_SESSION['admin_error']) ?>,
+                            showConfirmButton: false,
+                            timer: 4000,
+                            timerProgressBar: true
+                        });
+                    });
+                </script>
+                <?php unset($_SESSION['admin_error']); ?>
+            <?php endif; ?>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <div>
                     <h1 style="font-size: 26px;">Order Details #<?= htmlspecialchars($order['order_number']) ?></h1>
