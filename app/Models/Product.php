@@ -90,6 +90,12 @@ class Product extends Model {
         } catch (Exception $e) {
             try { $this->db->exec("ALTER TABLE products ADD COLUMN media TEXT DEFAULT '[]'"); } catch (Exception $ex) {}
         }
+
+        try {
+            $this->db->query("SELECT is_verified FROM products LIMIT 1");
+        } catch (Exception $e) {
+            try { $this->db->exec("ALTER TABLE products ADD COLUMN is_verified TINYINT(1) DEFAULT 1"); } catch (Exception $ex) {}
+        }
     }
 
     public function getAll($limit = null, $offset = 0, $sort = 'featured', $minPrice = null, $maxPrice = null, $activeOnly = true) {
@@ -98,10 +104,10 @@ class Product extends Model {
                 LEFT JOIN categories c ON FIND_IN_SET(c.id, p.category_id) WHERE 1=1";
         
         if ($activeOnly) {
-            $sql .= " AND p.is_active = 1";
+            $sql .= " AND p.is_active = 1 AND COALESCE(p.is_verified, 1) = 1";
         }
         $sql .= " GROUP BY p.id";
-        
+
         $params = [];
         if ($minPrice !== null && $minPrice !== '') {
             $minKwd = (float)$minPrice / $this->bhdExchangeRate;
@@ -128,7 +134,7 @@ class Product extends Model {
             "SELECT p.*, GROUP_CONCAT(c.name SEPARATOR ', ') as category_name, GROUP_CONCAT(c.slug SEPARATOR ',') as category_slug 
              FROM products p 
              LEFT JOIN categories c ON FIND_IN_SET(c.id, p.category_id) 
-             WHERE p.is_featured = 1 AND p.is_active = 1
+             WHERE p.is_featured = 1 AND p.is_active = 1 AND COALESCE(p.is_verified, 1) = 1
              GROUP BY p.id ORDER BY p.id DESC"
         );
     }
@@ -145,7 +151,7 @@ class Product extends Model {
                 WHERE c.slug = ?";
         
         if ($activeOnly) {
-            $sql .= " AND p.is_active = 1";
+            $sql .= " AND p.is_active = 1 AND COALESCE(p.is_verified, 1) = 1";
         }
         
         $sql .= " GROUP BY p.id";
@@ -176,13 +182,13 @@ class Product extends Model {
         if ($slug === 'all-abaya' || $slug === 'all-dresses') {
             $sql = "SELECT COUNT(*) as total FROM products p WHERE 1=1";
             if ($activeOnly) {
-                $sql .= " AND p.is_active = 1";
+                $sql .= " AND p.is_active = 1 AND COALESCE(p.is_verified, 1) = 1";
             }
             $params = [];
         } else {
             $sql = "SELECT COUNT(DISTINCT p.id) as total FROM products p JOIN categories c ON FIND_IN_SET(c.id, p.category_id) WHERE c.slug = ?";
             if ($activeOnly) {
-                $sql .= " AND p.is_active = 1";
+                $sql .= " AND p.is_active = 1 AND COALESCE(p.is_verified, 1) = 1";
             }
             $params = [$slug];
         }
@@ -248,16 +254,21 @@ class Product extends Model {
              WHERE (p.name LIKE ? OR p.product_code LIKE ? OR p.description LIKE ?)";
         
         if ($activeOnly) {
-            $sql .= " AND p.is_active = 1";
+            $sql .= " AND p.is_active = 1 AND COALESCE(p.is_verified, 1) = 1";
         }
         $sql .= " GROUP BY p.id ORDER BY p.id DESC";
 
         return $this->fetchAll($sql, [$likeTerm, $likeTerm, $likeTerm]);
     }
 
+    public function togglePublishStatus($id, $isVerified) {
+        $status = (int)$isVerified ? 1 : 0;
+        return $this->query("UPDATE products SET is_verified = ? WHERE id = ?", [$status, $id]);
+    }
+
     public function create($data) {
-        $sql = "INSERT INTO products (category_id, product_code, name, name_ar, slug, price, sale_price, image, secondary_image, description, description_ar, offer_tag_type, colors, sizes, lengths, is_featured, is_active, stock, media) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO products (category_id, product_code, name, name_ar, slug, price, sale_price, image, secondary_image, description, description_ar, offer_tag_type, colors, sizes, lengths, is_featured, is_active, is_verified, stock, media) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $this->query($sql, [
             $data['category_id'],
             $data['product_code'],
@@ -276,6 +287,7 @@ class Product extends Model {
             $data['lengths'] ?? '52,54,55,56,57,58,60',
             $data['is_featured'] ?? 0,
             $data['is_active'] ?? 1,
+            isset($data['is_verified']) ? (int)$data['is_verified'] : 0,
             $data['stock'] ?? 50,
             $data['media'] ?? '[]'
         ]);
@@ -294,7 +306,7 @@ class Product extends Model {
         $sql = "UPDATE products SET 
                 category_id = ?, product_code = ?, name = ?, name_ar = ?, slug = ?, price = ?, 
                 sale_price = ?, image = ?, secondary_image = ?, description = ?, description_ar = ?, 
-                offer_tag_type = ?, colors = ?, sizes = ?, lengths = ?, is_featured = ?, is_active = ?, stock = ?, media = ? 
+                offer_tag_type = ?, colors = ?, sizes = ?, lengths = ?, is_featured = ?, is_active = ?, is_verified = ?, stock = ?, media = ? 
                 WHERE id = ?";
         
         $this->query($sql, [
@@ -315,12 +327,14 @@ class Product extends Model {
             $data['lengths'] ?? '52,54,55,56,57,58,60',
             $data['is_featured'] ?? 0,
             $data['is_active'] ?? 1,
+            isset($data['is_verified']) ? (int)$data['is_verified'] : 1,
             $data['stock'] ?? 50,
             $data['media'] ?? '[]',
             $id
         ]);
         return true;
     }
+
     public function delete($id) {
         $this->query("DELETE FROM products WHERE id = ?", [$id]);
         return true;

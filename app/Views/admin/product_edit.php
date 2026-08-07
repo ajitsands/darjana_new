@@ -237,6 +237,10 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                             <input type="checkbox" name="is_active" value="1" id="is_active" <?= (isset($product['is_active']) && $product['is_active']) ? 'checked' : '' ?>>
                             <label for="is_active" style="font-size: 14px; font-weight: bold; color: var(--color-primary);">Display on Website (Product Available)</label>
                         </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="is_verified" value="1" id="is_verified" <?= (!isset($product['is_verified']) || $product['is_verified']) ? 'checked' : '' ?>>
+                            <label for="is_verified" style="font-size: 14px; font-weight: 700; color: #16a34a;">🟢 Verified &amp; Published to Storefront Portal</label>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; border-radius: 4px; font-size: 16px;">Save Changes</button>

@@ -809,9 +809,13 @@ class AdminController extends Controller {
         foreach ($products as $p) {
             $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $p['image']);
             $imageHtml = '<img src="' . htmlspecialchars($tinyImg) . '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">';
-            $activeBadge = (isset($p['is_active']) && $p['is_active'] == 0) ? ' <span style="color: #e53e3e; font-size: 10px; font-weight: 700;">(Inactive)</span>' : '';
+            $isVerified = isset($p['is_verified']) ? (int)$p['is_verified'] : 1;
+            $verifyBadge = ($isVerified === 1) 
+                ? ' <span style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; margin-left: 6px;">🟢 Published</span>'
+                : ' <span style="background: #fefce8; color: #ca8a04; border: 1px solid #fef08a; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; margin-left: 6px;">🟡 Unverified Draft</span>';
+
             $infoHtml = '<div style="font-size: 11px; color: #c5a059; font-weight: 700;">' . htmlspecialchars($p['product_code']) . '</div>' .
-                        '<div style="font-weight: 600; font-size: 13px;">' . htmlspecialchars($p['name']) . $activeBadge . '</div>';
+                        '<div style="font-weight: 600; font-size: 13px;">' . htmlspecialchars($p['name']) . $activeBadge . $verifyBadge . '</div>';
             $categoryHtml = '<span style="font-size: 12px;">' . htmlspecialchars($p['category_name']) . '</span>';
             $tagHtml = '<span style="font-size: 11px; font-weight: 700; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">' . htmlspecialchars($p['offer_tag_type']) . '</span>';
             $priceHtml = '<span style="font-weight: 700; font-size: 13px;">' . number_format($p['price'], 2) . ' BHD</span>';
@@ -840,7 +844,27 @@ class AdminController extends Controller {
                 'locations' => $pStats['locations'] ?? []
             ], JSON_HEX_APOS | JSON_HEX_QUOT);
 
-            $actionsHtml = '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>' .
+            $productOptionData = json_encode([
+                'id' => $p['id'],
+                'code' => $p['product_code'],
+                'name' => $p['name'],
+                'name_ar' => $p['name_ar'] ?? '',
+                'slug' => $p['slug'],
+                'price' => (float)$p['price'],
+                'sale_price' => $p['sale_price'] ? (float)$p['sale_price'] : null,
+                'image' => $p['image'],
+                'description' => $p['description'] ?? '',
+                'description_ar' => $p['description_ar'] ?? '',
+                'colors' => $p['colors'] ?? '',
+                'sizes' => $p['sizes'] ?? '',
+                'lengths' => $p['lengths'] ?? '',
+                'is_verified' => $isVerified,
+                'url' => BASE_URL . '/product/' . $p['slug']
+            ], JSON_HEX_APOS | JSON_HEX_QUOT);
+
+            $actionsHtml = '<a href="javascript:void(0)" onclick=\'openProductOptionsModal(' . $productOptionData . ')\' style="color: #181818; font-size: 12px; font-weight: 700; margin-right: 10px; background: #edf2f7; padding: 4px 8px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Manage Verification, Preview & Status">' .
+                           '⚙️ Actions</a>' .
+                           '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>' .
                            '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="confirmDelete(event, this.href, \'Delete this product?\')" style="color: #e53e3e; font-size: 12px; font-weight: 600; margin-right: 8px;">Delete</a>' .
                            '<a href="javascript:void(0)" onclick=\'openShareModal(' . $productShareData . ')\' style="color: #2b6cb0; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Share Product Link & Track Clicks">' .
                            '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg> Share' .
@@ -858,8 +882,31 @@ class AdminController extends Controller {
         }
         
         header('Content-Type: application/json');
+        echo json_encode(['data' => $data]);
+        exit;
+    }
+
+    public function ajaxTogglePublishProduct() {
+        $this->requireAuth();
+        $id = (int)($_POST['id'] ?? 0);
+        $status = (int)($_POST['status'] ?? 0);
+
+        if ($id <= 0) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Invalid Product ID']);
+            exit;
+        }
+
+        $productModel = new Product();
+        $productModel->togglePublishStatus($id, $status);
+
+        $this->logActivity('TOGGLE_PUBLISH_PRODUCT', "Updated product #{$id} publish verification status to: " . ($status ? 'Published' : 'Unverified Draft'));
+
+        header('Content-Type: application/json');
         echo json_encode([
-            "data" => $data
+            'success' => true,
+            'is_verified' => $status,
+            'message' => $status ? 'Product verified and published to storefront portal!' : 'Product unpublished and hidden from storefront portal.'
         ]);
         exit;
     }
@@ -992,6 +1039,7 @@ class AdminController extends Controller {
             'lengths' => $lengths,
             'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
+            'is_verified' => isset($_POST['is_verified']) ? 1 : 0,
             'stock' => (int)($_POST['stock'] ?? 50),
             'media' => json_encode($mediaArray)
         ]);
@@ -1180,6 +1228,7 @@ class AdminController extends Controller {
             'lengths' => $lengths,
             'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
+            'is_verified' => isset($_POST['is_verified']) ? 1 : 0,
             'stock' => (int)($_POST['stock'] ?? 50),
             'media' => json_encode($mediaArray)
         ]);

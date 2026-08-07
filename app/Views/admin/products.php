@@ -240,6 +240,10 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                                     <input type="checkbox" name="is_active" value="1" id="is_active" checked>
                                     <label for="is_active" style="font-size: 13px; font-weight: bold; color: var(--color-primary);">Display on Website (Product Available)</label>
                                 </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" name="is_verified" value="1" id="is_verified">
+                                    <label for="is_verified" style="font-size: 13px; font-weight: 700; color: #16a34a;">🟢 Verify &amp; Publish Immediately</label>
+                                </div>
                             </div>
 
                             <button type="submit" id="publishBtn" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 4px;" onclick="this.innerHTML='<span style=\'display:inline-block;animation:spin 1s linear infinite;\'>⏳</span> Uploading... Please Wait'; this.style.opacity='0.7'; this.style.pointerEvents='none'; this.form.submit();">Publish Product</button>
@@ -249,6 +253,117 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
             </div>
         </div>
     </div>
+
+<!-- PRODUCT OPTIONS & VERIFICATION MODAL -->
+<div id="productOptionsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+    <div style="background: #fff; width: 90%; max-width: 520px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; animation: fadeIn 0.2s ease;">
+        <div style="padding: 18px 24px; background: #1a1a1a; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span id="optModalCode" style="font-size: 11px; color: #c5a059; font-weight: 700; display: block;">PRODUCT ACTIONS</span>
+                <h3 id="optModalName" style="margin: 0; font-size: 16px; font-weight: 600; color: #fff;">Product Management</h3>
+            </div>
+            <button onclick="closeProductOptionsModal()" style="background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+        
+        <div style="padding: 24px;">
+            <!-- Current Verification Status Banner -->
+            <div id="optModalStatusBanner" style="padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+                <span id="optModalStatusText">Status: Published</span>
+                <span id="optModalStatusBadge" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Published</span>
+            </div>
+
+            <!-- 3 Main Action Cards -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- 1. PREVIEW -->
+                <button type="button" onclick="triggerProductPreview()" style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 18px; background: #f8fafc; border: 1px solid #cbd5e0; border-radius: 6px; cursor: pointer; text-align: left; transition: all 0.2s ease;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 20px;">👁️</span>
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; color: #1e293b;">Preview Product</div>
+                            <div style="font-size: 12px; color: #64748b;">Inspect content, images &amp; details before confirming</div>
+                        </div>
+                    </div>
+                    <span style="font-size: 12px; color: #2563eb; font-weight: 700;">Open &rarr;</span>
+                </button>
+
+                <!-- 2. PUBLISH / VERIFY -->
+                <button type="button" id="publishActionBtn" onclick="togglePublishStatus(1)" style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 18px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; cursor: pointer; text-align: left; transition: all 0.2s ease;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 20px;">🚀</span>
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; color: #166534;">Publish &amp; Verify</div>
+                            <div style="font-size: 12px; color: #15803d;">Confirm content &amp; make visible on Storefront Portal</div>
+                        </div>
+                    </div>
+                    <span style="font-size: 12px; color: #16a34a; font-weight: 700;">Publish Now &rarr;</span>
+                </button>
+
+                <!-- 3. UNPUBLISH -->
+                <button type="button" id="unpublishActionBtn" onclick="togglePublishStatus(0)" style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 18px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; cursor: pointer; text-align: left; transition: all 0.2s ease;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 20px;">⏸️</span>
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; color: #991b1b;">Unpublish (Hide)</div>
+                            <div style="font-size: 12px; color: #b91c1c;">Convert to unverified draft and hide from Storefront</div>
+                        </div>
+                    </div>
+                    <span style="font-size: 12px; color: #dc2626; font-weight: 700;">Unpublish &rarr;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUCT PREVIEW MODAL -->
+<div id="productPreviewModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div style="background: #fff; width: 92%; max-width: 750px; max-height: 88vh; border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow-y: auto; position: relative;">
+        <div style="padding: 16px 24px; background: #181818; color: #fff; display: flex; justify-content: space-between; align-items: center; sticky: top: 0; z-index: 10;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">👁️</span>
+                <div>
+                    <h3 style="margin: 0; font-size: 15px; font-weight: 600; color: #fff;">Storefront Content &amp; Image Verification Preview</h3>
+                    <span id="prevModalCode" style="font-size: 11px; color: #c5a059;">DAR-101</span>
+                </div>
+            </div>
+            <button onclick="closeProductPreviewModal()" style="background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+
+        <div style="padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Left Column: Image Preview -->
+            <div>
+                <img id="prevModalImage" src="" style="width: 100%; height: 320px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+            </div>
+
+            <!-- Right Column: Details -->
+            <div>
+                <span id="prevModalTag" style="font-size: 10px; font-weight: 700; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">TAG</span>
+                <h2 id="prevModalName" style="margin: 8px 0 4px; font-size: 18px; color: #181818;">Product Title</h2>
+                <div id="prevModalNameAr" dir="rtl" style="font-size: 15px; color: #718096; margin-bottom: 12px; font-family: 'Noto Naskh Arabic', sans-serif;">عنوان المنتج بالعربي</div>
+
+                <div style="font-size: 20px; font-weight: 700; color: #c5a059; margin-bottom: 16px;">
+                    <span id="prevModalPrice">0.00 BHD</span>
+                    <span id="prevModalSalePrice" style="text-decoration: line-through; color: #a0aec0; font-size: 14px; margin-left: 8px;"></span>
+                </div>
+
+                <div style="border-top: 1px solid #edf2f7; border-bottom: 1px solid #edf2f7; padding: 12px 0; margin-bottom: 16px; font-size: 12.5px; color: #4a5568; line-height: 1.5;">
+                    <strong>Colors:</strong> <span id="prevModalColors">Black</span><br>
+                    <strong>Sizes:</strong> <span id="prevModalSizes">S, M, L, XL</span><br>
+                    <strong>Abaya Lengths:</strong> <span id="prevModalLengths">52, 54, 56</span>
+                </div>
+
+                <div style="font-size: 13px; color: #2d3748; line-height: 1.6;">
+                    <strong>Description:</strong>
+                    <div id="prevModalDesc" style="margin-top: 4px; white-space: pre-line;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+            <a id="prevModalFullUrl" href="#" target="_blank" style="color: #2563eb; font-size: 13px; font-weight: 600; text-decoration: none;">🔗 Open Full Storefront Page &rarr;</a>
+            <button type="button" onclick="closeProductPreviewModal()" style="padding: 8px 18px; background: #475569; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Close Preview</button>
+        </div>
+    </div>
+</div>
 
 <!-- SHARE MODAL -->
 <div id="shareModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
@@ -492,11 +607,116 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+let currentOptionsProduct = null;
+
+function openProductOptionsModal(product) {
+    currentOptionsProduct = product;
+    document.getElementById('optModalCode').textContent = product.code || 'DAR-101';
+    document.getElementById('optModalName').textContent = product.name || 'Product Options';
+
+    const banner = document.getElementById('optModalStatusBanner');
+    const text = document.getElementById('optModalStatusText');
+    const badge = document.getElementById('optModalStatusBadge');
+    const pubBtn = document.getElementById('publishActionBtn');
+    const unpubBtn = document.getElementById('unpublishActionBtn');
+
+    if (product.is_verified === 1) {
+        banner.style.background = '#f0fdf4';
+        banner.style.border = '1px solid #bbf7d0';
+        text.textContent = 'Storefront Status: Published & Verified';
+        badge.textContent = 'Published';
+        badge.style.background = '#16a34a';
+        badge.style.color = '#fff';
+        pubBtn.style.opacity = '0.5';
+        unpubBtn.style.opacity = '1';
+    } else {
+        banner.style.background = '#fefce8';
+        banner.style.border = '1px solid #fef08a';
+        text.textContent = 'Storefront Status: Unverified Draft';
+        badge.textContent = 'Draft (Hidden)';
+        badge.style.background = '#ca8a04';
+        badge.style.color = '#fff';
+        pubBtn.style.opacity = '1';
+        unpubBtn.style.opacity = '0.5';
+    }
+
+    document.getElementById('productOptionsModal').style.display = 'flex';
+}
+
+function closeProductOptionsModal() {
+    document.getElementById('productOptionsModal').style.display = 'none';
+}
+
+function triggerProductPreview() {
+    if (!currentOptionsProduct) return;
+    const p = currentOptionsProduct;
+    document.getElementById('prevModalCode').textContent = p.code || '';
+    document.getElementById('prevModalName').textContent = p.name || '';
+    document.getElementById('prevModalNameAr').textContent = p.name_ar || '';
+    document.getElementById('prevModalPrice').textContent = (parseFloat(p.sale_price || p.price)).toFixed(2) + ' BHD';
+    
+    if (p.sale_price && parseFloat(p.sale_price) < parseFloat(p.price)) {
+        document.getElementById('prevModalSalePrice').textContent = (parseFloat(p.price)).toFixed(2) + ' BHD';
+        document.getElementById('prevModalSalePrice').style.display = 'inline';
+    } else {
+        document.getElementById('prevModalSalePrice').style.display = 'none';
+    }
+
+    const imgPath = p.image ? p.image.replace('/high/', '/thumb/') : '';
+    document.getElementById('prevModalImage').src = imgPath;
+    document.getElementById('prevModalColors').textContent = p.colors || 'N/A';
+    document.getElementById('prevModalSizes').textContent = p.sizes || 'N/A';
+    document.getElementById('prevModalLengths').textContent = p.lengths || 'N/A';
+    document.getElementById('prevModalTag').textContent = (p.offer_tag_type || 'percentage').toUpperCase();
+    document.getElementById('prevModalDesc').textContent = p.description || 'No description available.';
+    document.getElementById('prevModalFullUrl').href = p.url;
+
+    document.getElementById('productPreviewModal').style.display = 'flex';
+}
+
+function closeProductPreviewModal() {
+    document.getElementById('productPreviewModal').style.display = 'none';
+}
+
+function togglePublishStatus(newStatus) {
+    if (!currentOptionsProduct) return;
+    const prodId = currentOptionsProduct.id;
+
+    fetch(window.BASE_URL + '/admin/products/toggle-publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id=' + prodId + '&status=' + newStatus
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            closeProductOptionsModal();
+            showShareToast(data.message);
+            if (typeof table !== 'undefined' && table.ajax) {
+                table.ajax.reload(null, false);
+            } else {
+                location.reload();
+            }
+        } else {
+            alert(data.message || 'Error updating status.');
+        }
+    })
+    .catch(err => alert('Network error occurred.'));
+}
+
 // Close modal on background click
 window.addEventListener('click', function(e) {
     const modal = document.getElementById('shareModal');
+    const optModal = document.getElementById('productOptionsModal');
+    const prevModal = document.getElementById('productPreviewModal');
     if (e.target === modal) {
         closeShareModal();
+    }
+    if (e.target === optModal) {
+        closeProductOptionsModal();
+    }
+    if (e.target === prevModal) {
+        closeProductPreviewModal();
     }
 });
 
