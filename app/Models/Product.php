@@ -21,6 +21,9 @@ class Product extends Model {
                 source VARCHAR(50) NOT NULL,
                 ip_address VARCHAR(45) NOT NULL,
                 user_agent TEXT NULL,
+                country VARCHAR(100) DEFAULT NULL,
+                country_code VARCHAR(10) DEFAULT NULL,
+                city VARCHAR(100) DEFAULT NULL,
                 clicked_at DATETIME NOT NULL,
                 INDEX idx_prod_ip_src (product_id, ip_address, source, clicked_at)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
@@ -33,10 +36,21 @@ class Product extends Model {
                     source TEXT NOT NULL,
                     ip_address TEXT NOT NULL,
                     user_agent TEXT NULL,
+                    country TEXT NULL,
+                    country_code TEXT NULL,
+                    city TEXT NULL,
                     clicked_at DATETIME NOT NULL
                 )";
                 try { $this->db->exec($sqlSqlite); } catch (Exception $ex2) {}
             }
+        }
+
+        try {
+            $this->db->query("SELECT country FROM product_share_clicks LIMIT 1");
+        } catch (Exception $e) {
+            try { $this->db->exec("ALTER TABLE product_share_clicks ADD COLUMN country VARCHAR(100) DEFAULT NULL"); } catch (Exception $ex) {}
+            try { $this->db->exec("ALTER TABLE product_share_clicks ADD COLUMN country_code VARCHAR(10) DEFAULT NULL"); } catch (Exception $ex) {}
+            try { $this->db->exec("ALTER TABLE product_share_clicks ADD COLUMN city VARCHAR(100) DEFAULT NULL"); } catch (Exception $ex) {}
         }
     }
 
@@ -313,6 +327,53 @@ class Product extends Model {
     }
 
     /**
+     * Resolve GeoLocation (Country, Country Code, City) from IP Address
+     */
+    public function resolveGeoLocation($ipAddress) {
+        $cfCountry = $_SERVER['HTTP_CF_IPCOUNTRY'] ?? null;
+        $cfCity = $_SERVER['HTTP_CF_IPCITY'] ?? null;
+        if (!empty($cfCountry) && $cfCountry !== 'XX') {
+            return [
+                'country' => $cfCountry,
+                'country_code' => strtoupper($cfCountry),
+                'city' => $cfCity ?: 'Unknown City'
+            ];
+        }
+
+        if (in_array($ipAddress, ['127.0.0.1', '::1']) || strpos($ipAddress, '192.168.') === 0 || strpos($ipAddress, '10.') === 0) {
+            return [
+                'country' => 'Localhost / Dev',
+                'country_code' => 'LOCAL',
+                'city' => 'Localhost'
+            ];
+        }
+
+        try {
+            $url = "http://ip-api.com/json/" . urlencode($ipAddress) . "?fields=status,country,countryCode,city";
+            $ctx = stream_context_create([
+                'http' => ['timeout' => 2]
+            ]);
+            $response = @file_get_contents($url, false, $ctx);
+            if ($response) {
+                $data = json_decode($response, true);
+                if (isset($data['status']) && $data['status'] === 'success') {
+                    return [
+                        'country' => $data['country'] ?? 'Unknown Country',
+                        'country_code' => strtoupper($data['countryCode'] ?? 'UN'),
+                        'city' => $data['city'] ?? 'Unknown City'
+                    ];
+                }
+            }
+        } catch (Exception $e) {}
+
+        return [
+            'country' => 'Unknown Country',
+            'country_code' => 'UN',
+            'city' => 'Unknown City'
+        ];
+    }
+
+    /**
      * Track a share link click with deduplication window configured by admin (default: 60 minutes)
      */
     public function trackShareClick($productId, $source, $ipAddress, $userAgent = '') {
@@ -332,10 +393,11 @@ class Product extends Model {
         );
 
         if (!$existing) {
+            $location = $this->resolveGeoLocation($ipAddress);
             $now = date('Y-m-d H:i:s');
             $this->query(
-                "INSERT INTO product_share_clicks (product_id, source, ip_address, user_agent, clicked_at) VALUES (?, ?, ?, ?, ?)",
-                [(int)$productId, strtolower($source), $ipAddress, substr($userAgent, 0, 500), $now]
+                "INSERT INTO product_share_clicks (product_id, source, ip_address, user_agent, country, country_code, city, clicked_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [(int)$productId, strtolower($source), $ipAddress, substr($userAgent, 0, 500), $location['country'], $location['country_code'], $location['city'], $now]
             );
             return true; // Click counted!
         }
@@ -344,12 +406,16 @@ class Product extends Model {
     }
 
     /**
-     * Get share click statistics per product or for all products
+     * Get share click statistics per product or for all products including locations
      */
     public function getShareStats($productId = null) {
         if ($productId) {
             $rows = $this->fetchAll(
                 "SELECT source, COUNT(*) as click_count FROM product_share_clicks WHERE product_id = ? GROUP BY source",
+                [(int)$productId]
+            );
+            $locRows = $this->fetchAll(
+                "SELECT country, country_code, city, COUNT(*) as click_count FROM product_share_clicks WHERE product_id = ? GROUP BY country, country_code, city ORDER BY click_count DESC LIMIT 10",
                 [(int)$productId]
             );
             $total = 0;
@@ -366,11 +432,26 @@ class Product extends Model {
                 $bySource[$src] = $count;
                 $total += $count;
             }
-            return ['total' => $total, 'by_source' => $bySource];
+
+            $locations = [];
+            foreach ($locRows as $lr) {
+                $locations[] = [
+                    'country' => $lr['country'] ?: 'Unknown',
+                    'country_code' => $lr['country_code'] ?: 'UN',
+                    'city' => $lr['city'] ?: 'Unknown',
+                    'count' => (int)$lr['click_count']
+                ];
+            }
+
+            return ['total' => $total, 'by_source' => $bySource, 'locations' => $locations];
         } else {
             $rows = $this->fetchAll(
                 "SELECT product_id, source, COUNT(*) as click_count FROM product_share_clicks GROUP BY product_id, source"
             );
+            $locRows = $this->fetchAll(
+                "SELECT product_id, country, country_code, city, COUNT(*) as click_count FROM product_share_clicks GROUP BY product_id, country, country_code, city ORDER BY click_count DESC"
+            );
+
             $stats = [];
             foreach ($rows as $r) {
                 $pid = (int)$r['product_id'];
@@ -383,7 +464,8 @@ class Product extends Model {
                             'whatsapp' => 0,
                             'tiktok' => 0,
                             'youtube' => 0
-                        ]
+                        ],
+                        'locations' => []
                     ];
                 }
                 $src = strtolower($r['source']);
@@ -391,6 +473,21 @@ class Product extends Model {
                 $stats[$pid]['by_source'][$src] = $count;
                 $stats[$pid]['total'] += $count;
             }
+
+            foreach ($locRows as $lr) {
+                $pid = (int)$lr['product_id'];
+                if (isset($stats[$pid])) {
+                    if (count($stats[$pid]['locations']) < 10) {
+                        $stats[$pid]['locations'][] = [
+                            'country' => $lr['country'] ?: 'Unknown',
+                            'country_code' => $lr['country_code'] ?: 'UN',
+                            'city' => $lr['city'] ?: 'Unknown',
+                            'count' => (int)$lr['click_count']
+                        ];
+                    }
+                }
+            }
+
             return $stats;
         }
     }

@@ -325,11 +325,19 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
             </div>
 
             <!-- Direct URL Preview Box -->
-            <div style="background: #f7fafc; padding: 12px; border-radius: 6px; border: 1px solid #edf2f7;">
+            <div style="background: #f7fafc; padding: 12px; border-radius: 6px; border: 1px solid #edf2f7; margin-bottom: 16px;">
                 <label style="display: block; font-size: 11px; font-weight: 700; color: #718096; margin-bottom: 6px;">GENERATED TRACKABLE LINK</label>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="shareUrlPreview" readonly style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 12px; font-family: monospace; background: #fff; color: #2d3748;">
                     <button type="button" onclick="copyCurrentShareUrl()" style="background: #2b6cb0; color: #fff; border: none; padding: 8px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy Link</button>
+                </div>
+            </div>
+
+            <!-- Geographic Locations Breakdown -->
+            <div style="background: #f7fafc; padding: 12px; border-radius: 6px; border: 1px solid #edf2f7;">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: #718096; margin-bottom: 8px;">🌍 GEOGRAPHIC LOCATIONS (CLICK BREAKDOWN BY PLACE)</label>
+                <div id="shareLocationsList" style="font-size: 12px; color: #2d3748; max-height: 120px; overflow-y: auto;">
+                    <div style="color: #a0aec0; font-size: 12px; font-style: italic;">No click locations recorded yet.</div>
                 </div>
             </div>
             
@@ -365,11 +373,48 @@ function openShareModal(product) {
     document.getElementById('stat_tiktok').textContent = stats.tiktok || 0;
     document.getElementById('stat_youtube').textContent = stats.youtube || 0;
 
+    // Render Locations
+    const locList = document.getElementById('shareLocationsList');
+    locList.innerHTML = '';
+    const locations = product.locations || [];
+    if (locations.length === 0) {
+        locList.innerHTML = '<div style="color: #a0aec0; font-size: 12px; font-style: italic;">No click locations recorded yet.</div>';
+    } else {
+        locations.forEach(loc => {
+            const flag = getFlagEmoji(loc.country_code);
+            const row = document.createElement('div');
+            row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #edf2f7;';
+            row.innerHTML = `<span style="font-weight: 600;">${flag} ${escapeHtml(loc.country)} <span style="color: #718096; font-weight: 400;">(${escapeHtml(loc.city)})</span></span> <span style="font-weight: 700; color: #2b6cb0; background: #ebf8ff; padding: 1px 7px; border-radius: 10px; font-size: 11px;">${loc.count} ${loc.count === 1 ? 'click' : 'clicks'}</span>`;
+            locList.appendChild(row);
+        });
+    }
+
     // Default to whatsapp link preview
     updateShareUrlPreview('whatsapp');
 
     const modal = document.getElementById('shareModal');
     modal.style.display = 'flex';
+}
+
+function getFlagEmoji(countryCode) {
+    if (!countryCode || countryCode === 'LOCAL') return '📍';
+    if (countryCode === 'UN') return '🌐';
+    try {
+        const codePoints = countryCode
+            .toUpperCase()
+            .split('')
+            .map(char => 127397 + char.charCodeAt(0));
+        return String.fromCodePoint(...codePoints);
+    } catch (e) {
+        return '🏳️';
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+    });
 }
 
 function closeShareModal() {

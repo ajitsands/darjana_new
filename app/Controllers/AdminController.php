@@ -785,7 +785,8 @@ class AdminController extends Controller {
                     'whatsapp' => 0,
                     'tiktok' => 0,
                     'youtube' => 0
-                ]
+                ],
+                'locations' => []
             ];
             $totalShares = $pStats['total'];
 
@@ -796,7 +797,8 @@ class AdminController extends Controller {
                 'slug' => $p['slug'],
                 'url' => BASE_URL . '/product/' . $p['slug'],
                 'total' => $totalShares,
-                'stats' => $pStats['by_source']
+                'stats' => $pStats['by_source'],
+                'locations' => $pStats['locations'] ?? []
             ], JSON_HEX_APOS | JSON_HEX_QUOT);
 
             $actionsHtml = '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>' .
