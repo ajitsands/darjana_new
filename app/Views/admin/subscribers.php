@@ -255,7 +255,12 @@ function sendSinglePromo(email) {
 function sendSelectedPromo() {
     const count = $('.sub-checkbox:checked').length;
     if (count === 0) {
-        alert('Please select at least one subscriber checkbox in the table.');
+        Swal.fire({
+            title: 'No Subscribers Selected',
+            text: 'Please select at least one subscriber checkbox in the table.',
+            icon: 'warning',
+            confirmButtonColor: '#181818'
+        });
         return;
     }
     openPromoModal();
@@ -304,7 +309,12 @@ function submitPromoCampaign(e) {
             selected.push($(this).val());
         });
         if (selected.length === 0) {
-            alert('Please select at least one subscriber from the table.');
+            Swal.fire({
+                title: 'No Audience Selected',
+                text: 'Please select at least one subscriber from the table.',
+                icon: 'warning',
+                confirmButtonColor: '#181818'
+            });
             return;
         }
         selected.forEach(email => formData.append('selected_emails[]', email));
@@ -321,15 +331,30 @@ function submitPromoCampaign(e) {
     .then(data => {
         sendBtn.prop('disabled', false).html('✉️ Broadcast Promotional Email');
         if (data.success) {
-            alert(data.message);
+            Swal.fire({
+                title: data.sent_count > 0 ? 'Campaign Sent!' : 'Campaign Completed',
+                text: data.message,
+                icon: data.sent_count > 0 ? 'success' : 'info',
+                confirmButtonColor: '#181818'
+            });
             closePromoModal();
         } else {
-            alert(data.message);
+            Swal.fire({
+                title: 'Campaign Error',
+                text: data.message,
+                icon: 'error',
+                confirmButtonColor: '#181818'
+            });
         }
     })
     .catch(err => {
         sendBtn.prop('disabled', false).html('✉️ Broadcast Promotional Email');
-        alert('An error occurred while sending campaign emails.');
+        Swal.fire({
+            title: 'Request Failed',
+            text: 'An error occurred while sending campaign emails.',
+            icon: 'error',
+            confirmButtonColor: '#181818'
+        });
     });
 }
 </script>
