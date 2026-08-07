@@ -7,6 +7,8 @@
     
     <!-- Meta SEO -->
     <meta name="description" content="Discover luxury abayas, couture dresses, sets, and blazers at Dar Jana Fashion. Premium GCC delivery to Bahrain, Kuwait, Saudi Arabia, UAE, Qatar, and Oman.">
+    <meta name="author" content="SaNDS Lab - www.sandslab.com">
+    <meta name="developer" content="Developed by SaNDS Lab (www.sandslab.com)">
     <meta name="theme-color" content="#f3f3f3">
 
     <!-- Favicon -->
