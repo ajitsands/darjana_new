@@ -65,6 +65,14 @@ class AdminController extends Controller {
                 $settingModel->set('promo_desc', trim($_POST['promo_desc']));
             }
 
+            // Currency Exchange Rates (Relative to 1 BHD)
+            $rateKeys = ['kwd', 'sar', 'aed', 'qar', 'omr', 'usd', 'eur'];
+            foreach ($rateKeys as $rk) {
+                if (isset($_POST['currency_rate_' . $rk])) {
+                    $settingModel->set('currency_rate_' . $rk, (float)$_POST['currency_rate_' . $rk]);
+                }
+            }
+
             // Payment Gateway Settings
             $afsEnabled = isset($_POST['afs_gateway_enabled']) ? '1' : '0';
             $settingModel->set('afs_gateway_enabled', $afsEnabled);

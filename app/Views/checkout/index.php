@@ -168,6 +168,7 @@
                 </div>
                 <div id="coupon_message" style="font-size: 12px; margin-top: 5px;"></div>
                 <input type="hidden" name="coupon_code" id="applied_coupon_code">
+                <input type="hidden" name="user_currency" id="user_currency_input">
             </div>
 
             <div style="border-top: 2px solid var(--color-primary); padding-top: 16px;">
@@ -204,7 +205,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const differentShippingCheckbox = document.getElementById('different_shipping');
     const shippingFields = document.getElementById('shipping_fields');
     
-    // Link country selection to phone code
+    // Sync active user currency
+    const userCurrencyInput = document.getElementById('user_currency_input');
+    const activeCurrency = localStorage.getItem('selectedCurrency') || 'BHD';
+    if (userCurrencyInput) {
+        userCurrencyInput.value = activeCurrency;
+    }
+
+    // Link country selection to phone code & currency
     const billingCountry = document.getElementById('billing_country');
     const phoneCode = document.getElementById('phone_code');
     const countryToPhoneCode = {
@@ -215,12 +223,24 @@ document.addEventListener('DOMContentLoaded', function () {
         'Qatar': '+974',
         'Oman': '+968'
     };
+    const countryToCurrency = {
+        'Bahrain': 'BHD',
+        'Kuwait': 'KWD',
+        'Saudi Arabia': 'SAR',
+        'UAE': 'AED',
+        'Qatar': 'QAR',
+        'Oman': 'OMR'
+    };
 
-    if (billingCountry && phoneCode) {
+    if (billingCountry) {
         billingCountry.addEventListener('change', function() {
             const code = countryToPhoneCode[this.value];
-            if (code) {
+            if (code && phoneCode) {
                 phoneCode.value = code;
+            }
+            const curr = countryToCurrency[this.value];
+            if (curr && userCurrencyInput) {
+                userCurrencyInput.value = curr;
             }
         });
     }

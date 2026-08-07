@@ -18,14 +18,7 @@
     <link rel="preload" href="<?= BASE_URL ?>/assets/css/style.css" as="style">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
     
-    <!-- Base URL definition for JS engines -->
-    <script>
-        window.BASE_URL = '<?= BASE_URL ?>';
-    </script>
-</head>
-<body>
-
-    <!-- Top Announcement Bar -->
+    <!-- Base URL & Currency Rates definition for JS engines -->
     <?php
     if (!isset($siteSettings)) {
         require_once __DIR__ . '/../../Models/Setting.php';
@@ -33,7 +26,25 @@
         $siteSettings = $settingModelHelper->getAll();
     }
     $topAnnouncementText = $siteSettings['top_announcement_bar'] ?? 'EXPRESS GCC DELIVERY TO BAHRAIN, KUWAIT, KSA, UAE, QATAR & OMAN';
+    $currencyRatesConfig = [
+        'BHD' => 1.00,
+        'KWD' => (float)($siteSettings['currency_rate_kwd'] ?? 0.81),
+        'SAR' => (float)($siteSettings['currency_rate_sar'] ?? 9.95),
+        'AED' => (float)($siteSettings['currency_rate_aed'] ?? 9.76),
+        'QAR' => (float)($siteSettings['currency_rate_qar'] ?? 9.67),
+        'OMR' => (float)($siteSettings['currency_rate_omr'] ?? 1.02),
+        'USD' => (float)($siteSettings['currency_rate_usd'] ?? 2.65),
+        'EUR' => (float)($siteSettings['currency_rate_eur'] ?? 2.44)
+    ];
     ?>
+    <script>
+        window.BASE_URL = '<?= BASE_URL ?>';
+        window.siteCurrencyRates = <?= json_encode($currencyRatesConfig) ?>;
+    </script>
+</head>
+<body>
+
+    <!-- Top Announcement Bar -->
     <div class="announcement-bar">
         <span><?= htmlspecialchars($topAnnouncementText) ?></span>
     </div>

@@ -152,6 +152,60 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Currency Exchange Rates Configuration -->
+                <div style="margin-top: 30px; border-top: 1px solid #edf2f7; padding-top: 24px;">
+                    <h3 style="font-size: 16px; margin-top: 0; margin-bottom: 8px; color: #2b6cb0;">
+                        💱 Multi-Currency Exchange Rates Configuration (Relative to 1.000 BHD)
+                    </h3>
+                    <p style="font-size: 12px; color: #718096; margin-bottom: 18px;">
+                        Configure exchange rates used for storefront price conversion and payment gateway checkout calculations. (Example: 1 BHD = 9.95 SAR).
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <!-- KWD -->
+                        <div class="form-group">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 4px; font-size: 13px;">🇰🇼 Kuwaiti Dinar (KWD)</label>
+                            <input type="number" step="0.01" min="0.01" name="currency_rate_kwd" value="<?= htmlspecialchars($settings['currency_rate_kwd'] ?? '0.81') ?>" class="form-control" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                        </div>
+
+                        <!-- SAR -->
+                        <div class="form-group">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 4px; font-size: 13px;">🇸🇦 Saudi Riyal (SAR)</label>
+                            <input type="number" step="0.01" min="0.01" name="currency_rate_sar" value="<?= htmlspecialchars($settings['currency_rate_sar'] ?? '9.95') ?>" class="form-control" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                        </div>
+
+                        <!-- AED -->
+                        <div class="form-group">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 4px; font-size: 13px;">🇦🇪 UAE Dirham (AED)</label>
+                            <input type="number" step="0.01" min="0.01" name="currency_rate_aed" value="<?= htmlspecialchars($settings['currency_rate_aed'] ?? '9.76') ?>" class="form-control" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                        </div>
+
+                        <!-- QAR -->
+                        <div class="form-group">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 4px; font-size: 13px;">🇶🇦 Qatari Riyal (QAR)</label>
+                            <input type="number" step="0.01" min="0.01" name="currency_rate_qar" value="<?= htmlspecialchars($settings['currency_rate_qar'] ?? '9.67') ?>" class="form-control" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                        </div>
+
+                        <!-- OMR -->
+                        <div class="form-group">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 4px; font-size: 13px;">🇴🇲 Omani Rial (OMR)</label>
+                            <input type="number" step="0.01" min="0.01" name="currency_rate_omr" value="<?= htmlspecialchars($settings['currency_rate_omr'] ?? '1.02') ?>" class="form-control" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                        </div>
+
+                        <!-- USD -->
+                        <div class="form-group">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 4px; font-size: 13px;">🇺🇸 US Dollar (USD)</label>
+                            <input type="number" step="0.01" min="0.01" name="currency_rate_usd" value="<?= htmlspecialchars($settings['currency_rate_usd'] ?? '2.65') ?>" class="form-control" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                        </div>
+
+                        <!-- EUR -->
+                        <div class="form-group">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 4px; font-size: 13px;">🇪🇺 Euro (EUR)</label>
+                            <input type="number" step="0.01" min="0.01" name="currency_rate_eur" value="<?= htmlspecialchars($settings['currency_rate_eur'] ?? '2.44') ?>" class="form-control" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

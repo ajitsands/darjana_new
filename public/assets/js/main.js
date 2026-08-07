@@ -42,21 +42,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     };
 
-    // Multi-Currency Exchange Rates relative to base KWD
+    // Multi-Currency Exchange Rates (Dynamic from Admin Settings if available)
+    const siteRates = window.siteCurrencyRates || {};
+
     const currencies = {
-        'BHD': { symbol: 'BHD', name: 'Bahraini Dinar', rate: 1.0, decimals: 3, flagSrc: baseUrl + '/assets/images/flags/bh.png' },
-        'KWD': { symbol: 'KWD', name: 'Kuwaiti Dinar', rate: 0.813, decimals: 3, flagSrc: baseUrl + '/assets/images/flags/kw.png' },
-        'SAR': { symbol: 'SAR', name: 'Saudi Riyal', rate: 9.96, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/sa.png' },
-        'AED': { symbol: 'AED', name: 'UAE Dirham', rate: 9.76, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/ae.png' },
-        'QAR': { symbol: 'QAR', name: 'Qatari Riyal', rate: 9.67, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/qa.png' },
-        'OMR': { symbol: 'OMR', name: 'Omani Rial', rate: 1.02, decimals: 3, flagSrc: baseUrl + '/assets/images/flags/om.png' },
-        'USD': { symbol: '$', name: 'US Dollar', rate: 2.65, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/us.png' },
-        'EUR': { symbol: '€', name: 'Euro', rate: 2.44, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/eu.png' }
+        'BHD': { symbol: 'BHD', name: 'Bahraini Dinar', rate: siteRates['BHD'] || 1.0, decimals: 3, flagSrc: baseUrl + '/assets/images/flags/bh.png' },
+        'KWD': { symbol: 'KWD', name: 'Kuwaiti Dinar', rate: siteRates['KWD'] || 0.81, decimals: 3, flagSrc: baseUrl + '/assets/images/flags/kw.png' },
+        'SAR': { symbol: 'SAR', name: 'Saudi Riyal', rate: siteRates['SAR'] || 9.95, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/sa.png' },
+        'AED': { symbol: 'AED', name: 'UAE Dirham', rate: siteRates['AED'] || 9.76, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/ae.png' },
+        'QAR': { symbol: 'QAR', name: 'Qatari Riyal', rate: siteRates['QAR'] || 9.67, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/qa.png' },
+        'OMR': { symbol: 'OMR', name: 'Omani Rial', rate: siteRates['OMR'] || 1.02, decimals: 3, flagSrc: baseUrl + '/assets/images/flags/om.png' },
+        'USD': { symbol: '$', name: 'US Dollar', rate: siteRates['USD'] || 2.65, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/us.png' },
+        'EUR': { symbol: '€', name: 'Euro', rate: siteRates['EUR'] || 2.44, decimals: 2, flagSrc: baseUrl + '/assets/images/flags/eu.png' }
     };
 
     // Default Currency is Bahrain (BHD)
     let activeCurrency = localStorage.getItem('selectedCurrency') || 'BHD';
     if (!currencies[activeCurrency]) activeCurrency = 'BHD';
+
+    // Set cookie for PHP back-end
+    document.cookie = "user_currency=" + activeCurrency + "; path=/; max-age=2592000";
 
     // Currency Switcher UI Elements
     const currencyTrigger = document.getElementById('currencyFloatingTrigger');
@@ -89,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (currencies[code]) {
                 activeCurrency = code;
                 localStorage.setItem('selectedCurrency', code);
+                document.cookie = "user_currency=" + code + "; path=/; max-age=2592000";
                 updateCurrencyUI();
                 if (currencyPopover) currencyPopover.classList.remove('active');
             }
