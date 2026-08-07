@@ -1657,4 +1657,97 @@ class AdminController extends Controller {
         }
         $this->redirect(BASE_URL . '/admin/categories');
     }
+
+    public function subscribers() {
+        $this->requireAuth();
+        require_once __DIR__ . '/../Models/Subscriber.php';
+        require_once __DIR__ . '/../Models/Product.php';
+
+        $subscriberModel = new Subscriber();
+        $productModel = new Product();
+
+        $subscribers = $subscriberModel->getAllSubscribers();
+        $products = $productModel->getAll();
+
+        $data = [
+            'pageTitle' => 'Newsletter Subscribers & Promotional Campaigns | Admin',
+            'subscribers' => $subscribers,
+            'products' => $products
+        ];
+
+        $this->render('admin/subscribers', $data, 'admin');
+    }
+
+    public function deleteSubscriber($id) {
+        $this->requireAuth();
+        require_once __DIR__ . '/../Models/Subscriber.php';
+        $subscriberModel = new Subscriber();
+        $subscriberModel->deleteSubscriber($id);
+        $this->logActivity('SUBSCRIBER_DELETE', "Deleted subscriber ID: $id");
+        $this->redirect(BASE_URL . '/admin/subscribers');
+    }
+
+    public function ajaxSendPromotionalEmail() {
+        $this->requireAuth();
+        require_once __DIR__ . '/../Models/Subscriber.php';
+        require_once __DIR__ . '/../Models/Product.php';
+        require_once __DIR__ . '/../../core/Mail.php';
+
+        $productId = (int)($_POST['product_id'] ?? 0);
+        $subject = trim($_POST['subject'] ?? '');
+        $customMessage = trim($_POST['custom_message'] ?? '');
+        $targetAudience = $_POST['target_audience'] ?? 'all';
+        $selectedEmails = $_POST['selected_emails'] ?? [];
+
+        if ($productId <= 0) {
+            $this->json(['success' => false, 'message' => 'Please select a valid product for the promotional email.']);
+            return;
+        }
+
+        $productModel = new Product();
+        $product = $productModel->getById($productId);
+
+        if (!$product) {
+            $this->json(['success' => false, 'message' => 'Selected product not found in catalog.']);
+            return;
+        }
+
+        $subscriberModel = new Subscriber();
+        $targetEmails = [];
+
+        if ($targetAudience === 'selected' && !empty($selectedEmails) && is_array($selectedEmails)) {
+            $targetEmails = array_unique(array_filter(array_map('trim', $selectedEmails)));
+        } else {
+            $allSubs = $subscriberModel->getActiveSubscribers();
+            $targetEmails = array_column($allSubs, 'email');
+        }
+
+        if (empty($targetEmails)) {
+            $this->json(['success' => false, 'message' => 'No active subscribers selected for this campaign.']);
+            return;
+        }
+
+        $sentCount = 0;
+        $failedCount = 0;
+
+        foreach ($targetEmails as $email) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $sent = Mail::sendPromotionalEmail($email, $subject, $product, $customMessage);
+                if ($sent) {
+                    $sentCount++;
+                } else {
+                    $failedCount++;
+                }
+            }
+        }
+
+        $this->logActivity('PROMO_EMAIL_CAMPAIGN', "Sent promo email for product '{$product['name']}' to {$sentCount} subscribers.");
+
+        $this->json([
+            'success' => true,
+            'message' => "Campaign sent successfully! Total Delivered: {$sentCount} email(s)." . ($failedCount > 0 ? " ({$failedCount} failed)" : ""),
+            'sent_count' => $sentCount,
+            'failed_count' => $failedCount
+        ]);
+    }
 }

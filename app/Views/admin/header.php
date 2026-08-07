@@ -233,6 +233,7 @@
                 <li><a href="<?= BASE_URL ?>/admin/tailoring-units" class="<?= strpos($uri, '/admin/tailoring-units') !== false ? 'active' : '' ?>">Tailoring Units</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/orders" class="<?= strpos($uri, '/admin/orders') !== false || strpos($uri, '/admin/order') !== false ? 'active' : '' ?>">Customer Orders</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/coupons" class="<?= strpos($uri, '/admin/coupons') !== false ? 'active' : '' ?>">Coupons &amp; Offers</a></li>
+                <li><a href="<?= BASE_URL ?>/admin/subscribers" class="<?= strpos($uri, '/admin/subscribers') !== false ? 'active' : '' ?>">Subscribers &amp; Promo</a></li>
                 <li><a href="<?= BASE_URL ?>/admin/settings" class="<?= strpos($uri, '/admin/settings') !== false ? 'active' : '' ?>">Store Settings</a></li>
                 <li><a href="<?= BASE_URL ?>/collections/all-abaya" target="_blank">View Storefront ↗</a></li>
             </ul>

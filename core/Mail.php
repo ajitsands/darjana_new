@@ -50,4 +50,30 @@ class Mail {
             return false;
         }
     }
+
+    public static function sendPromotionalEmail($recipientEmail, $subject, $product, $customMessage = '') {
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isMail();
+            $mail->setFrom('promo@darjanafashion.com', 'Dar Jana Fashion');
+            $mail->addAddress($recipientEmail);
+
+            $mail->isHTML(true);
+            $mail->Subject = $subject ?: ('Exclusive Showcase: ' . $product['name'] . ' | Dar Jana Fashion');
+
+            ob_start();
+            include __DIR__ . '/../app/Views/emails/promotional_product.php';
+            $htmlBody = ob_get_clean();
+
+            $mail->Body = $htmlBody;
+            $mail->AltBody = "Discover " . $product['name'] . " at Dar Jana Fashion!\n\nPrice: " . number_format($product['price'], 2) . " BHD\nView details: " . (defined('BASE_URL') ? BASE_URL : '') . '/product/' . $product['slug'];
+
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Promotional mail failed to {$recipientEmail}: {$mail->ErrorInfo}");
+            return false;
+        }
+    }
 }
