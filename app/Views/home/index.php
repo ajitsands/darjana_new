@@ -7,11 +7,21 @@
 </section>
 
 <!-- Promotional Announcement Callout (Section Padding: 50px) -->
+<?php
+if (!isset($siteSettings)) {
+    require_once __DIR__ . '/../../Models/Setting.php';
+    $settingModelHelper = new Setting();
+    $siteSettings = $settingModelHelper->getAll();
+}
+$promoTagline = $siteSettings['promo_tagline'] ?? 'PROMOTION';
+$promoTitle = $siteSettings['promo_title'] ?? 'التوصيل مجاني لمدة أسبوع';
+$promoDesc = $siteSettings['promo_desc'] ?? 'Enjoy complimentary express delivery on all dress and abaya orders across all GCC regions for a limited period.';
+?>
 <div style="background-color: #f3f3f3; border-bottom: 1px solid var(--color-border); padding: 50px 0; text-align: center;">
     <div class="container">
-        <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 8px;">PROMOTION</span>
-        <h3 style="font-size: 24px; margin: 4px 0 10px; font-weight: 600; color: var(--color-primary);">التوصيل مجاني لمدة أسبوع</h3>
-        <p style="color: var(--color-text-muted); font-size: 15px; max-width: 720px; margin: 0 auto; line-height: 1.6;">Enjoy complimentary express delivery on all dress and abaya orders across all GCC regions for a limited period.</p>
+        <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 8px;"><?= htmlspecialchars($promoTagline) ?></span>
+        <h3 style="font-size: 24px; margin: 4px 0 10px; font-weight: 600; color: var(--color-primary);"><?= htmlspecialchars($promoTitle) ?></h3>
+        <p style="color: var(--color-text-muted); font-size: 15px; max-width: 720px; margin: 0 auto; line-height: 1.6;"><?= htmlspecialchars($promoDesc) ?></p>
     </div>
 </div>
 

@@ -51,6 +51,20 @@ class AdminController extends Controller {
                 $settingModel->set('privacy_policy', $_POST['privacy_policy']);
             }
 
+            // Top Announcement Bar & Homepage Promo Banner Settings
+            if (isset($_POST['top_announcement_bar'])) {
+                $settingModel->set('top_announcement_bar', trim($_POST['top_announcement_bar']));
+            }
+            if (isset($_POST['promo_tagline'])) {
+                $settingModel->set('promo_tagline', trim($_POST['promo_tagline']));
+            }
+            if (isset($_POST['promo_title'])) {
+                $settingModel->set('promo_title', trim($_POST['promo_title']));
+            }
+            if (isset($_POST['promo_desc'])) {
+                $settingModel->set('promo_desc', trim($_POST['promo_desc']));
+            }
+
             // Payment Gateway Settings
             $afsEnabled = isset($_POST['afs_gateway_enabled']) ? '1' : '0';
             $settingModel->set('afs_gateway_enabled', $afsEnabled);

@@ -26,8 +26,16 @@
 <body>
 
     <!-- Top Announcement Bar -->
+    <?php
+    if (!isset($siteSettings)) {
+        require_once __DIR__ . '/../../Models/Setting.php';
+        $settingModelHelper = new Setting();
+        $siteSettings = $settingModelHelper->getAll();
+    }
+    $topAnnouncementText = $siteSettings['top_announcement_bar'] ?? 'EXPRESS GCC DELIVERY TO BAHRAIN, KUWAIT, KSA, UAE, QATAR & OMAN';
+    ?>
     <div class="announcement-bar">
-        <span>EXPRESS GCC DELIVERY TO BAHRAIN, KUWAIT, KSA, UAE, QATAR & OMAN</span>
+        <span><?= htmlspecialchars($topAnnouncementText) ?></span>
     </div>
 
     <!-- Main Header Wrapper -->

@@ -280,6 +280,49 @@
             </div>
         </div>
 
+        <!-- Website Header Banner & Homepage Promotions Configuration -->
+        <div class="settings-card" style="background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); grid-column: span 2; margin-top: 24px;">
+            <h3 style="font-size: 18px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; margin-bottom: 20px; color: #2b6cb0;">
+                📢 Website Header Banner &amp; Homepage Promotions
+            </h3>
+            <p style="color: #718096; font-size: 13px; margin-bottom: 20px;">
+                Customize the top header announcement ticker text and the homepage promotional callout banner content.
+            </p>
+
+            <!-- 1. Top Announcement Bar -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    📣 Top Announcement Bar Text (Top Ticker Banner)
+                </label>
+                <input type="text" name="top_announcement_bar" value="<?= htmlspecialchars($settings['top_announcement_bar'] ?? 'EXPRESS GCC DELIVERY TO BAHRAIN, KUWAIT, KSA, UAE, QATAR & OMAN') ?>" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+                <span style="font-size: 11px; color: #718096;">Displays at the very top header across all pages.</span>
+            </div>
+
+            <!-- 2. Promotion Tagline -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    🏷️ Homepage Promotion Tagline
+                </label>
+                <input type="text" name="promo_tagline" value="<?= htmlspecialchars($settings['promo_tagline'] ?? 'PROMOTION') ?>" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px;">
+            </div>
+
+            <!-- 3. Promotion Title (Arabic/English) -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    📢 Homepage Promotion Heading / Title
+                </label>
+                <input type="text" name="promo_title" value="<?= htmlspecialchars($settings['promo_title'] ?? 'التوصيل مجاني لمدة أسبوع') ?>" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 14px;">
+            </div>
+
+            <!-- 4. Promotion Description -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    📝 Homepage Promotion Description
+                </label>
+                <textarea name="promo_desc" rows="3" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['promo_desc'] ?? 'Enjoy complimentary express delivery on all dress and abaya orders across all GCC regions for a limited period.') ?></textarea>
+            </div>
+        </div>
+
     </div>
 </div>
 
