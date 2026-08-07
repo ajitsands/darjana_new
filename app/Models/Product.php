@@ -8,6 +8,36 @@ class Product extends Model {
     public function __construct() {
         parent::__construct();
         $this->ensureVariantColumns();
+        $this->ensureShareClicksTable();
+    }
+
+    private function ensureShareClicksTable() {
+        try {
+            $this->db->query("SELECT 1 FROM product_share_clicks LIMIT 1");
+        } catch (Exception $e) {
+            $sql = "CREATE TABLE IF NOT EXISTS product_share_clicks (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                product_id INT NOT NULL,
+                source VARCHAR(50) NOT NULL,
+                ip_address VARCHAR(45) NOT NULL,
+                user_agent TEXT NULL,
+                clicked_at DATETIME NOT NULL,
+                INDEX idx_prod_ip_src (product_id, ip_address, source, clicked_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+            try {
+                $this->db->exec($sql);
+            } catch (Exception $ex) {
+                $sqlSqlite = "CREATE TABLE IF NOT EXISTS product_share_clicks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    product_id INTEGER NOT NULL,
+                    source TEXT NOT NULL,
+                    ip_address TEXT NOT NULL,
+                    user_agent TEXT NULL,
+                    clicked_at DATETIME NOT NULL
+                )";
+                try { $this->db->exec($sqlSqlite); } catch (Exception $ex2) {}
+            }
+        }
     }
 
     private function ensureVariantColumns() {
@@ -280,5 +310,88 @@ class Product extends Model {
     public function delete($id) {
         $this->query("DELETE FROM products WHERE id = ?", [$id]);
         return true;
+    }
+
+    /**
+     * Track a share link click with deduplication window configured by admin (default: 60 minutes)
+     */
+    public function trackShareClick($productId, $source, $ipAddress, $userAgent = '') {
+        require_once __DIR__ . '/Setting.php';
+        $settingModel = new Setting();
+        $dedupMinutes = (int)$settingModel->get('share_click_dedup_minutes', 60);
+        if ($dedupMinutes <= 0) {
+            $dedupMinutes = 60;
+        }
+
+        $timeThreshold = date('Y-m-d H:i:s', time() - ($dedupMinutes * 60));
+
+        // Check if click exists from this IP address for this product & source within the deduplication duration
+        $existing = $this->fetchOne(
+            "SELECT id FROM product_share_clicks WHERE product_id = ? AND source = ? AND ip_address = ? AND clicked_at >= ? LIMIT 1",
+            [(int)$productId, strtolower($source), $ipAddress, $timeThreshold]
+        );
+
+        if (!$existing) {
+            $now = date('Y-m-d H:i:s');
+            $this->query(
+                "INSERT INTO product_share_clicks (product_id, source, ip_address, user_agent, clicked_at) VALUES (?, ?, ?, ?, ?)",
+                [(int)$productId, strtolower($source), $ipAddress, substr($userAgent, 0, 500), $now]
+            );
+            return true; // Click counted!
+        }
+
+        return false; // Ignored duplicate click within window
+    }
+
+    /**
+     * Get share click statistics per product or for all products
+     */
+    public function getShareStats($productId = null) {
+        if ($productId) {
+            $rows = $this->fetchAll(
+                "SELECT source, COUNT(*) as click_count FROM product_share_clicks WHERE product_id = ? GROUP BY source",
+                [(int)$productId]
+            );
+            $total = 0;
+            $bySource = [
+                'instagram' => 0,
+                'facebook' => 0,
+                'whatsapp' => 0,
+                'tiktok' => 0,
+                'youtube' => 0
+            ];
+            foreach ($rows as $r) {
+                $src = strtolower($r['source']);
+                $count = (int)$r['click_count'];
+                $bySource[$src] = $count;
+                $total += $count;
+            }
+            return ['total' => $total, 'by_source' => $bySource];
+        } else {
+            $rows = $this->fetchAll(
+                "SELECT product_id, source, COUNT(*) as click_count FROM product_share_clicks GROUP BY product_id, source"
+            );
+            $stats = [];
+            foreach ($rows as $r) {
+                $pid = (int)$r['product_id'];
+                if (!isset($stats[$pid])) {
+                    $stats[$pid] = [
+                        'total' => 0,
+                        'by_source' => [
+                            'instagram' => 0,
+                            'facebook' => 0,
+                            'whatsapp' => 0,
+                            'tiktok' => 0,
+                            'youtube' => 0
+                        ]
+                    ];
+                }
+                $src = strtolower($r['source']);
+                $count = (int)$r['click_count'];
+                $stats[$pid]['by_source'][$src] = $count;
+                $stats[$pid]['total'] += $count;
+            }
+            return $stats;
+        }
     }
 }

@@ -244,7 +244,211 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
         </div>
     </div>
 
+<!-- SHARE MODAL -->
+<div id="shareModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+    <div style="background: #fff; width: 90%; max-width: 520px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; animation: fadeIn 0.2s ease;">
+        <div style="padding: 18px 24px; background: #1a1a1a; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span id="shareModalCode" style="font-size: 11px; color: #c5a059; font-weight: 700; display: block; letter-spacing: 0.05em;">PRODUCT CODE</span>
+                <h3 id="shareModalName" style="margin: 0; font-size: 16px; font-weight: 600; color: #fff;">Share Product Link</h3>
+            </div>
+            <button type="button" onclick="closeShareModal()" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+        
+        <div style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <span style="font-size: 12px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.05em;">CHOOSE PLATFORM TO COPY LINK</span>
+                <span id="shareModalTotal" style="font-size: 12px; font-weight: 700; color: #2b6cb0; background: #ebf8ff; padding: 2px 8px; border-radius: 12px; border: 1px solid #bee3f8;">Total Clicks: 0</span>
+            </div>
+
+            <!-- Platform Buttons Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <!-- Instagram -->
+                <button type="button" onclick="copySharePlatform('instagram')" class="share-platform-btn" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; cursor: pointer; transition: all 0.2s; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 18px;">📸</span>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 600; color: #2d3748;">Instagram</div>
+                            <div style="font-size: 10px; color: #a0aec0;">Copy link</div>
+                        </div>
+                    </div>
+                    <span id="stat_instagram" style="font-size: 11px; font-weight: 700; color: #d69e2e; background: #fefcbf; padding: 2px 6px; border-radius: 10px;">0</span>
+                </button>
+
+                <!-- Facebook -->
+                <button type="button" onclick="copySharePlatform('facebook')" class="share-platform-btn" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; cursor: pointer; transition: all 0.2s; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 18px;">📘</span>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 600; color: #2d3748;">Facebook</div>
+                            <div style="font-size: 10px; color: #a0aec0;">Copy link</div>
+                        </div>
+                    </div>
+                    <span id="stat_facebook" style="font-size: 11px; font-weight: 700; color: #3182ce; background: #ebf8ff; padding: 2px 6px; border-radius: 10px;">0</span>
+                </button>
+
+                <!-- WhatsApp -->
+                <button type="button" onclick="copySharePlatform('whatsapp')" class="share-platform-btn" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; cursor: pointer; transition: all 0.2s; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 18px;">💬</span>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 600; color: #2d3748;">WhatsApp</div>
+                            <div style="font-size: 10px; color: #a0aec0;">Copy link</div>
+                        </div>
+                    </div>
+                    <span id="stat_whatsapp" style="font-size: 11px; font-weight: 700; color: #38a169; background: #f0fff4; padding: 2px 6px; border-radius: 10px;">0</span>
+                </button>
+
+                <!-- TikTok -->
+                <button type="button" onclick="copySharePlatform('tiktok')" class="share-platform-btn" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; cursor: pointer; transition: all 0.2s; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 18px;">🎵</span>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 600; color: #2d3748;">TikTok</div>
+                            <div style="font-size: 10px; color: #a0aec0;">Copy link</div>
+                        </div>
+                    </div>
+                    <span id="stat_tiktok" style="font-size: 11px; font-weight: 700; color: #805ad5; background: #faf5ff; padding: 2px 6px; border-radius: 10px;">0</span>
+                </button>
+
+                <!-- YouTube (Spans full width) -->
+                <button type="button" onclick="copySharePlatform('youtube')" class="share-platform-btn" style="grid-column: span 2; display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; cursor: pointer; transition: all 0.2s; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 18px;">📺</span>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 600; color: #2d3748;">YouTube</div>
+                            <div style="font-size: 10px; color: #a0aec0;">Copy link</div>
+                        </div>
+                    </div>
+                    <span id="stat_youtube" style="font-size: 11px; font-weight: 700; color: #e53e3e; background: #fff5f5; padding: 2px 6px; border-radius: 10px;">0</span>
+                </button>
+            </div>
+
+            <!-- Direct URL Preview Box -->
+            <div style="background: #f7fafc; padding: 12px; border-radius: 6px; border: 1px solid #edf2f7;">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: #718096; margin-bottom: 6px;">GENERATED TRACKABLE LINK</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="shareUrlPreview" readonly style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 12px; font-family: monospace; background: #fff; color: #2d3748;">
+                    <button type="button" onclick="copyCurrentShareUrl()" style="background: #2b6cb0; color: #fff; border: none; padding: 8px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy Link</button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 14px; font-size: 11px; color: #a0aec0; text-align: center;">
+                ⏱️ Click deduplication duration: Configurable in <a href="<?= BASE_URL ?>/admin/settings" style="color: #2b6cb0; text-decoration: underline;">Store Settings</a> (Default: 1 Hour).
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SHARE TOAST NOTIFICATION -->
+<div id="shareToast" style="display: none; position: fixed; bottom: 30px; right: 30px; background: #2b6cb0; color: #fff; padding: 12px 20px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; font-size: 13px; z-index: 100000; align-items: center; gap: 8px;">
+    <span>✅</span> <span id="shareToastText">Link copied to clipboard!</span>
+</div>
+
+<style>
+.share-platform-btn:hover { border-color: #2b6cb0 !important; background: #f7fafc !important; transform: translateY(-1px); }
+</style>
+
 <script>
+let currentShareProduct = null;
+
+function openShareModal(product) {
+    currentShareProduct = product;
+    document.getElementById('shareModalCode').textContent = product.code || 'PRODUCT';
+    document.getElementById('shareModalName').textContent = product.name || 'Share Product';
+    document.getElementById('shareModalTotal').textContent = 'Total Clicks: ' + (product.total || 0);
+
+    const stats = product.stats || {};
+    document.getElementById('stat_instagram').textContent = stats.instagram || 0;
+    document.getElementById('stat_facebook').textContent = stats.facebook || 0;
+    document.getElementById('stat_whatsapp').textContent = stats.whatsapp || 0;
+    document.getElementById('stat_tiktok').textContent = stats.tiktok || 0;
+    document.getElementById('stat_youtube').textContent = stats.youtube || 0;
+
+    // Default to whatsapp link preview
+    updateShareUrlPreview('whatsapp');
+
+    const modal = document.getElementById('shareModal');
+    modal.style.display = 'flex';
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').style.display = 'none';
+}
+
+function updateShareUrlPreview(source) {
+    if (!currentShareProduct) return;
+    const url = currentShareProduct.url + '?source=' + source;
+    document.getElementById('shareUrlPreview').value = url;
+    return url;
+}
+
+function copySharePlatform(source) {
+    const url = updateShareUrlPreview(source);
+    if (!url) return;
+
+    copyToClipboard(url, 'Copied ' + capitalize(source) + ' share link!');
+}
+
+function copyCurrentShareUrl() {
+    const urlInput = document.getElementById('shareUrlPreview');
+    if (!urlInput || !urlInput.value) return;
+
+    copyToClipboard(urlInput.value, 'Share link copied to clipboard!');
+}
+
+function copyToClipboard(text, message) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showShareToast(message);
+        }).catch(err => {
+            fallbackCopyText(text, message);
+        });
+    } else {
+        fallbackCopyText(text, message);
+    }
+}
+
+function fallbackCopyText(text, message) {
+    const input = document.getElementById('shareUrlPreview');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    try {
+        document.execCommand('copy');
+        showShareToast(message);
+    } catch (e) {
+        alert(message + '\n' + text);
+    }
+}
+
+function showShareToast(message) {
+    const toast = document.getElementById('shareToast');
+    const toastText = document.getElementById('shareToastText');
+    if (!toast || !toastText) return;
+
+    toastText.textContent = message;
+    toast.style.display = 'flex';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3500);
+}
+
+function capitalize(str) {
+    if (!str) return '';
+    if (str === 'whatsapp') return 'WhatsApp';
+    if (str === 'tiktok') return 'TikTok';
+    if (str === 'youtube') return 'YouTube';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Close modal on background click
+window.addEventListener('click', function(e) {
+    const modal = document.getElementById('shareModal');
+    if (e.target === modal) {
+        closeShareModal();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const regPriceInput = document.getElementById('regular_price');
     const salePriceInput = document.getElementById('sale_price');

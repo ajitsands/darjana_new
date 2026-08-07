@@ -74,6 +74,21 @@ class ProductController extends Controller {
             $this->redirect(BASE_URL . '/collections/all-abaya');
         }
 
+        // Track share link click if source or utm_source or ref query parameter exists
+        $shareSource = $_GET['source'] ?? $_GET['utm_source'] ?? $_GET['ref'] ?? null;
+        if (!empty($shareSource)) {
+            $allowedSources = ['instagram', 'facebook', 'whatsapp', 'tiktok', 'youtube'];
+            $cleanSource = strtolower(trim($shareSource));
+            if (in_array($cleanSource, $allowedSources)) {
+                $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                if (strpos($ip, ',') !== false) {
+                    $ip = trim(explode(',', $ip)[0]);
+                }
+                $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+                $productModel->trackShareClick($product['id'], $cleanSource, $ip, $userAgent);
+            }
+        }
+
         $relatedProducts = array_filter(
             $productModel->getByCategorySlug($product['category_slug'], 12, 0),
             fn($p) => $p['id'] !== $product['id']

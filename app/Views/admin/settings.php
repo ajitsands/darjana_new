@@ -60,6 +60,32 @@
                         </select>
                     </div>
 
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">Share Link Click Tracking Deduplication Window</label>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+                            Repeat clicks from the same user/IP within this duration will be ignored (counted as 1 click). After this duration, a new click will be counted again.
+                        </p>
+                        <select name="share_click_dedup_minutes" class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: 4px;">
+                            <?php 
+                                $currentDedup = (int)($settings['share_click_dedup_minutes'] ?? 60);
+                                $dedupOptions = [
+                                    15 => '15 Minutes',
+                                    30 => '30 Minutes',
+                                    60 => '1 Hour (Default)',
+                                    90 => '1 Hour 30 Minutes',
+                                    120 => '2 Hours',
+                                    360 => '6 Hours',
+                                    720 => '12 Hours',
+                                    1440 => '24 Hours (1 Day)'
+                                ];
+                                foreach ($dedupOptions as $mins => $label) {
+                                    $sel = ($mins === $currentDedup) ? 'selected' : '';
+                                    echo "<option value=\"$mins\" $sel>$label</option>";
+                                }
+                            ?>
+                        </select>
+                    </div>
+
                     </div>
 
 <!-- COLUMN 2: CHEST & SHOULDER -->

@@ -33,6 +33,10 @@ class AdminController extends Controller {
                 $settingModel->set('size_guide_desc_ar', $_POST['size_guide_desc_ar']);
             }
             
+            if (isset($_POST['share_click_dedup_minutes'])) {
+                $settingModel->set('share_click_dedup_minutes', (int)$_POST['share_click_dedup_minutes']);
+            }
+            
             // Payment Gateway Settings
             $afsEnabled = isset($_POST['afs_gateway_enabled']) ? '1' : '0';
             $settingModel->set('afs_gateway_enabled', $afsEnabled);
@@ -760,6 +764,7 @@ class AdminController extends Controller {
         $this->requireAuth();
         $productModel = new Product();
         $products = $productModel->getAll(null, 0, 'featured', null, null, false);
+        $shareStats = $productModel->getShareStats();
         
         $data = [];
         foreach ($products as $p) {
@@ -771,8 +776,35 @@ class AdminController extends Controller {
             $categoryHtml = '<span style="font-size: 12px;">' . htmlspecialchars($p['category_name']) . '</span>';
             $tagHtml = '<span style="font-size: 11px; font-weight: 700; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">' . htmlspecialchars($p['offer_tag_type']) . '</span>';
             $priceHtml = '<span style="font-weight: 700; font-size: 13px;">' . number_format($p['price'], 2) . ' BHD</span>';
+
+            $pStats = $shareStats[$p['id']] ?? [
+                'total' => 0,
+                'by_source' => [
+                    'instagram' => 0,
+                    'facebook' => 0,
+                    'whatsapp' => 0,
+                    'tiktok' => 0,
+                    'youtube' => 0
+                ]
+            ];
+            $totalShares = $pStats['total'];
+
+            $productShareData = json_encode([
+                'id' => $p['id'],
+                'code' => $p['product_code'],
+                'name' => $p['name'],
+                'slug' => $p['slug'],
+                'url' => BASE_URL . '/product/' . $p['slug'],
+                'total' => $totalShares,
+                'stats' => $pStats['by_source']
+            ], JSON_HEX_APOS | JSON_HEX_QUOT);
+
             $actionsHtml = '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>' .
-                           '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="confirmDelete(event, this.href, \'Delete this product?\')" style="color: #e53e3e; font-size: 12px; font-weight: 600;">Delete</a>';
+                           '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="confirmDelete(event, this.href, \'Delete this product?\')" style="color: #e53e3e; font-size: 12px; font-weight: 600; margin-right: 8px;">Delete</a>' .
+                           '<a href="javascript:void(0)" onclick=\'openShareModal(' . $productShareData . ')\' style="color: #2b6cb0; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Share Product Link & Track Clicks">' .
+                           '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg> Share' .
+                           ($totalShares > 0 ? ' <span style="background: #ebf8ff; color: #2b6cb0; padding: 1px 5px; border-radius: 10px; font-size: 10px; font-weight: 700; border: 1px solid #bee3f8;">' . $totalShares . '</span>' : '') .
+                           '</a>';
             
             $data[] = [
                 $imageHtml,
