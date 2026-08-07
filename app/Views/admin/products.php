@@ -329,9 +329,13 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
         </div>
 
         <div style="padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-            <!-- Left Column: Image Preview -->
+            <!-- Left Column: Image & Gallery Media Preview -->
             <div>
-                <img id="prevModalImage" src="" style="width: 100%; height: 320px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+                <img id="prevModalImage" src="" style="width: 100%; height: 320px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px;">GALLERY IMAGES &amp; MEDIA:</div>
+                <div id="prevModalGallery" style="display: flex; gap: 8px; flex-wrap: wrap; max-height: 120px; overflow-y: auto; padding: 2px;">
+                    <!-- Thumbnails dynamically rendered by JS -->
+                </div>
             </div>
 
             <!-- Right Column: Details -->
@@ -662,8 +666,47 @@ function triggerProductPreview() {
         document.getElementById('prevModalSalePrice').style.display = 'none';
     }
 
-    const imgPath = p.image ? p.image.replace('/high/', '/thumb/') : '';
-    document.getElementById('prevModalImage').src = imgPath;
+    const mainImgPath = p.image ? p.image.replace('/high/', '/thumb/') : '';
+    const mainImgEl = document.getElementById('prevModalImage');
+    mainImgEl.src = mainImgPath;
+
+    // Render Gallery Images & Media Thumbnails
+    const galleryContainer = document.getElementById('prevModalGallery');
+    galleryContainer.innerHTML = '';
+
+    const allImages = [];
+    if (p.image) allImages.push(p.image);
+    if (p.secondary_image && p.secondary_image !== p.image) allImages.push(p.secondary_image);
+
+    if (Array.isArray(p.media)) {
+        p.media.forEach(m => {
+            const imgUrl = (typeof m === 'string') ? m : (m.thumb || m.high || m.url || '');
+            if (imgUrl && !allImages.includes(imgUrl) && (!m.type || m.type === 'image')) {
+                allImages.push(imgUrl);
+            }
+        });
+    }
+
+    if (allImages.length === 0) {
+        galleryContainer.innerHTML = '<div style="font-size: 11px; color: #a0aec0; font-style: italic;">No additional gallery images added.</div>';
+    } else {
+        allImages.forEach((imgUrl, idx) => {
+            const thumbSrc = imgUrl.replace('/high/', '/thumb/');
+            const thumbImg = document.createElement('img');
+            thumbImg.src = thumbSrc;
+            thumbImg.style.cssText = 'width: 52px; height: 52px; object-fit: cover; border-radius: 4px; border: 2px solid ' + (idx === 0 ? '#2563eb' : '#cbd5e0') + '; cursor: pointer; transition: all 0.15s ease;';
+            thumbImg.title = 'Click to preview image ' + (idx + 1);
+
+            thumbImg.addEventListener('click', function() {
+                mainImgEl.src = thumbSrc;
+                galleryContainer.querySelectorAll('img').forEach(el => el.style.borderColor = '#cbd5e0');
+                thumbImg.style.borderColor = '#2563eb';
+            });
+
+            galleryContainer.appendChild(thumbImg);
+        });
+    }
+
     document.getElementById('prevModalColors').textContent = p.colors || 'N/A';
     document.getElementById('prevModalSizes').textContent = p.sizes || 'N/A';
     document.getElementById('prevModalLengths').textContent = p.lengths || 'N/A';

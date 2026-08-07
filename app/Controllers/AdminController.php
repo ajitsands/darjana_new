@@ -854,6 +854,8 @@ class AdminController extends Controller {
                 'price' => (float)$p['price'],
                 'sale_price' => $p['sale_price'] ? (float)$p['sale_price'] : null,
                 'image' => $p['image'],
+                'secondary_image' => $p['secondary_image'] ?? '',
+                'media' => json_decode($p['media'] ?? '[]', true) ?: [],
                 'description' => $p['description'] ?? '',
                 'description_ar' => $p['description_ar'] ?? '',
                 'colors' => $p['colors'] ?? '',
