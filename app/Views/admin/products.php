@@ -707,14 +707,52 @@ function triggerProductPreview() {
         });
     }
 
-    document.getElementById('prevModalColors').textContent = p.colors || 'N/A';
-    document.getElementById('prevModalSizes').textContent = p.sizes || 'N/A';
-    document.getElementById('prevModalLengths').textContent = p.lengths || 'N/A';
+    document.getElementById('prevModalColors').textContent = formatColorsDisplay(p.colors);
+    document.getElementById('prevModalSizes').textContent = formatSimpleListDisplay(p.sizes);
+    document.getElementById('prevModalLengths').textContent = formatSimpleListDisplay(p.lengths);
     document.getElementById('prevModalTag').textContent = (p.offer_tag_type || 'percentage').toUpperCase();
     document.getElementById('prevModalDesc').textContent = p.description || 'No description available.';
     document.getElementById('prevModalFullUrl').href = p.url;
 
     document.getElementById('productPreviewModal').style.display = 'flex';
+}
+
+function formatColorsDisplay(rawColors) {
+    if (!rawColors) return 'N/A';
+    if (typeof rawColors === 'string') {
+        try {
+            const parsed = JSON.parse(rawColors);
+            if (Array.isArray(parsed)) {
+                return parsed.map(c => {
+                    if (typeof c === 'string') return c;
+                    if (c && c.name) return c.name;
+                    return '';
+                }).filter(Boolean).join(', ');
+            }
+        } catch(e) {
+            return rawColors;
+        }
+    }
+    if (Array.isArray(rawColors)) {
+        return rawColors.map(c => (typeof c === 'string' ? c : (c.name || ''))).filter(Boolean).join(', ');
+    }
+    return String(rawColors);
+}
+
+function formatSimpleListDisplay(rawList) {
+    if (!rawList) return 'N/A';
+    if (typeof rawList === 'string') {
+        try {
+            const parsed = JSON.parse(rawList);
+            if (Array.isArray(parsed)) {
+                return parsed.join(', ');
+            }
+        } catch(e) {
+            return rawList;
+        }
+    }
+    if (Array.isArray(rawList)) return rawList.join(', ');
+    return String(rawList);
 }
 
 function closeProductPreviewModal() {
