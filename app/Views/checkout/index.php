@@ -132,11 +132,24 @@
             </div>
 
             <?php if (isset($afs_gateway_enabled) && $afs_gateway_enabled): ?>
-                <button type="submit" class="btn-primary btn-buy-now" style="width: 100%; padding: 18px; font-size: 14px;">Complete Order and Pay Now</button>
+                <button type="submit" id="submitCheckoutBtn" class="btn-primary btn-buy-now" style="width: 100%; padding: 18px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
+                    <span id="btnText">Complete Order and Pay Now</span>
+                    <span id="btnLoader" style="display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top: 2px solid #ffffff; border-radius: 50%; animation: checkoutSpin 0.8s linear infinite;"></span>
+                </button>
             <?php else: ?>
-                <button type="submit" class="btn-primary btn-buy-now" style="width: 100%; padding: 18px; font-size: 14px;">Complete Order & Pay Cash / KNET on Delivery</button>
+                <button type="submit" id="submitCheckoutBtn" class="btn-primary btn-buy-now" style="width: 100%; padding: 18px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
+                    <span id="btnText">Complete Order & Pay Cash / KNET on Delivery</span>
+                    <span id="btnLoader" style="display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top: 2px solid #ffffff; border-radius: 50%; animation: checkoutSpin 0.8s linear infinite;"></span>
+                </button>
             <?php endif; ?>
         </div>
+
+        <style>
+            @keyframes checkoutSpin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
 
         <!-- Order Items Breakdown Sidebar -->
         <div style="background-color: var(--color-bg-light); border: 1px solid var(--color-border); padding: 30px;">
@@ -264,6 +277,38 @@ document.addEventListener('DOMContentLoaded', function () {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
+            const submitBtn = document.getElementById('submitCheckoutBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const originalText = btnText ? btnText.textContent : 'Complete Order and Pay Now';
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.75';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+            if (btnLoader) {
+                btnLoader.style.display = 'inline-block';
+            }
+            if (btnText) {
+                btnText.textContent = 'Processing Payment...';
+            }
+
+            function resetSubmitBtn() {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
+                if (btnLoader) {
+                    btnLoader.style.display = 'none';
+                }
+                if (btnText) {
+                    btnText.textContent = originalText;
+                }
+            }
+
             const formData = new FormData(this);
 
             fetch(window.BASE_URL + '/checkout/process', {
@@ -295,9 +340,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 } else {
                     alert(data.message || 'Error processing order.');
+                    resetSubmitBtn();
                 }
             })
-            .catch(err => alert('Network error occurred.'));
+            .catch(err => {
+                alert('Network error occurred.');
+                resetSubmitBtn();
+            });
         });
     }
 
