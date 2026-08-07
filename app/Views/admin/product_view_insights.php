@@ -46,6 +46,7 @@ $endDate = $endDate ?? '';
 
     <!-- ===== DATE RANGE FILTER BAR ===== -->
     <form method="GET" action="" id="viewDateFilterForm" style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px; margin-bottom:24px; display:flex; flex-wrap:wrap; align-items:center; gap:14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+        <input type="hidden" name="all_time" id="all_time_input" value="<?= !empty($_GET['all_time']) ? '1' : '0' ?>">
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <?php
                 $presets = [
@@ -57,7 +58,7 @@ $endDate = $endDate ?? '';
                 ];
             ?>
             <?php foreach ($presets as $key => [$label, $ps, $pe]): ?>
-                <?php $isActive = ($startDate === $ps && $endDate === $pe); ?>
+                <?php $isActive = ($startDate === $ps && $endDate === $pe && empty($_GET['all_time'])); ?>
                 <button type="button" onclick="setPreset('<?= $ps ?>','<?= $pe ?>')" style="
                     padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer;
                     border:1.5px solid <?= $isActive ? '#8b5cf6' : '#e2e8f0' ?>;
@@ -66,7 +67,7 @@ $endDate = $endDate ?? '';
                     transition:all 0.15s;
                 "><?= $label ?></button>
             <?php endforeach; ?>
-            <?php if (!$startDate && !$endDate): ?>
+            <?php if (!$startDate && !$endDate && !empty($_GET['all_time'])): ?>
                 <button type="button" style="padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid #8b5cf6; background:#8b5cf6; color:#fff; cursor:default;">All Time</button>
             <?php else: ?>
                 <button type="button" onclick="clearFilter()" style="padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid #e2e8f0; background:#fff; color:#4a5568; cursor:pointer;">All Time</button>
@@ -80,23 +81,29 @@ $endDate = $endDate ?? '';
             <input type="date" id="start_date" name="start_date" value="<?= htmlspecialchars($startDate) ?>" style="padding:6px 10px; border:1px solid #cbd5e0; border-radius:6px; font-size:13px; color:#181818;">
             <label style="font-size:12px; font-weight:600; color:#718096;">TO</label>
             <input type="date" id="end_date" name="end_date" value="<?= htmlspecialchars($endDate) ?>" style="padding:6px 10px; border:1px solid #cbd5e0; border-radius:6px; font-size:13px; color:#181818;">
-            <button type="submit" style="padding:7px 18px; background:#8b5cf6; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;">Filter Dates</button>
+            <button type="submit" onclick="document.getElementById('all_time_input').value='0';" style="padding:7px 18px; background:#8b5cf6; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;">Filter Dates</button>
         </div>
 
         <?php if ($startDate && $endDate): ?>
             <div style="font-size:12px; color:#8b5cf6; font-weight:700; margin-left:auto;">
                 Showing: <?= date('d M Y', strtotime($startDate)) ?> – <?= date('d M Y', strtotime($endDate)) ?>
             </div>
+        <?php else: ?>
+            <div style="font-size:12px; color:#8b5cf6; font-weight:700; margin-left:auto;">
+                Showing: All Time Data
+            </div>
         <?php endif; ?>
     </form>
 
     <script>
     function setPreset(start, end) {
+        document.getElementById('all_time_input').value = '0';
         document.getElementById('start_date').value = start;
         document.getElementById('end_date').value = end;
         document.getElementById('viewDateFilterForm').submit();
     }
     function clearFilter() {
+        document.getElementById('all_time_input').value = '1';
         document.getElementById('start_date').value = '';
         document.getElementById('end_date').value = '';
         document.getElementById('viewDateFilterForm').submit();

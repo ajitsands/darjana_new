@@ -529,8 +529,15 @@ class AdminController extends Controller {
 
     public function productViewInsights() {
         $this->requireAuth();
-        $startDate = $_GET['start_date'] ?? '';
-        $endDate   = $_GET['end_date']   ?? '';
+        
+        if (!isset($_GET['start_date']) && !isset($_GET['end_date']) && empty($_GET['all_time'])) {
+            // Default to "This Week"
+            $startDate = date('Y-m-d', strtotime('monday this week'));
+            $endDate   = date('Y-m-d');
+        } else {
+            $startDate = $_GET['start_date'] ?? '';
+            $endDate   = $_GET['end_date']   ?? '';
+        }
 
         $productModel = new Product();
         $insights = $productModel->getDetailedProductViewInsights($startDate ?: null, $endDate ?: null);
