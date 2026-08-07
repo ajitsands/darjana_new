@@ -63,15 +63,38 @@
                     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
                     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                     <script>
+                        var table = null;
+                        var highlightProductId = null;
                         $(document).ready(function() {
-                            $('#productsTable').DataTable({
+                            table = $('#productsTable').DataTable({
                                 "ajax": "<?= BASE_URL ?>/admin/products/ajax",
                                 "processing": true,
                                 "pageLength": 20,
                                 "ordering": false,
+                                "stateSave": true,
                                 "language": {
                                     "search": "Search Products:",
                                     "lengthMenu": "Show _MENU_ products per page"
+                                },
+                                "drawCallback": function(settings) {
+                                    if (highlightProductId) {
+                                        const targetId = highlightProductId;
+                                        setTimeout(function() {
+                                            const rowEl = document.getElementById('product-row-' + targetId);
+                                            if (rowEl) {
+                                                rowEl.style.transition = 'background-color 0.4s ease, border-left 0.4s ease';
+                                                rowEl.style.backgroundColor = '#dcfce7'; // Light green highlight
+                                                rowEl.style.borderLeft = '4px solid #16a34a';
+
+                                                // Fade off after 10 seconds
+                                                setTimeout(function() {
+                                                    rowEl.style.transition = 'background-color 1.2s ease, border-left 1.2s ease';
+                                                    rowEl.style.backgroundColor = '';
+                                                    rowEl.style.borderLeft = '';
+                                                }, 10000);
+                                            }
+                                        }, 120);
+                                    }
                                 }
                             });
                         });
@@ -768,6 +791,7 @@ function closeProductPreviewModal() {
 function togglePublishStatus(newStatus) {
     if (!currentOptionsProduct) return;
     const prodId = currentOptionsProduct.id;
+    highlightProductId = prodId;
     const baseUrl = '<?= BASE_URL ?>';
 
     fetch(baseUrl + '/admin/products/toggle-publish', {
@@ -780,7 +804,7 @@ function togglePublishStatus(newStatus) {
         if (data.success) {
             closeProductOptionsModal();
             showShareToast(data.message, 'success');
-            if (typeof table !== 'undefined' && table.ajax) {
+            if (typeof table !== 'undefined' && table && table.ajax) {
                 table.ajax.reload(null, false);
             } else {
                 location.reload();

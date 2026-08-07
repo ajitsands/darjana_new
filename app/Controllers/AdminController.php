@@ -802,7 +802,7 @@ class AdminController extends Controller {
     public function ajaxProducts() {
         $this->requireAuth();
         $productModel = new Product();
-        $products = $productModel->getAll(null, 0, 'featured', null, null, false);
+        $products = $productModel->getAll(null, 0, 'date_asc', null, null, false);
         $shareStats = $productModel->getShareStats();
         
         $data = [];
@@ -888,12 +888,14 @@ class AdminController extends Controller {
                            '</div>';
             
             $data[] = [
-                $imageHtml,
-                $infoHtml,
-                $categoryHtml,
-                $tagHtml,
-                $priceHtml,
-                $actionsHtml
+                'DT_RowId' => 'product-row-' . $p['id'],
+                'DT_RowClass' => 'product-table-row',
+                0 => $imageHtml,
+                1 => $infoHtml,
+                2 => $categoryHtml,
+                3 => $tagHtml,
+                4 => $priceHtml,
+                5 => $actionsHtml
             ];
         }
         
