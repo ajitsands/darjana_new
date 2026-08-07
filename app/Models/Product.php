@@ -614,8 +614,7 @@ class Product extends Model {
             'facebook' => ['name' => 'Facebook', 'icon' => '📘', 'color' => '#3182ce'],
             'tiktok' => ['name' => 'TikTok', 'icon' => '🎵', 'color' => '#805ad5'],
             'youtube' => ['name' => 'YouTube', 'icon' => '📺', 'color' => '#e53e3e'],
-            'email' => ['name' => 'Email Campaign', 'icon' => '✉️', 'color' => '#8b5cf6'],
-            'email_campaign' => ['name' => 'Email Campaign', 'icon' => '✉️', 'color' => '#8b5cf6']
+            'email' => ['name' => 'Email Campaign', 'icon' => '✉️', 'color' => '#8b5cf6']
         ];
 
         $platformCounts = $this->fetchAll("
@@ -625,7 +624,9 @@ class Product extends Model {
         ");
         $platformTotals = [];
         foreach ($platformCounts as $pc) {
-            $platformTotals[strtolower($pc['source'])] = (int)$pc['cnt'];
+            $src = strtolower($pc['source']);
+            if ($src === 'email_campaign') $src = 'email';
+            $platformTotals[$src] = ($platformTotals[$src] ?? 0) + (int)$pc['cnt'];
         }
 
         $topProductByPlatform = [];
@@ -638,6 +639,7 @@ class Product extends Model {
         ");
         foreach ($topProdQuery as $tpq) {
             $src = strtolower($tpq['source']);
+            if ($src === 'email_campaign') $src = 'email';
             if (!isset($topProductByPlatform[$src])) {
                 $topProductByPlatform[$src] = $tpq['product_name'];
             }
@@ -652,6 +654,7 @@ class Product extends Model {
         ");
         foreach ($topCountryQuery as $tcq) {
             $src = strtolower($tcq['source']);
+            if ($src === 'email_campaign') $src = 'email';
             if (!isset($topCountryByPlatform[$src])) {
                 $topCountryByPlatform[$src] = $tcq['country'] ?: 'Unknown';
             }
