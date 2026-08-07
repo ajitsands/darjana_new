@@ -156,17 +156,24 @@
 
 <script>
 function switchPolicyTab(tabKey, btn) {
-    document.querySelectorAll('.policy-pane').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.policy-tab-btn').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.policy-pane').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    document.querySelectorAll('.policy-tab-btn').forEach(function(el) {
+        el.classList.remove('active');
+    });
 
     const targetPane = document.getElementById('tab-' + tabKey);
     if (targetPane) {
         targetPane.classList.add('active');
     }
-    btn.classList.add('active');
+    if (btn) {
+        btn.classList.add('active');
+    }
 
     // Update browser URL state without page reload
     if (window.history && window.history.pushState) {
         window.history.pushState(null, null, '<?= BASE_URL ?>/policies/' + tabKey);
+    }
 }
 </script>
