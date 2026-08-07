@@ -256,9 +256,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const salePrice = parseFloat(salePriceInput.value);
         const tagType = tagTypeSelect.value;
         if (isNaN(regPrice) || isNaN(salePrice) || salePrice >= regPrice || salePrice <= 0) { previewSpan.style.display = 'none'; return; }
-        previewSpan.style.display = 'inline-block';
-        if (tagType === 'percentage') { previewSpan.textContent = Math.round(((regPrice - salePrice) / regPrice) * 100) + '% OFF'; }
-        else { previewSpan.textContent = 'SAVE ' + (regPrice - salePrice).toFixed(2).replace(/\.00$/, '') + ' BHD'; }
+        
+        if (tagType === 'percentage') {
+            const percent = Math.round(((regPrice - salePrice) / regPrice) * 100);
+            if (percent <= 0) { previewSpan.style.display = 'none'; return; }
+            previewSpan.style.display = 'inline-block';
+            previewSpan.textContent = percent + '% OFF';
+        } else {
+            const savedVal = regPrice - salePrice;
+            if (savedVal <= 0) { previewSpan.style.display = 'none'; return; }
+            previewSpan.style.display = 'inline-block';
+            previewSpan.textContent = 'SAVE ' + savedVal.toFixed(2).replace(/\.00$/, '') + ' BHD';
+        }
     }
     if (regPriceInput) regPriceInput.addEventListener('input', updatePreview);
     if (salePriceInput) salePriceInput.addEventListener('input', updatePreview);

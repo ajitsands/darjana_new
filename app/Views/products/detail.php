@@ -88,17 +88,22 @@ if (empty($mediaItems)) {
         <!-- Image Gallery & Zoom Column -->
         <div class="product-gallery-column">
             <div class="product-zoom-container" id="productZoomContainer" title="Hover to Zoom or Click to Enlarge">
-                <?php if (!empty($product['sale_price'])): ?>
+                <?php if (!empty($product['sale_price']) && $product['sale_price'] > 0 && $product['price'] > $product['sale_price']): ?>
                     <?php 
                         $tagType = $product['offer_tag_type'] ?? 'percentage';
                         if ($tagType === 'amount'):
-                            $saveAmt = number_format(($product['price'] - $product['sale_price']), 3);
+                            $saveAmtVal = $product['price'] - $product['sale_price'];
+                            if ($saveAmtVal > 0):
+                                $saveAmt = number_format($saveAmtVal, 3);
                     ?>
-                        <span class="product-offer-tag" data-save-bhd="<?= $product['price'] - $product['sale_price'] ?>">SAVE <?= $saveAmt ?> BHD</span>
+                                <span class="product-offer-tag" data-save-bhd="<?= $saveAmtVal ?>">SAVE <?= $saveAmt ?> BHD</span>
+                            <?php endif; ?>
                     <?php else: 
                             $discountPct = round((($product['price'] - $product['sale_price']) / $product['price']) * 100);
+                            if ($discountPct > 0):
                     ?>
-                        <span class="product-offer-tag"><?= $discountPct ?>% OFF</span>
+                                <span class="product-offer-tag"><?= $discountPct ?>% OFF</span>
+                            <?php endif; ?>
                     <?php endif; ?>
                 <?php endif; ?>
 
@@ -148,7 +153,7 @@ if (empty($mediaItems)) {
             <h1 style="font-size: 26px; font-weight: 400; line-height: 1.3; margin-bottom: 16px; color: var(--color-primary);"><?= htmlspecialchars($displayName) ?></h1>
             
             <div class="product-price-wrap" style="margin-bottom: 20px;">
-                <?php if ($product['sale_price']): ?>
+                <?php if (!empty($product['sale_price']) && $product['sale_price'] > 0 && $product['price'] > $product['sale_price']): ?>
                     <span class="product-price sale" style="font-size: 24px; font-weight: 700;" data-price-bhd="<?= $product['sale_price'] ?>"><?= number_format($product['sale_price'], 3) ?> BHD</span>
                     <span class="product-price-old" style="font-size: 18px; text-decoration: line-through; color: #999; margin-left: 8px;" data-price-bhd="<?= $product['price'] ?>"><?= number_format($product['price'], 3) ?> BHD</span>
                 <?php else: ?>
@@ -334,7 +339,7 @@ if (empty($mediaItems)) {
                                     <?= htmlspecialchars($relProduct['product_code']) ?>
                                 </div>
                                 <div style="font-size: 14px; font-weight: 600; color: var(--color-primary);">
-                                    <?php if ($relProduct['sale_price']): ?>
+                                    <?php if (!empty($relProduct['sale_price']) && $relProduct['sale_price'] > 0 && $relProduct['price'] > $relProduct['sale_price']): ?>
                                         <span class="product-price" data-price-bhd="<?= $relProduct['sale_price'] ?>"><?= number_format($relProduct['sale_price'], 3) ?> BHD</span>
                                         <span style="text-decoration: line-through; font-size: 12px; color: #aaa; margin-left: 6px;" data-price-bhd="<?= $relProduct['price'] ?>"><?= number_format($relProduct['price'], 3) ?> BHD</span>
                                     <?php else: ?>

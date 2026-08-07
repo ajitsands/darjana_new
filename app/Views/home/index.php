@@ -38,17 +38,22 @@
                         <div class="product-card">
                             <!-- Image with Corner '+' Box & Dynamic Admin Offer Tag (% or Amount) -->
                             <div class="product-image-wrap">
-                                <?php if (!empty($product['sale_price'])): ?>
+                                <?php if (!empty($product['sale_price']) && $product['sale_price'] > 0 && $product['price'] > $product['sale_price']): ?>
                                     <?php 
                                         $tagType = $product['offer_tag_type'] ?? 'percentage';
                                         if ($tagType === 'amount'):
-                                            $saveAmt = number_format(($product['price'] - $product['sale_price']), 3);
+                                            $saveAmtVal = $product['price'] - $product['sale_price'];
+                                            if ($saveAmtVal > 0):
+                                                $saveAmt = number_format($saveAmtVal, 3);
                                     ?>
-                                        <span class="product-offer-tag" data-save-bhd="<?= $product['price'] - $product['sale_price'] ?>">SAVE <?= $saveAmt ?> BHD</span>
+                                                <span class="product-offer-tag" data-save-bhd="<?= $saveAmtVal ?>">SAVE <?= $saveAmt ?> BHD</span>
+                                            <?php endif; ?>
                                     <?php else: 
                                             $discountPct = round((($product['price'] - $product['sale_price']) / $product['price']) * 100);
+                                            if ($discountPct > 0):
                                     ?>
-                                        <span class="product-offer-tag"><?= $discountPct ?>% OFF</span>
+                                                <span class="product-offer-tag"><?= $discountPct ?>% OFF</span>
+                                            <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endif; ?>
 
@@ -74,7 +79,7 @@
                                     </a>
                                 </h3>
                                 <div class="product-price-minimal">
-                                    <?php if ($product['sale_price']): ?>
+                                    <?php if (!empty($product['sale_price']) && $product['sale_price'] > 0 && $product['price'] > $product['sale_price']): ?>
                                         <span class="product-price sale" data-price-bhd="<?= $product['sale_price'] ?>"><?= number_format($product['sale_price'], 3) ?> BHD</span>
                                         <span style="text-decoration: line-through; color: #64748b; font-size: 11px; margin-left: 6px;" data-price-bhd="<?= $product['price'] ?>"><?= number_format($product['price'], 3) ?> BHD</span>
                                     <?php else: ?>

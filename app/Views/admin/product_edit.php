@@ -263,13 +263,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        previewSpan.style.display = 'inline-block';
         if (tagType === 'percentage') {
             const percent = Math.round(((regPrice - salePrice) / regPrice) * 100);
+            if (percent <= 0) {
+                previewSpan.style.display = 'none';
+                return;
+            }
+            previewSpan.style.display = 'inline-block';
             previewSpan.textContent = percent + '% OFF';
         } else {
-            const saved = (regPrice - salePrice).toFixed(2);
-            // Remove trailing .00 if not needed, or keep 2 decimals
+            const savedVal = regPrice - salePrice;
+            if (savedVal <= 0) {
+                previewSpan.style.display = 'none';
+                return;
+            }
+            previewSpan.style.display = 'inline-block';
+            const saved = savedVal.toFixed(2);
             previewSpan.textContent = 'SAVE ' + saved.replace(/\.00$/, '') + ' BHD';
         }
     }
