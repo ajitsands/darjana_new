@@ -53,7 +53,36 @@
 
     <!-- Main Header Wrapper -->
     <header class="header-wrapper">
-    <?php $activeNav = $currentCategory ?? $currentSlug ?? ($product['category_slug'] ?? ''); ?>
+    <?php 
+        // Determine active navigation menu item accurately via URL path
+        $currentUri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $baseFolder = str_replace('\\', '/', dirname($scriptName));
+        if ($baseFolder !== '/' && strpos($currentUri, $baseFolder) === 0) {
+            $currentUri = substr($currentUri, strlen($baseFolder));
+        }
+        $cleanPath = '/' . trim($currentUri, '/');
+        if ($cleanPath === '//') $cleanPath = '/';
+
+        $isHomeActive = ($cleanPath === '/' || $cleanPath === '/index.php');
+        $activeNavSlug = '';
+
+        if (!$isHomeActive) {
+            if (strpos($cleanPath, '/collections/') === 0) {
+                $activeNavSlug = trim(substr($cleanPath, 13), '/');
+            } elseif (isset($currentSlug) && is_string($currentSlug)) {
+                $activeNavSlug = $currentSlug;
+            } elseif (isset($currentCategory)) {
+                if (is_array($currentCategory) && !empty($currentCategory['slug'])) {
+                    $activeNavSlug = $currentCategory['slug'];
+                } elseif (is_string($currentCategory)) {
+                    $activeNavSlug = $currentCategory;
+                }
+            } elseif (isset($product['category_slug'])) {
+                $activeNavSlug = $product['category_slug'];
+            }
+        }
+    ?>
 
         <div class="header-container">
             <div class="site-header">
@@ -76,10 +105,10 @@
                         $headerCategories = $db->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                     <ul class="main-nav">
-                        <li><a href="<?= BASE_URL ?>/" class="nav-link <?= empty($activeNav) ? 'active' : '' ?>">HOME</a></li>
+                        <li><a href="<?= BASE_URL ?>/" class="nav-link <?= $isHomeActive ? 'active' : '' ?>">HOME</a></li>
                         <?php foreach($headerCategories as $cat): ?>
                             <li>
-                                <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="nav-link <?= $activeNav === $cat['slug'] ? 'active' : '' ?>">
+                                <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="nav-link <?= (!$isHomeActive && $activeNavSlug === $cat['slug']) ? 'active' : '' ?>">
                                     <?= htmlspecialchars(strtoupper($cat['name'])) ?>
                                 </a>
                             </li>
@@ -128,10 +157,10 @@
         </div>
         <div class="mobile-menu-body">
             <ul class="mobile-nav-list">
-                <li><a href="<?= BASE_URL ?>/" class="mobile-nav-link <?= empty($activeNav) ? 'active' : '' ?>">HOME</a></li>
+                <li><a href="<?= BASE_URL ?>/" class="mobile-nav-link <?= $isHomeActive ? 'active' : '' ?>">HOME</a></li>
                 <?php foreach($headerCategories as $cat): ?>
                     <li>
-                        <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="mobile-nav-link <?= $activeNav === $cat['slug'] ? 'active' : '' ?>">
+                        <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="mobile-nav-link <?= (!$isHomeActive && $activeNavSlug === $cat['slug']) ? 'active' : '' ?>">
                             <?= htmlspecialchars(strtoupper($cat['name'])) ?>
                         </a>
                     </li>
