@@ -37,12 +37,13 @@
                     <h3 style="font-size: 18px; margin-bottom: 16px;">Product Catalog</h3>
                     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
                     <style>
-                        #productsTable_wrapper { margin-top: 10px; font-size: 13px; }
+                        #productsTable_wrapper { margin-top: 10px; font-size: 13px; overflow: visible !important; }
                         #productsTable_wrapper .dataTables_filter input { border: 1px solid #cbd5e0; padding: 4px 8px; border-radius: 4px; margin-left: 8px; }
                         #productsTable_wrapper .dataTables_length select { border: 1px solid #cbd5e0; padding: 4px; border-radius: 4px; }
                         table.dataTable thead th { border-bottom: 2px solid #e2e8f0; font-size: 12px; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--heading-font-family); padding: 12px; }
-                        table.dataTable tbody td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+                        table.dataTable tbody td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; overflow: visible !important; position: relative; }
                         table.dataTable.no-footer { border-bottom: 1px solid #e2e8f0; }
+                        .table-responsive { overflow: visible !important; }
                     </style>
                     <div class="table-responsive">
                         <table id="productsTable" class="display" style="width:100%">
@@ -791,8 +792,27 @@ function togglePublishStatus(newStatus) {
     .catch(err => showShareToast('Network request failed. Please try again.', 'error'));
 }
 
-// Close modal on background click
+function toggleActionMenu(event, btn) {
+    event.stopPropagation();
+    const dropdown = btn.nextElementSibling;
+    const isVisible = dropdown.style.display === 'block';
+    
+    closeAllActionMenus();
+    
+    if (!isVisible) {
+        dropdown.style.display = 'block';
+    }
+}
+
+function closeAllActionMenus() {
+    document.querySelectorAll('.action-menu-dropdown').forEach(menu => {
+        menu.style.display = 'none';
+    });
+}
+
+// Close modal & action dropdowns on background click
 window.addEventListener('click', function(e) {
+    closeAllActionMenus();
     const modal = document.getElementById('shareModal');
     const optModal = document.getElementById('productOptionsModal');
     const prevModal = document.getElementById('productPreviewModal');

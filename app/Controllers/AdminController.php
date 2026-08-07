@@ -865,14 +865,27 @@ class AdminController extends Controller {
                 'url' => BASE_URL . '/product/' . $p['slug']
             ], JSON_HEX_APOS | JSON_HEX_QUOT);
 
-            $actionsHtml = '<a href="javascript:void(0)" onclick=\'openProductOptionsModal(' . $productOptionData . ')\' style="color: #181818; font-size: 12px; font-weight: 700; margin-right: 10px; background: #edf2f7; padding: 4px 8px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Manage Verification, Preview & Status">' .
-                           '⚙️ Actions</a>' .
-                           '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="color: #181818; font-size: 12px; font-weight: 600; margin-right: 8px;">Edit</a>' .
-                           '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="confirmDelete(event, this.href, \'Delete this product?\')" style="color: #e53e3e; font-size: 12px; font-weight: 600; margin-right: 8px;">Delete</a>' .
-                           '<a href="javascript:void(0)" onclick=\'openShareModal(' . $productShareData . ')\' style="color: #2b6cb0; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Share Product Link & Track Clicks">' .
-                           '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg> Share' .
-                           ($totalShares > 0 ? ' <span style="background: #ebf8ff; color: #2b6cb0; padding: 1px 5px; border-radius: 10px; font-size: 10px; font-weight: 700; border: 1px solid #bee3f8;">' . $totalShares . '</span>' : '') .
-                           '</a>';
+            $shareCountBadge = ($totalShares > 0) ? ' <span style="background: #ebf8ff; color: #2b6cb0; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; border: 1px solid #bee3f8; margin-left: auto;">' . $totalShares . '</span>' : '';
+
+            $actionsHtml = '<div class="action-dropdown" style="position: relative; display: inline-block;">' .
+                           '<button type="button" onclick="toggleActionMenu(event, this)" style="background: #f1f5f9; border: 1px solid #cbd5e0; color: #1e293b; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;" onmouseover="this.style.background=\'#e2e8f0\'" onmouseout="this.style.background=\'#f1f5f9\'" title="Product Options & Actions">' .
+                           '⚙️ <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>' .
+                           '</button>' .
+                           '<div class="action-menu-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 4px; background: #ffffff; border: 1px solid #cbd5e0; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); min-width: 170px; z-index: 99999; text-align: left; overflow: hidden;">' .
+                           '<a href="javascript:void(0)" onclick=\'openProductOptionsModal(' . $productOptionData . '); closeAllActionMenus();\' style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: #1e293b; font-size: 12px; font-weight: 600; text-decoration: none; border-bottom: 1px solid #f1f5f9;" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'transparent\'">' .
+                           '<span>⚙️</span> Verify &amp; Status' .
+                           '</a>' .
+                           '<a href="' . BASE_URL . '/admin/product/edit/' . $p['id'] . '" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: #2b6cb0; font-size: 12px; font-weight: 600; text-decoration: none; border-bottom: 1px solid #f1f5f9;" onmouseover="this.style.background=\'#ebf8ff\'" onmouseout="this.style.background=\'transparent\'">' .
+                           '<span>✏️</span> Edit Product' .
+                           '</a>' .
+                           '<a href="javascript:void(0)" onclick=\'openShareModal(' . $productShareData . '); closeAllActionMenus();\' style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: #319795; font-size: 12px; font-weight: 600; text-decoration: none; border-bottom: 1px solid #f1f5f9;" onmouseover="this.style.background=\'#e6fffa\'" onmouseout="this.style.background=\'transparent\'">' .
+                           '<span>📤</span> Share Link' . $shareCountBadge .
+                           '</a>' .
+                           '<a href="' . BASE_URL . '/admin/product/delete/' . $p['id'] . '" onclick="confirmDelete(event, this.href, \'Delete this product?\')" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: #e53e3e; font-size: 12px; font-weight: 600; text-decoration: none;" onmouseover="this.style.background=\'#fff5f5\'" onmouseout="this.style.background=\'transparent\'">' .
+                           '<span>🗑️</span> Delete Product' .
+                           '</a>' .
+                           '</div>' .
+                           '</div>';
             
             $data[] = [
                 $imageHtml,
