@@ -1,5 +1,3 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
-
 <main style="padding: 60px 0 100px; background-color: #fafafa; min-height: 80vh;">
     <div class="container" style="max-width: 1000px;">
         <!-- Page Header -->
@@ -170,8 +168,5 @@ function switchPolicyTab(tabKey, btn) {
     // Update browser URL state without page reload
     if (window.history && window.history.pushState) {
         window.history.pushState(null, null, '<?= BASE_URL ?>/policies/' + tabKey);
-    }
 }
 </script>
-
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
