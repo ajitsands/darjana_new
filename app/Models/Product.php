@@ -765,10 +765,25 @@ class Product extends Model {
     }
 
     /**
-     * Get Comprehensive Detailed Product View Insights & Repeat IP Report
+     * Get Comprehensive Detailed Product View Insights & Repeat IP Report (with date range filtering)
      */
-    public function getDetailedProductViewInsights() {
-        $totalViewsRow = $this->fetchOne("SELECT COUNT(*) as total, COUNT(DISTINCT ip_address) as unique_ips FROM product_views");
+    public function getDetailedProductViewInsights($startDate = null, $endDate = null) {
+        $whereSql = " WHERE 1=1";
+        $pvWhereSql = " WHERE 1=1";
+        $params = [];
+
+        if ($startDate) {
+            $whereSql .= " AND DATE(viewed_at) >= ?";
+            $pvWhereSql .= " AND DATE(pv.viewed_at) >= ?";
+            $params[] = $startDate;
+        }
+        if ($endDate) {
+            $whereSql .= " AND DATE(viewed_at) <= ?";
+            $pvWhereSql .= " AND DATE(pv.viewed_at) <= ?";
+            $params[] = $endDate;
+        }
+
+        $totalViewsRow = $this->fetchOne("SELECT COUNT(*) as total, COUNT(DISTINCT ip_address) as unique_ips FROM product_views" . $whereSql, $params);
         $totalViews = $totalViewsRow ? (int)$totalViewsRow['total'] : 0;
         $uniqueIps = $totalViewsRow ? (int)$totalViewsRow['unique_ips'] : 0;
 
@@ -776,15 +791,17 @@ class Product extends Model {
             SELECT p.name, COUNT(pv.id) as cnt 
             FROM product_views pv 
             JOIN products p ON p.id = pv.product_id 
+            " . $pvWhereSql . "
             GROUP BY p.id ORDER BY cnt DESC LIMIT 1
-        ");
+        ", $params);
         $topProduct = $topProductRow ? $topProductRow['name'] : 'None';
 
         $topCountryRow = $this->fetchOne("
             SELECT country, COUNT(*) as cnt 
             FROM product_views 
+            " . $whereSql . "
             GROUP BY country ORDER BY cnt DESC LIMIT 1
-        ");
+        ", $params);
         $topCountry = $topCountryRow ? ($topCountryRow['country'] ?: 'Unknown') : 'None';
 
         // Product Ranking Performance
@@ -792,21 +809,23 @@ class Product extends Model {
             SELECT p.id, p.product_code, p.name, p.slug, p.image, p.price, p.sale_price, 
                    COUNT(pv.id) as total_views, 
                    COUNT(DISTINCT pv.ip_address) as unique_visitors
-            FROM products p
-            LEFT JOIN product_views pv ON pv.product_id = p.id
+            FROM product_views pv
+            JOIN products p ON p.id = pv.product_id
+            " . $pvWhereSql . "
             GROUP BY p.id
             HAVING total_views > 0
             ORDER BY total_views DESC
-        ");
+        ", $params);
 
         // Geolocation Performance
         $locationPerformance = $this->fetchAll("
             SELECT country, country_code, city, COUNT(*) as total_views
             FROM product_views
+            " . $whereSql . "
             GROUP BY country, country_code, city
             ORDER BY total_views DESC
-            LIMIT 25
-        ");
+            LIMIT 50
+        ", $params);
 
         // Repeat IP Visitor Report (How many times the same user/IP viewed the same item)
         $repeatIpReport = $this->fetchAll("
@@ -815,19 +834,21 @@ class Product extends Model {
                    COUNT(pv.id) as ip_view_count, MAX(pv.viewed_at) as last_viewed_at
             FROM product_views pv
             JOIN products p ON p.id = pv.product_id
+            " . $pvWhereSql . "
             GROUP BY p.id, pv.ip_address, pv.country, pv.country_code, pv.city
             ORDER BY ip_view_count DESC, last_viewed_at DESC
-            LIMIT 50
-        ");
+            LIMIT 100
+        ", $params);
 
         // Recent Individual View Logs
         $recentViews = $this->fetchAll("
             SELECT pv.*, p.name as product_name, p.product_code, p.image
             FROM product_views pv
             JOIN products p ON p.id = pv.product_id
+            " . $pvWhereSql . "
             ORDER BY pv.viewed_at DESC
-            LIMIT 30
-        ");
+            LIMIT 100
+        ", $params);
 
         return [
             'summary' => [

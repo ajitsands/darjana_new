@@ -529,8 +529,11 @@ class AdminController extends Controller {
 
     public function productViewInsights() {
         $this->requireAuth();
+        $startDate = $_GET['start_date'] ?? '';
+        $endDate   = $_GET['end_date']   ?? '';
+
         $productModel = new Product();
-        $insights = $productModel->getDetailedProductViewInsights();
+        $insights = $productModel->getDetailedProductViewInsights($startDate ?: null, $endDate ?: null);
 
         $data = [
             'pageTitle' => 'Product Detail View Insights & Analytics | Admin',
@@ -538,7 +541,9 @@ class AdminController extends Controller {
             'productPerformance' => $insights['product_performance'],
             'locationPerformance' => $insights['location_performance'],
             'repeatIpReport' => $insights['repeat_ip_report'],
-            'recentViews' => $insights['recent_views']
+            'recentViews' => $insights['recent_views'],
+            'startDate' => $startDate,
+            'endDate' => $endDate
         ];
 
         $this->render('admin/product_view_insights', $data, 'admin');

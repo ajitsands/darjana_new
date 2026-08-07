@@ -11,11 +11,24 @@ function getViewFlagEmoji($countryCode) {
         return '🌐';
     }
 }
+
+$startDate = $startDate ?? '';
+$endDate = $endDate ?? '';
 ?>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<style>
+    .dataTables_wrapper { font-size: 13px; margin-top: 8px; }
+    .dataTables_wrapper .dataTables_filter input { border: 1px solid #cbd5e0; padding: 5px 10px; border-radius: 4px; margin-left: 8px; font-size: 12px; }
+    .dataTables_wrapper .dataTables_length select { border: 1px solid #cbd5e0; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    table.dataTable thead th { border-bottom: 2px solid #e2e8f0 !important; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; background: #f8fafc; }
+    table.dataTable tbody td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    table.dataTable.no-footer { border-bottom: 1px solid #e2e8f0; }
+</style>
 
 <div class="admin-main" style="padding: 28px; background: #f8fafc; min-height: 100vh;">
     <!-- Top Bar -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <a href="<?= BASE_URL ?>/admin" style="color: #64748b; font-size: 13px; text-decoration: none; font-weight: 600;">← Dashboard</a>
@@ -30,6 +43,65 @@ function getViewFlagEmoji($countryCode) {
             <a href="<?= BASE_URL ?>/admin/click-insights" style="background: #2563eb; color: #ffffff; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 13px; text-decoration: none;">📤 Share Click Insights</a>
         </div>
     </div>
+
+    <!-- ===== DATE RANGE FILTER BAR ===== -->
+    <form method="GET" action="" id="viewDateFilterForm" style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px; margin-bottom:24px; display:flex; flex-wrap:wrap; align-items:center; gap:14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <?php
+                $presets = [
+                    'today'      => ['Today',       date('Y-m-d'),                          date('Y-m-d')],
+                    'this_week'  => ['This Week',   date('Y-m-d', strtotime('monday this week')), date('Y-m-d')],
+                    'this_month' => ['This Month',  date('Y-m-01'),                         date('Y-m-d')],
+                    'last_month' => ['Last Month',  date('Y-m-01', strtotime('first day of last month')), date('Y-m-t', strtotime('last month'))],
+                    'this_year'  => ['This Year',   date('Y-01-01'),                        date('Y-m-d')],
+                ];
+            ?>
+            <?php foreach ($presets as $key => [$label, $ps, $pe]): ?>
+                <?php $isActive = ($startDate === $ps && $endDate === $pe); ?>
+                <button type="button" onclick="setPreset('<?= $ps ?>','<?= $pe ?>')" style="
+                    padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer;
+                    border:1.5px solid <?= $isActive ? '#8b5cf6' : '#e2e8f0' ?>;
+                    background:<?= $isActive ? '#8b5cf6' : '#fff' ?>;
+                    color:<?= $isActive ? '#fff' : '#4a5568' ?>;
+                    transition:all 0.15s;
+                "><?= $label ?></button>
+            <?php endforeach; ?>
+            <?php if (!$startDate && !$endDate): ?>
+                <button type="button" style="padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid #8b5cf6; background:#8b5cf6; color:#fff; cursor:default;">All Time</button>
+            <?php else: ?>
+                <button type="button" onclick="clearFilter()" style="padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid #e2e8f0; background:#fff; color:#4a5568; cursor:pointer;">All Time</button>
+            <?php endif; ?>
+        </div>
+
+        <div style="width:1px; height:28px; background:#e2e8f0;"></div>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+            <label style="font-size:12px; font-weight:600; color:#718096;">FROM</label>
+            <input type="date" id="start_date" name="start_date" value="<?= htmlspecialchars($startDate) ?>" style="padding:6px 10px; border:1px solid #cbd5e0; border-radius:6px; font-size:13px; color:#181818;">
+            <label style="font-size:12px; font-weight:600; color:#718096;">TO</label>
+            <input type="date" id="end_date" name="end_date" value="<?= htmlspecialchars($endDate) ?>" style="padding:6px 10px; border:1px solid #cbd5e0; border-radius:6px; font-size:13px; color:#181818;">
+            <button type="submit" style="padding:7px 18px; background:#8b5cf6; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;">Filter Dates</button>
+        </div>
+
+        <?php if ($startDate && $endDate): ?>
+            <div style="font-size:12px; color:#8b5cf6; font-weight:700; margin-left:auto;">
+                Showing: <?= date('d M Y', strtotime($startDate)) ?> – <?= date('d M Y', strtotime($endDate)) ?>
+            </div>
+        <?php endif; ?>
+    </form>
+
+    <script>
+    function setPreset(start, end) {
+        document.getElementById('start_date').value = start;
+        document.getElementById('end_date').value = end;
+        document.getElementById('viewDateFilterForm').submit();
+    }
+    function clearFilter() {
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+        document.getElementById('viewDateFilterForm').submit();
+    }
+    </script>
 
     <!-- Summary KPI Cards -->
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px;">
@@ -55,7 +127,7 @@ function getViewFlagEmoji($countryCode) {
         </div>
     </div>
 
-    <!-- Section 1: Repeat Visitor IP Breakdown Report -->
+    <!-- Section 1: Repeat Visitor IP Breakdown Report (DataTables Enabled) -->
     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
             <div>
@@ -66,37 +138,37 @@ function getViewFlagEmoji($countryCode) {
         </div>
 
         <?php if (!empty($repeatIpReport)): ?>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+            <div class="table-responsive">
+                <table id="repeatIpTable" class="display" style="width: 100%; border-collapse: collapse; font-size: 13px;">
                     <thead>
-                        <tr style="background: #f8fafc; color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">
-                            <th style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">Product</th>
-                            <th style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">Visitor IP Address</th>
-                            <th style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">Location</th>
-                            <th style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0; text-align: center;">Times Viewed from Same IP</th>
-                            <th style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0; text-align: right;">Latest View Time</th>
+                        <tr>
+                            <th>Product</th>
+                            <th>Visitor IP Address</th>
+                            <th>Location</th>
+                            <th style="text-align: center;">Times Viewed from Same IP</th>
+                            <th style="text-align: right;">Latest View Time</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($repeatIpReport as $idx => $r): ?>
                             <?php $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $r['image']); ?>
-                            <tr style="border-bottom: 1px solid #f1f5f9; <?= $r['ip_view_count'] > 1 ? 'background: #faf5ff;' : '' ?>">
-                                <td style="padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
+                            <tr style="<?= $r['ip_view_count'] > 1 ? 'background: #faf5ff;' : '' ?>">
+                                <td style="display: flex; align-items: center; gap: 10px;">
                                     <img src="<?= htmlspecialchars($tinyImg) ?>" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px;">
                                     <div>
                                         <div style="font-size: 11px; color: #c5a059; font-weight: 700;"><?= htmlspecialchars($r['product_code']) ?></div>
                                         <div style="font-weight: 600; color: #1e293b;"><?= htmlspecialchars($r['product_name']) ?></div>
                                     </div>
                                 </td>
-                                <td style="padding: 10px 14px; font-family: monospace; font-size: 12.5px; color: #334155; font-weight: 600;">
+                                <td style="font-family: monospace; font-size: 12.5px; color: #334155; font-weight: 600;">
                                     <?= htmlspecialchars($r['ip_address']) ?>
                                 </td>
-                                <td style="padding: 10px 14px;">
+                                <td>
                                     <span style="font-size: 14px; margin-right: 4px;"><?= getViewFlagEmoji($r['country_code']) ?></span>
                                     <strong style="color: #334155;"><?= htmlspecialchars($r['country']) ?></strong>
                                     <span style="color: #64748b; font-size: 11.5px;">(<?= htmlspecialchars($r['city']) ?>)</span>
                                 </td>
-                                <td style="padding: 10px 14px; text-align: center;">
+                                <td style="text-align: center;" data-order="<?= (int)$r['ip_view_count'] ?>">
                                     <?php if ($r['ip_view_count'] > 1): ?>
                                         <span style="background: #f3e8ff; color: #7c3aed; border: 1px solid #d8b4fe; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px;">
                                             🔥 <?= number_format($r['ip_view_count']) ?> Views
@@ -107,7 +179,7 @@ function getViewFlagEmoji($countryCode) {
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td style="padding: 10px 14px; text-align: right; color: #64748b; font-size: 12px;">
+                                <td style="text-align: right; color: #64748b; font-size: 12px;" data-order="<?= strtotime($r['last_viewed_at']) ?>">
                                     <?= date('d M Y, h:i A', strtotime($r['last_viewed_at'])) ?>
                                 </td>
                             </tr>
@@ -116,57 +188,59 @@ function getViewFlagEmoji($countryCode) {
                 </table>
             </div>
         <?php else: ?>
-            <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic; font-size: 13px;">No repeat product view logs recorded yet.</div>
+            <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic; font-size: 13px;">No repeat product view logs recorded for the selected date range.</div>
         <?php endif; ?>
     </div>
 
     <!-- Section 2 & 3: Most Viewed Ranking & Geolocation Distribution -->
     <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; margin-bottom: 28px;">
-        <!-- Most Viewed Products Table -->
+        <!-- Most Viewed Products Table (DataTables Enabled) -->
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
             <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px;">🏆 Product Views Ranking</h3>
             <?php if (!empty($productPerformance)): ?>
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                    <thead>
-                        <tr style="background: #f8fafc; color: #475569; font-size: 11px; text-transform: uppercase;">
-                            <th style="padding: 8px 10px; text-align: left;">Rank</th>
-                            <th style="padding: 8px 10px; text-align: left;">Product</th>
-                            <th style="padding: 8px 10px; text-align: right;">Price</th>
-                            <th style="padding: 8px 10px; text-align: right;">Total Views</th>
-                            <th style="padding: 8px 10px; text-align: right;">Unique Visitors</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($productPerformance as $idx => $p): ?>
-                            <?php $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $p['image']); ?>
-                            <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 10px; font-weight: 700; color: #64748b; width: 40px; text-align: center;">
-                                    #<?= $idx + 1 ?>
-                                </td>
-                                <td style="padding: 10px; display: flex; align-items: center; gap: 10px;">
-                                    <img src="<?= htmlspecialchars($tinyImg) ?>" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">
-                                    <div>
-                                        <div style="font-size: 10.5px; color: #c5a059; font-weight: 700;"><?= htmlspecialchars($p['product_code']) ?></div>
-                                        <a href="<?= BASE_URL ?>/product/<?= htmlspecialchars($p['slug']) ?>" target="_blank" style="font-weight: 600; color: #1e293b; text-decoration: none;"><?= htmlspecialchars($p['name']) ?></a>
-                                    </div>
-                                </td>
-                                <td style="padding: 10px; text-align: right; font-weight: 600; color: #475569;">
-                                    <?= number_format($p['price'], 2) ?> BHD
-                                </td>
-                                <td style="padding: 10px; text-align: right;">
-                                    <span style="background: #f3e8ff; color: #7c3aed; font-weight: 700; padding: 2px 8px; border-radius: 10px; font-size: 12px;">
-                                        👁️ <?= number_format($p['total_views']) ?>
-                                    </span>
-                                </td>
-                                <td style="padding: 10px; text-align: right; font-weight: 600; color: #0284c7;">
-                                    👤 <?= number_format($p['unique_visitors']) ?>
-                                </td>
+                <div class="table-responsive">
+                    <table id="viewRankingTable" class="display" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th style="text-align: right;">Price</th>
+                                <th style="text-align: right;">Total Views</th>
+                                <th style="text-align: right;">Unique Visitors</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($productPerformance as $idx => $p): ?>
+                                <?php $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $p['image']); ?>
+                                <tr>
+                                    <td style="font-weight: 700; color: #64748b; width: 40px; text-align: center;" data-order="<?= $idx + 1 ?>">
+                                        #<?= $idx + 1 ?>
+                                    </td>
+                                    <td style="display: flex; align-items: center; gap: 10px;">
+                                        <img src="<?= htmlspecialchars($tinyImg) ?>" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">
+                                        <div>
+                                            <div style="font-size: 10.5px; color: #c5a059; font-weight: 700;"><?= htmlspecialchars($p['product_code']) ?></div>
+                                            <a href="<?= BASE_URL ?>/product/<?= htmlspecialchars($p['slug']) ?>" target="_blank" style="font-weight: 600; color: #1e293b; text-decoration: none;"><?= htmlspecialchars($p['name']) ?></a>
+                                        </div>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 600; color: #475569;" data-order="<?= (float)$p['price'] ?>">
+                                        <?= number_format($p['price'], 2) ?> BHD
+                                    </td>
+                                    <td style="text-align: right;" data-order="<?= (int)$p['total_views'] ?>">
+                                        <span style="background: #f3e8ff; color: #7c3aed; font-weight: 700; padding: 2px 8px; border-radius: 10px; font-size: 12px;">
+                                            👁️ <?= number_format($p['total_views']) ?>
+                                        </span>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 600; color: #0284c7;" data-order="<?= (int)$p['unique_visitors'] ?>">
+                                        👤 <?= number_format($p['unique_visitors']) ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             <?php else: ?>
-                <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic;">No product view data yet.</div>
+                <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic;">No product view data recorded for selected date range.</div>
             <?php endif; ?>
         </div>
 
@@ -199,6 +273,93 @@ function getViewFlagEmoji($countryCode) {
                 <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic;">No location data available.</div>
             <?php endif; ?>
         </div>
+    </div>
+
+    <!-- Section 4: Recent Individual Views Log (DataTables Enabled) -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px;">⏱️ Recent Detail View Activity Log</h3>
+        <?php if (!empty($recentViews)): ?>
+            <div class="table-responsive">
+                <table id="recentViewsTable" class="display" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Visitor IP</th>
+                            <th>Location</th>
+                            <th style="text-align: right;">Viewed At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($recentViews as $v): ?>
+                            <?php $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $v['image']); ?>
+                            <tr>
+                                <td style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="<?= htmlspecialchars($tinyImg) ?>" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">
+                                    <div>
+                                        <div style="font-size: 10.5px; color: #c5a059; font-weight: 700;"><?= htmlspecialchars($v['product_code']) ?></div>
+                                        <div style="font-weight: 600; color: #1e293b;"><?= htmlspecialchars($v['product_name']) ?></div>
+                                    </div>
+                                </td>
+                                <td style="font-family: monospace; font-size: 12px; color: #475569; font-weight: 600;">
+                                    <?= htmlspecialchars($v['ip_address']) ?>
+                                </td>
+                                <td>
+                                    <span style="font-size: 14px; margin-right: 4px;"><?= getViewFlagEmoji($v['country_code']) ?></span>
+                                    <strong style="color: #334155;"><?= htmlspecialchars($v['country']) ?></strong>
+                                    <span style="color: #64748b; font-size: 11px;">(<?= htmlspecialchars($v['city']) ?>)</span>
+                                </td>
+                                <td style="text-align: right; color: #64748b; font-size: 12px;" data-order="<?= strtotime($v['viewed_at']) ?>">
+                                    <?= date('d M Y, h:i A', strtotime($v['viewed_at'])) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic;">No recent view logs available.</div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    if ($('#repeatIpTable').length) {
+        $('#repeatIpTable').DataTable({
+            "pageLength": 15,
+            "order": [[ 3, "desc" ]],
+            "language": {
+                "search": "Filter Repeat IPs:",
+                "lengthMenu": "Show _MENU_ rows"
+            }
+        });
+    }
+
+    if ($('#viewRankingTable').length) {
+        $('#viewRankingTable').DataTable({
+            "pageLength": 15,
+            "order": [[ 3, "desc" ]],
+            "language": {
+                "search": "Filter Products:",
+                "lengthMenu": "Show _MENU_ rows"
+            }
+        });
+    }
+
+    if ($('#recentViewsTable').length) {
+        $('#recentViewsTable').DataTable({
+            "pageLength": 15,
+            "order": [[ 3, "desc" ]],
+            "language": {
+                "search": "Filter Activity:",
+                "lengthMenu": "Show _MENU_ rows"
+            }
+        });
+    }
+});
+</script>
 </div>
 </body>
 </html>
