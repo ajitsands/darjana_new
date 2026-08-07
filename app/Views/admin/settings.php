@@ -204,7 +204,7 @@
                 <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
                     🚚 Shipping &amp; GCC Delivery Policy (`shipping_policy`)
                 </label>
-                <textarea name="shipping_policy" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['shipping_policy'] ?? '<h3>Shipping & GCC Delivery Policy</h3>
+                <textarea name="shipping_policy" id="shipping_policy" class="policy-editor" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px;"><?= htmlspecialchars($settings['shipping_policy'] ?? '<h3>Shipping & GCC Delivery Policy</h3>
 <p>At Dar Jana Fashion, we craft and deliver high-couture luxury abayas and sets across Bahrain and all GCC countries (Saudi Arabia, Kuwait, United Arab Emirates, Qatar, Oman) as well as international destinations.</p>
 
 <h4>1. Order Processing & Tailoring Time</h4>
@@ -226,7 +226,7 @@
                 <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
                     🔄 Returns &amp; Exchanges Policy (`return_policy`)
                 </label>
-                <textarea name="return_policy" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['return_policy'] ?? '<h3>Returns & Exchanges Policy</h3>
+                <textarea name="return_policy" id="return_policy" class="policy-editor" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px;"><?= htmlspecialchars($settings['return_policy'] ?? '<h3>Returns & Exchanges Policy</h3>
 <p>We take pride in the craftsmanship of Dar Jana Fashion. If you are not entirely satisfied with your item, we are here to assist you.</p>
 
 <h4>1. Return Window</h4>
@@ -248,7 +248,7 @@
                 <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
                     📜 Terms &amp; Conditions (`terms_conditions`)
                 </label>
-                <textarea name="terms_conditions" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['terms_conditions'] ?? '<h3>Terms & Conditions</h3>
+                <textarea name="terms_conditions" id="terms_conditions" class="policy-editor" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px;"><?= htmlspecialchars($settings['terms_conditions'] ?? '<h3>Terms & Conditions</h3>
 <p>Welcome to Dar Jana Fashion. By accessing our website, browsing our collections, or making a purchase, you agree to comply with and be bound by the following terms.</p>
 
 <h4>1. Intellectual Property</h4>
@@ -266,7 +266,7 @@
                 <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
                     🔒 Privacy Policy (`privacy_policy`)
                 </label>
-                <textarea name="privacy_policy" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['privacy_policy'] ?? '<h3>Privacy Policy</h3>
+                <textarea name="privacy_policy" id="privacy_policy" class="policy-editor" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px;"><?= htmlspecialchars($settings['privacy_policy'] ?? '<h3>Privacy Policy</h3>
 <p>Dar Jana Fashion values your privacy and is dedicated to protecting your personal information.</p>
 
 <h4>1. Information Collection</h4>
@@ -291,16 +291,36 @@
         </div>
         
 
-<!-- jQuery and DataTables -->
+<!-- jQuery, DataTables & Summernote WYSIWYG Text Editor -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
 <style>
     .dataTables_wrapper .dataTables_filter input { border: 1px solid #cbd5e0; padding: 4px 8px; border-radius: 4px; margin-left: 8px; }
     .dataTables_wrapper .dataTables_length select { border: 1px solid #cbd5e0; padding: 4px; border-radius: 4px; }
+    .note-editor .note-toolbar { background: #f7fafc; border-bottom: 1px solid #e2e8f0; }
+    .note-editor.note-frame { border: 1px solid #cbd5e0; border-radius: 6px; overflow: hidden; }
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 
 <script>
+$(document).ready(function() {
+    $('.policy-editor').summernote({
+        height: 220,
+        toolbar: [
+            ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+            ['font', ['strikethrough', 'superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+        placeholder: 'Enter policy terms and conditions here...'
+    });
+});
 
 const defaultChest = [
     {size: 'S', chest: '20.00', shoulder: '27.00'},
