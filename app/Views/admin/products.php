@@ -591,16 +591,21 @@ function fallbackCopyText(text, message) {
     }
 }
 
-function showShareToast(message) {
+function showShareToast(message, type = 'success') {
     const toast = document.getElementById('shareToast');
     const toastText = document.getElementById('shareToastText');
     if (!toast || !toastText) return;
 
     toastText.textContent = message;
+    if (type === 'error') {
+        toast.style.background = '#e53e3e';
+    } else {
+        toast.style.background = '#16a34a';
+    }
     toast.style.display = 'flex';
     setTimeout(() => {
         toast.style.display = 'none';
-    }, 3500);
+    }, 4000);
 }
 
 function capitalize(str) {
@@ -762,8 +767,9 @@ function closeProductPreviewModal() {
 function togglePublishStatus(newStatus) {
     if (!currentOptionsProduct) return;
     const prodId = currentOptionsProduct.id;
+    const baseUrl = '<?= BASE_URL ?>';
 
-    fetch(window.BASE_URL + '/admin/products/toggle-publish', {
+    fetch(baseUrl + '/admin/products/toggle-publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'id=' + prodId + '&status=' + newStatus
@@ -772,17 +778,17 @@ function togglePublishStatus(newStatus) {
     .then(data => {
         if (data.success) {
             closeProductOptionsModal();
-            showShareToast(data.message);
+            showShareToast(data.message, 'success');
             if (typeof table !== 'undefined' && table.ajax) {
                 table.ajax.reload(null, false);
             } else {
                 location.reload();
             }
         } else {
-            alert(data.message || 'Error updating status.');
+            showShareToast(data.message || 'Error updating publish status.', 'error');
         }
     })
-    .catch(err => alert('Network error occurred.'));
+    .catch(err => showShareToast('Network request failed. Please try again.', 'error'));
 }
 
 // Close modal on background click
