@@ -86,6 +86,12 @@ class Product extends Model {
             try { $this->db->exec("ALTER TABLE product_share_clicks ADD COLUMN country_code VARCHAR(10) DEFAULT NULL"); } catch (Exception $ex) {}
             try { $this->db->exec("ALTER TABLE product_share_clicks ADD COLUMN city VARCHAR(100) DEFAULT NULL"); } catch (Exception $ex) {}
         }
+
+        try {
+            $this->db->query("SELECT recipient_email FROM product_share_clicks LIMIT 1");
+        } catch (Exception $e) {
+            try { $this->db->exec("ALTER TABLE product_share_clicks ADD COLUMN recipient_email VARCHAR(255) DEFAULT NULL"); } catch (Exception $ex) {}
+        }
     }
 
     private function ensureVariantColumns() {
@@ -424,7 +430,7 @@ class Product extends Model {
     /**
      * Track a share link click with deduplication window configured by admin (default: 60 minutes)
      */
-    public function trackShareClick($productId, $source, $ipAddress, $userAgent = '') {
+    public function trackShareClick($productId, $source, $ipAddress, $userAgent = '', $recipientEmail = null) {
         require_once __DIR__ . '/Setting.php';
         $settingModel = new Setting();
         $dedupMinutes = (int)$settingModel->get('share_click_dedup_minutes', 60);
@@ -444,8 +450,8 @@ class Product extends Model {
             $location = $this->resolveGeoLocation($ipAddress);
             $now = date('Y-m-d H:i:s');
             $this->query(
-                "INSERT INTO product_share_clicks (product_id, source, ip_address, user_agent, country, country_code, city, clicked_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [(int)$productId, strtolower($source), $ipAddress, substr($userAgent, 0, 500), $location['country'], $location['country_code'], $location['city'], $now]
+                "INSERT INTO product_share_clicks (product_id, source, ip_address, user_agent, country, country_code, city, recipient_email, clicked_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [(int)$productId, strtolower($source), $ipAddress, substr($userAgent, 0, 500), $location['country'], $location['country_code'], $location['city'], $recipientEmail, $now]
             );
             return true; // Click counted!
         }

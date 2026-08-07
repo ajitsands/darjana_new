@@ -43,7 +43,8 @@
                                 if ($prodImage && strpos($prodImage, 'http') !== 0) {
                                     $prodImage = (defined('BASE_URL') ? BASE_URL : '') . '/' . ltrim($prodImage, '/');
                                 }
-                                $prodUrl = (defined('BASE_URL') ? BASE_URL : '') . '/product/' . htmlspecialchars($product['slug'] ?? '') . '?source=email';
+                                $subToken = !empty($recipientEmail) ? '&sub=' . urlencode($recipientEmail) : '';
+                                $prodUrl = (defined('BASE_URL') ? BASE_URL : '') . '/product/' . htmlspecialchars($product['slug'] ?? '') . '?source=email' . $subToken;
                             ?>
                             <div style="border: 1px solid #edf2f7; border-radius: 10px; overflow: hidden; background: #ffffff;">
                                 <a href="<?= $prodUrl ?>" target="_blank" style="text-decoration: none; display: block;">

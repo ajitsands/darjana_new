@@ -155,6 +155,7 @@ $emailCampaignStats = $emailCampaignStats ?? ['total_clicks' => 0, 'unique_ips' 
                 <table id="emailClicksTable" class="display" style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
                     <thead>
                         <tr>
+                            <th>Recipient Mailbox</th>
                             <th>Product Clicked</th>
                             <th>Visitor IP Address</th>
                             <th>Visitor Location</th>
@@ -165,6 +166,14 @@ $emailCampaignStats = $emailCampaignStats ?? ['total_clicks' => 0, 'unique_ips' 
                         <?php foreach ($emailCampaignStats['recent_clicks'] as $ec): ?>
                             <?php $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $ec['image']); ?>
                             <tr>
+                                <td>
+                                    <?php if (!empty($ec['recipient_email'])): ?>
+                                        <div style="font-weight: 700; color: #0f172a; font-size: 13px;">✉️ <?= htmlspecialchars($ec['recipient_email']) ?></div>
+                                        <div style="font-size: 11px; color: #8b5cf6; font-weight: 600;">Subscribed VIP</div>
+                                    <?php else: ?>
+                                        <span style="color: #94a3b8; font-style: italic; font-size: 12.5px;">Email Visitor</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td style="display: flex; align-items: center; gap: 10px;">
                                     <img src="<?= htmlspecialchars($tinyImg) ?>" style="width: 34px; height: 34px; object-fit: cover; border-radius: 4px;">
                                     <div>
@@ -297,7 +306,7 @@ $(document).ready(function() {
     if ($('#emailClicksTable').length) {
         $('#emailClicksTable').DataTable({
             "pageLength": 10,
-            "order": [[ 3, "desc" ]],
+            "order": [[ 4, "desc" ]],
             "language": {
                 "search": "Filter Email Clicks:",
                 "lengthMenu": "Show _MENU_ rows"

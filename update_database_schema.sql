@@ -16,9 +16,13 @@ CREATE TABLE IF NOT EXISTS product_share_clicks (
     country VARCHAR(100) DEFAULT NULL,
     country_code VARCHAR(10) DEFAULT NULL,
     city VARCHAR(100) DEFAULT NULL,
+    recipient_email VARCHAR(255) DEFAULT NULL,
     clicked_at DATETIME NOT NULL,
     INDEX idx_prod_ip_src (product_id, ip_address, source, clicked_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Add recipient_email column for existing product_share_clicks tables
+ALTER TABLE product_share_clicks ADD COLUMN recipient_email VARCHAR(255) DEFAULT NULL;
 
 -- 3. Create `product_views` table for tracking detail page views & repeat IP visitors
 CREATE TABLE IF NOT EXISTS product_views (

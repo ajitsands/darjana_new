@@ -88,7 +88,11 @@ class ProductController extends Controller {
             $allowedSources = ['instagram', 'facebook', 'whatsapp', 'tiktok', 'youtube', 'email', 'email_campaign'];
             $cleanSource = strtolower(trim($shareSource));
             if (in_array($cleanSource, $allowedSources)) {
-                $productModel->trackShareClick($product['id'], $cleanSource, $clientIp, $clientUA);
+                $recipientEmail = $_GET['sub'] ?? $_GET['email'] ?? null;
+                if (!empty($recipientEmail)) {
+                    $recipientEmail = strtolower(trim(urldecode($recipientEmail)));
+                }
+                $productModel->trackShareClick($product['id'], $cleanSource, $clientIp, $clientUA, $recipientEmail);
             }
         }
 
