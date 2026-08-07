@@ -603,7 +603,9 @@ class Product extends Model {
             'instagram' => ['name' => 'Instagram', 'icon' => '📸', 'color' => '#d69e2e'],
             'facebook' => ['name' => 'Facebook', 'icon' => '📘', 'color' => '#3182ce'],
             'tiktok' => ['name' => 'TikTok', 'icon' => '🎵', 'color' => '#805ad5'],
-            'youtube' => ['name' => 'YouTube', 'icon' => '📺', 'color' => '#e53e3e']
+            'youtube' => ['name' => 'YouTube', 'icon' => '📺', 'color' => '#e53e3e'],
+            'email' => ['name' => 'Email Campaign', 'icon' => '✉️', 'color' => '#8b5cf6'],
+            'email_campaign' => ['name' => 'Email Campaign', 'icon' => '✉️', 'color' => '#8b5cf6']
         ];
 
         $platformCounts = $this->fetchAll("
@@ -861,6 +863,43 @@ class Product extends Model {
             'location_performance' => $locationPerformance,
             'repeat_ip_report' => $repeatIpReport,
             'recent_views' => $recentViews
+        ];
+    }
+
+    /**
+     * Get Email Campaign Click Performance (clicks resulting from promotional emails)
+     */
+    public function getEmailCampaignClickStats() {
+        $totalEmailClicksRow = $this->fetchOne("
+            SELECT COUNT(*) as total, COUNT(DISTINCT ip_address) as unique_ips 
+            FROM product_share_clicks 
+            WHERE source IN ('email', 'email_campaign')
+        ");
+
+        $recentEmailClicks = $this->fetchAll("
+            SELECT psc.*, p.name as product_name, p.product_code, p.image, p.slug
+            FROM product_share_clicks psc
+            JOIN products p ON p.id = psc.product_id
+            WHERE psc.source IN ('email', 'email_campaign')
+            ORDER BY psc.clicked_at DESC
+            LIMIT 50
+        ");
+
+        $topEmailProducts = $this->fetchAll("
+            SELECT p.id, p.product_code, p.name, p.image, p.price, COUNT(psc.id) as total_clicks
+            FROM product_share_clicks psc
+            JOIN products p ON p.id = psc.product_id
+            WHERE psc.source IN ('email', 'email_campaign')
+            GROUP BY p.id
+            ORDER BY total_clicks DESC
+            LIMIT 10
+        ");
+
+        return [
+            'total_clicks' => $totalEmailClicksRow ? (int)$totalEmailClicksRow['total'] : 0,
+            'unique_ips' => $totalEmailClicksRow ? (int)$totalEmailClicksRow['unique_ips'] : 0,
+            'top_products' => $topEmailProducts,
+            'recent_clicks' => $recentEmailClicks
         ];
     }
 }

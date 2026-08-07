@@ -1,4 +1,18 @@
-<?php include __DIR__ . '/header.php'; ?>
+<?php
+if (!function_exists('getPromoFlagEmoji')) {
+    function getPromoFlagEmoji($countryCode) {
+        if (!$countryCode || $countryCode === 'LOCAL') return '📍';
+        if ($countryCode === 'UN') return '🌐';
+        try {
+            $codePoints = array_map(fn($char) => 127397 + ord($char), str_split(strtoupper($countryCode)));
+            return mb_chr($codePoints[0], 'UTF-8') . mb_chr($codePoints[1], 'UTF-8');
+        } catch (Exception $e) {
+            return '🌐';
+        }
+    }
+}
+$emailCampaignStats = $emailCampaignStats ?? ['total_clicks' => 0, 'unique_ips' => 0, 'top_products' => [], 'recent_clicks' => []];
+?>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <style>
@@ -34,7 +48,7 @@
     </div>
 
     <!-- KPI Summary Cards -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px;">
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px;">
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #c5a059;">
             <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">TOTAL SUBSCRIBERS</div>
             <div style="font-size: 28px; font-weight: 800; color: #181818; margin-top: 6px;"><?= count($subscribers) ?></div>
@@ -45,10 +59,15 @@
             <div style="font-size: 28px; font-weight: 800; color: #22c55e; margin-top: 6px;"><?= count(array_filter($subscribers, fn($s) => ($s['status'] ?? 'active') === 'active')) ?></div>
             <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Ready to receive promos</div>
         </div>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #8b5cf6;">
+            <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">EMAIL CAMPAIGN CLICKS</div>
+            <div style="font-size: 28px; font-weight: 800; color: #8b5cf6; margin-top: 6px;"><?= number_format($emailCampaignStats['total_clicks']) ?></div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;"><?= number_format($emailCampaignStats['unique_ips']) ?> unique visitors from emails</div>
+        </div>
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #3b82f6;">
-            <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">PRODUCTS AVAILABLE FOR PROMO</div>
+            <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">PRODUCTS IN CATALOG</div>
             <div style="font-size: 28px; font-weight: 800; color: #3b82f6; margin-top: 6px;"><?= count($products) ?></div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Active catalog items</div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Available for promotion</div>
         </div>
     </div>
 
@@ -114,6 +133,61 @@
             </div>
         <?php else: ?>
             <div style="text-align: center; padding: 40px; color: #94a3b8; font-style: italic;">No newsletter subscribers recorded yet.</div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Email Campaign Click Tracking Report Section (User Directive) -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; margin-top: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">✉️ Email Campaign Clicks &amp; Traffic Report</h3>
+                <p style="font-size: 12.5px; color: #64748b; margin-top: 2px;">Track how many customers clicked product links from promotional email broadcasts</p>
+            </div>
+            <a href="<?= BASE_URL ?>/admin/click-insights" style="background: #8b5cf6; color: #ffffff; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; text-decoration: none;">
+                📊 View All Share &amp; Campaign Analytics →
+            </a>
+        </div>
+
+        <?php if (!empty($emailCampaignStats['recent_clicks'])): ?>
+            <div class="table-responsive">
+                <table id="emailClicksTable" class="display" style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+                    <thead>
+                        <tr>
+                            <th>Product Clicked</th>
+                            <th>Visitor IP Address</th>
+                            <th>Visitor Location</th>
+                            <th style="text-align: right;">Clicked Date &amp; Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($emailCampaignStats['recent_clicks'] as $ec): ?>
+                            <?php $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $ec['image']); ?>
+                            <tr>
+                                <td style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="<?= htmlspecialchars($tinyImg) ?>" style="width: 34px; height: 34px; object-fit: cover; border-radius: 4px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: #c5a059; font-weight: 700;"><?= htmlspecialchars($ec['product_code']) ?></div>
+                                        <a href="<?= BASE_URL ?>/product/<?= htmlspecialchars($ec['slug']) ?>" target="_blank" style="font-weight: 600; color: #1e293b; text-decoration: none;"><?= htmlspecialchars($ec['product_name']) ?></a>
+                                    </div>
+                                </td>
+                                <td style="font-family: monospace; font-size: 12.5px; color: #334155; font-weight: 600;">
+                                    <?= htmlspecialchars($ec['ip_address']) ?>
+                                </td>
+                                <td>
+                                    <span style="font-size: 14px; margin-right: 4px;"><?= getPromoFlagEmoji($ec['country_code']) ?></span>
+                                    <strong style="color: #334155;"><?= htmlspecialchars($ec['country'] ?: 'Unknown') ?></strong>
+                                    <span style="color: #64748b; font-size: 11.5px;">(<?= htmlspecialchars($ec['city'] ?: 'Unknown') ?>)</span>
+                                </td>
+                                <td style="text-align: right; color: #64748b; font-size: 12.5px;" data-order="<?= strtotime($ec['clicked_at']) ?>">
+                                    <?= date('d M Y, h:i A', strtotime($ec['clicked_at'])) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div style="text-align: center; padding: 40px; color: #94a3b8; font-style: italic;">No promotional email clicks recorded yet. Send your first campaign above to track subscriber traffic!</div>
         <?php endif; ?>
     </div>
 </div>
@@ -213,6 +287,17 @@ $(document).ready(function() {
             ],
             "language": {
                 "search": "Filter Subscribers:",
+                "lengthMenu": "Show _MENU_ rows"
+            }
+        });
+    }
+
+    if ($('#emailClicksTable').length) {
+        $('#emailClicksTable').DataTable({
+            "pageLength": 10,
+            "order": [[ 3, "desc" ]],
+            "language": {
+                "search": "Filter Email Clicks:",
                 "lengthMenu": "Show _MENU_ rows"
             }
         });

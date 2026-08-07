@@ -85,7 +85,7 @@ class ProductController extends Controller {
         // Track share link click if source or utm_source or ref query parameter exists
         $shareSource = $_GET['source'] ?? $_GET['utm_source'] ?? $_GET['ref'] ?? null;
         if (!empty($shareSource)) {
-            $allowedSources = ['instagram', 'facebook', 'whatsapp', 'tiktok', 'youtube'];
+            $allowedSources = ['instagram', 'facebook', 'whatsapp', 'tiktok', 'youtube', 'email', 'email_campaign'];
             $cleanSource = strtolower(trim($shareSource));
             if (in_array($cleanSource, $allowedSources)) {
                 $productModel->trackShareClick($product['id'], $cleanSource, $clientIp, $clientUA);

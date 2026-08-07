@@ -1668,11 +1668,13 @@ class AdminController extends Controller {
 
         $subscribers = $subscriberModel->getAllSubscribers();
         $products = $productModel->getAll();
+        $emailCampaignStats = $productModel->getEmailCampaignClickStats();
 
         $data = [
             'pageTitle' => 'Newsletter Subscribers & Promotional Campaigns | Admin',
             'subscribers' => $subscribers,
-            'products' => $products
+            'products' => $products,
+            'emailCampaignStats' => $emailCampaignStats
         ];
 
         $this->render('admin/subscribers', $data, 'admin');
