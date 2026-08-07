@@ -146,11 +146,13 @@
                                     <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                                         <?php 
                                             $srcs = $prod['by_source'];
-                                            if ($srcs['whatsapp'] > 0) echo '<span style="background: #f0fff4; color: #38a169; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">💬 WA: ' . $srcs['whatsapp'] . '</span>';
-                                            if ($srcs['instagram'] > 0) echo '<span style="background: #fefcbf; color: #d69e2e; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">📸 IG: ' . $srcs['instagram'] . '</span>';
-                                            if ($srcs['facebook'] > 0) echo '<span style="background: #ebf8ff; color: #3182ce; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">📘 FB: ' . $srcs['facebook'] . '</span>';
-                                            if ($srcs['tiktok'] > 0) echo '<span style="background: #faf5ff; color: #805ad5; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">🎵 TT: ' . $srcs['tiktok'] . '</span>';
-                                            if ($srcs['youtube'] > 0) echo '<span style="background: #fff5f5; color: #e53e3e; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">📺 YT: ' . $srcs['youtube'] . '</span>';
+                                            if (($srcs['whatsapp'] ?? 0) > 0) echo '<span style="background: #f0fff4; color: #38a169; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">💬 WA: ' . $srcs['whatsapp'] . '</span>';
+                                            if (($srcs['instagram'] ?? 0) > 0) echo '<span style="background: #fefcbf; color: #d69e2e; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">📸 IG: ' . $srcs['instagram'] . '</span>';
+                                            if (($srcs['facebook'] ?? 0) > 0) echo '<span style="background: #ebf8ff; color: #3182ce; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">📘 FB: ' . $srcs['facebook'] . '</span>';
+                                            if (($srcs['tiktok'] ?? 0) > 0) echo '<span style="background: #faf5ff; color: #805ad5; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">🎵 TT: ' . $srcs['tiktok'] . '</span>';
+                                            if (($srcs['youtube'] ?? 0) > 0) echo '<span style="background: #fff5f5; color: #e53e3e; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">📺 YT: ' . $srcs['youtube'] . '</span>';
+                                            $emailCount = ($srcs['email'] ?? 0) + ($srcs['email_campaign'] ?? 0);
+                                            if ($emailCount > 0) echo '<span style="background: #f3e8ff; color: #7c3aed; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">✉️ Email: ' . $emailCount . '</span>';
                                             if (array_sum($srcs) == 0) echo '<span style="color: #a0aec0; font-size: 11px;">No clicks</span>';
                                         ?>
                                     </div>

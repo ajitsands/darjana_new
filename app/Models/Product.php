@@ -478,12 +478,14 @@ class Product extends Model {
                 'facebook' => 0,
                 'whatsapp' => 0,
                 'tiktok' => 0,
-                'youtube' => 0
+                'youtube' => 0,
+                'email' => 0
             ];
             foreach ($rows as $r) {
                 $src = strtolower($r['source']);
+                if ($src === 'email_campaign') $src = 'email';
                 $count = (int)$r['click_count'];
-                $bySource[$src] = $count;
+                $bySource[$src] = ($bySource[$src] ?? 0) + $count;
                 $total += $count;
             }
 
@@ -517,14 +519,16 @@ class Product extends Model {
                             'facebook' => 0,
                             'whatsapp' => 0,
                             'tiktok' => 0,
-                            'youtube' => 0
+                            'youtube' => 0,
+                            'email' => 0
                         ],
                         'locations' => []
                     ];
                 }
                 $src = strtolower($r['source']);
+                if ($src === 'email_campaign') $src = 'email';
                 $count = (int)$r['click_count'];
-                $stats[$pid]['by_source'][$src] = $count;
+                $stats[$pid]['by_source'][$src] = ($stats[$pid]['by_source'][$src] ?? 0) + $count;
                 $stats[$pid]['total'] += $count;
             }
 
