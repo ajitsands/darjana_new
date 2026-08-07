@@ -809,6 +809,7 @@ class AdminController extends Controller {
         foreach ($products as $p) {
             $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $p['image']);
             $imageHtml = '<img src="' . htmlspecialchars($tinyImg) . '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">';
+            $activeBadge = (isset($p['is_active']) && $p['is_active'] == 0) ? ' <span style="color: #e53e3e; font-size: 10px; font-weight: 700;">(Inactive)</span>' : '';
             $isVerified = isset($p['is_verified']) ? (int)$p['is_verified'] : 1;
             $verifyBadge = ($isVerified === 1) 
                 ? ' <span style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; margin-left: 6px;">🟢 Published</span>'
@@ -881,6 +882,7 @@ class AdminController extends Controller {
             ];
         }
         
+        if (ob_get_length()) ob_clean();
         header('Content-Type: application/json');
         echo json_encode(['data' => $data]);
         exit;
