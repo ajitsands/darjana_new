@@ -9,6 +9,40 @@ class Product extends Model {
         parent::__construct();
         $this->ensureVariantColumns();
         $this->ensureShareClicksTable();
+        $this->ensureProductViewsTable();
+    }
+
+    private function ensureProductViewsTable() {
+        try {
+            $this->db->query("SELECT 1 FROM product_views LIMIT 1");
+        } catch (Exception $e) {
+            $sql = "CREATE TABLE IF NOT EXISTS product_views (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                product_id INT NOT NULL,
+                ip_address VARCHAR(45) NOT NULL,
+                user_agent TEXT NULL,
+                country VARCHAR(100) DEFAULT NULL,
+                country_code VARCHAR(10) DEFAULT NULL,
+                city VARCHAR(100) DEFAULT NULL,
+                viewed_at DATETIME NOT NULL,
+                INDEX idx_prod_ip_view (product_id, ip_address, viewed_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+            try {
+                $this->db->exec($sql);
+            } catch (Exception $ex) {
+                $sqlSqlite = "CREATE TABLE IF NOT EXISTS product_views (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    product_id INTEGER NOT NULL,
+                    ip_address TEXT NOT NULL,
+                    user_agent TEXT NULL,
+                    country TEXT NULL,
+                    country_code TEXT NULL,
+                    city TEXT NULL,
+                    viewed_at DATETIME NOT NULL
+                )";
+                try { $this->db->exec($sqlSqlite); } catch (Exception $ex2) {}
+            }
+        }
     }
 
     private function ensureShareClicksTable() {
@@ -661,6 +695,151 @@ class Product extends Model {
             'platform_performance' => $platformPerformance,
             'location_performance' => $locationPerformance,
             'recent_clicks' => $recentClicks
+        ];
+    }
+
+    /**
+     * Track a product detail page view with 2-minute cooldown per IP
+     */
+    public function trackProductView($productId, $ipAddress, $userAgent = '') {
+        if (!$productId || $productId <= 0) return false;
+
+        $timeThreshold = date('Y-m-d H:i:s', time() - 120);
+        $existing = $this->fetchOne(
+            "SELECT id FROM product_views WHERE product_id = ? AND ip_address = ? AND viewed_at >= ? LIMIT 1",
+            [(int)$productId, $ipAddress, $timeThreshold]
+        );
+
+        if (!$existing) {
+            $location = $this->resolveGeoLocation($ipAddress);
+            $now = date('Y-m-d H:i:s');
+            $this->query(
+                "INSERT INTO product_views (product_id, ip_address, user_agent, country, country_code, city, viewed_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [(int)$productId, $ipAddress, substr($userAgent, 0, 500), $location['country'], $location['country_code'], $location['city'], $now]
+            );
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get Total Product Views Count (supports optional date filtering)
+     */
+    public function getTotalProductViewsCount($startDate = null, $endDate = null) {
+        $sql = "SELECT COUNT(*) as total FROM product_views WHERE 1=1";
+        $params = [];
+        if ($startDate) {
+            $sql .= " AND DATE(viewed_at) >= ?";
+            $params[] = $startDate;
+        }
+        if ($endDate) {
+            $sql .= " AND DATE(viewed_at) <= ?";
+            $params[] = $endDate;
+        }
+        $row = $this->fetchOne($sql, $params);
+        return $row ? (int)$row['total'] : 0;
+    }
+
+    /**
+     * Get Top Viewed Products List (for Dashboard widget and ranking)
+     */
+    public function getTopViewedProducts($limit = 10, $startDate = null, $endDate = null) {
+        $sql = "SELECT p.id, p.product_code, p.name, p.slug, p.image, p.price, p.sale_price, 
+                       COUNT(pv.id) as total_views, 
+                       COUNT(DISTINCT pv.ip_address) as unique_visitors
+                FROM product_views pv
+                JOIN products p ON pv.product_id = p.id
+                WHERE 1=1";
+        $params = [];
+        if ($startDate) {
+            $sql .= " AND DATE(pv.viewed_at) >= ?";
+            $params[] = $startDate;
+        }
+        if ($endDate) {
+            $sql .= " AND DATE(pv.viewed_at) <= ?";
+            $params[] = $endDate;
+        }
+        $sql .= " GROUP BY p.id ORDER BY total_views DESC LIMIT " . (int)$limit;
+        return $this->fetchAll($sql, $params);
+    }
+
+    /**
+     * Get Comprehensive Detailed Product View Insights & Repeat IP Report
+     */
+    public function getDetailedProductViewInsights() {
+        $totalViewsRow = $this->fetchOne("SELECT COUNT(*) as total, COUNT(DISTINCT ip_address) as unique_ips FROM product_views");
+        $totalViews = $totalViewsRow ? (int)$totalViewsRow['total'] : 0;
+        $uniqueIps = $totalViewsRow ? (int)$totalViewsRow['unique_ips'] : 0;
+
+        $topProductRow = $this->fetchOne("
+            SELECT p.name, COUNT(pv.id) as cnt 
+            FROM product_views pv 
+            JOIN products p ON p.id = pv.product_id 
+            GROUP BY p.id ORDER BY cnt DESC LIMIT 1
+        ");
+        $topProduct = $topProductRow ? $topProductRow['name'] : 'None';
+
+        $topCountryRow = $this->fetchOne("
+            SELECT country, COUNT(*) as cnt 
+            FROM product_views 
+            GROUP BY country ORDER BY cnt DESC LIMIT 1
+        ");
+        $topCountry = $topCountryRow ? ($topCountryRow['country'] ?: 'Unknown') : 'None';
+
+        // Product Ranking Performance
+        $productPerformance = $this->fetchAll("
+            SELECT p.id, p.product_code, p.name, p.slug, p.image, p.price, p.sale_price, 
+                   COUNT(pv.id) as total_views, 
+                   COUNT(DISTINCT pv.ip_address) as unique_visitors
+            FROM products p
+            LEFT JOIN product_views pv ON pv.product_id = p.id
+            GROUP BY p.id
+            HAVING total_views > 0
+            ORDER BY total_views DESC
+        ");
+
+        // Geolocation Performance
+        $locationPerformance = $this->fetchAll("
+            SELECT country, country_code, city, COUNT(*) as total_views
+            FROM product_views
+            GROUP BY country, country_code, city
+            ORDER BY total_views DESC
+            LIMIT 25
+        ");
+
+        // Repeat IP Visitor Report (How many times the same user/IP viewed the same item)
+        $repeatIpReport = $this->fetchAll("
+            SELECT p.id as product_id, p.product_code, p.name as product_name, p.image, 
+                   pv.ip_address, pv.country, pv.country_code, pv.city, 
+                   COUNT(pv.id) as ip_view_count, MAX(pv.viewed_at) as last_viewed_at
+            FROM product_views pv
+            JOIN products p ON p.id = pv.product_id
+            GROUP BY p.id, pv.ip_address, pv.country, pv.country_code, pv.city
+            ORDER BY ip_view_count DESC, last_viewed_at DESC
+            LIMIT 50
+        ");
+
+        // Recent Individual View Logs
+        $recentViews = $this->fetchAll("
+            SELECT pv.*, p.name as product_name, p.product_code, p.image
+            FROM product_views pv
+            JOIN products p ON p.id = pv.product_id
+            ORDER BY pv.viewed_at DESC
+            LIMIT 30
+        ");
+
+        return [
+            'summary' => [
+                'total_views' => $totalViews,
+                'unique_ips' => $uniqueIps,
+                'top_product' => $topProduct,
+                'top_country' => $topCountry
+            ],
+            'product_performance' => $productPerformance,
+            'location_performance' => $locationPerformance,
+            'repeat_ip_report' => $repeatIpReport,
+            'recent_views' => $recentViews
         ];
     }
 }

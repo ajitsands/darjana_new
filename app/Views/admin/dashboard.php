@@ -72,27 +72,34 @@
             </script>
 
             <!-- KPI Cards Row -->
-            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 32px;">
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 32px;">
                 <div class="stat-card" style="border-left: 4px solid #c5a059;">
                     <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">TOTAL REVENUE</div>
-                    <div style="font-size: 24px; font-weight: 700; color: #c5a059;"><?= $totalRevenue ?> <span style="font-size:13px;">BHD</span></div>
+                    <div style="font-size: 22px; font-weight: 700; color: #c5a059;"><?= $totalRevenue ?> <span style="font-size:12px;">BHD</span></div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid #22c55e;">
                     <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">PAID REVENUE</div>
-                    <div style="font-size: 24px; font-weight: 700; color: #22c55e;"><?= $paidRevenue ?> <span style="font-size:13px;">BHD</span></div>
+                    <div style="font-size: 22px; font-weight: 700; color: #22c55e;"><?= $paidRevenue ?> <span style="font-size:12px;">BHD</span></div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid #181818;">
                     <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">TOTAL ORDERS</div>
-                    <div style="font-size: 24px; font-weight: 700; color: #181818;"><?= $totalOrdersCount ?></div>
+                    <div style="font-size: 22px; font-weight: 700; color: #181818;"><?= $totalOrdersCount ?></div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid #f97316;">
                     <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">PENDING ORDERS</div>
-                    <div style="font-size: 24px; font-weight: 700; color: #f97316;"><?= $pendingCount ?></div>
+                    <div style="font-size: 22px; font-weight: 700; color: #f97316;"><?= $pendingCount ?></div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid #3b82f6;">
                     <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">PRODUCTS IN CATALOG</div>
-                    <div style="font-size: 24px; font-weight: 700; color: #181818;"><?= $totalProductsCount ?></div>
+                    <div style="font-size: 22px; font-weight: 700; color: #181818;"><?= $totalProductsCount ?></div>
                 </div>
+                <a href="<?= BASE_URL ?>/admin/product-view-insights" class="stat-card" style="border-left: 4px solid #8b5cf6; text-decoration: none; display: block; background: #fff; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(139,92,246,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-size: 11px; font-family: var(--heading-font-family); color: #718096; letter-spacing: 0.1em; margin-bottom: 6px;">TOTAL PRODUCT VIEWS</div>
+                    <div style="font-size: 22px; font-weight: 700; color: #8b5cf6; display: flex; align-items: center; justify-content: space-between;">
+                        <span><?= number_format($totalProductViewsCount) ?></span>
+                        <span style="font-size: 10px; background: #f3e8ff; color: #7c3aed; padding: 2px 6px; border-radius: 10px; font-weight: 700;">Report →</span>
+                    </div>
+                </a>
             </div>
 
             <!-- Order Status Badges Row -->
@@ -109,7 +116,10 @@
                     <span style="width: 10px; height: 10px; background: #ef4444; border-radius: 50%; display: inline-block;"></span>
                     <span style="font-size: 13px; font-weight: 600;">Failed: <strong style="color:#ef4444;"><?= $failedCount ?></strong></span>
                 </div>
-                <a href="<?= BASE_URL ?>/admin/orders" style="background: #181818; color: #fff; padding: 12px 22px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                <a href="<?= BASE_URL ?>/admin/product-view-insights" style="background: #8b5cf6; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                    👁️ Product View Analytics →
+                </a>
+                <a href="<?= BASE_URL ?>/admin/orders" style="background: #181818; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                     View All Orders →
                 </a>
             </div>
@@ -135,10 +145,10 @@
                 </div>
             </div>
 
-            <!-- Bottom Row: Top Products + Recent Orders -->
-            <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px;">
+            <!-- Bottom Row: Top Products + Most Viewed Items + Recent Orders -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 20px;">
 
-                <!-- Top 5 Products -->
+                <!-- Top 5 Selling Products -->
                 <div style="background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
                     <div style="font-size: 14px; font-weight: 700; color: #181818; margin-bottom: 16px; font-family: var(--heading-font-family); letter-spacing: 0.05em;">TOP SELLING PRODUCTS</div>
                     <?php if (!empty($topProducts)): ?>
@@ -153,6 +163,33 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div style="color: #718096; font-size: 13px; text-align: center; padding: 30px 0;">No order data yet.</div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Most Viewed Items Widget -->
+                <div style="background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 700; color: #181818; font-family: var(--heading-font-family); letter-spacing: 0.05em;">MOST VIEWED ITEMS</div>
+                        <a href="<?= BASE_URL ?>/admin/product-view-insights" style="font-size: 11px; color: #8b5cf6; font-weight: 700; text-decoration: none;">View All →</a>
+                    </div>
+                    <?php if (!empty($topViewedProducts)): ?>
+                        <?php foreach ($topViewedProducts as $i => $vp): ?>
+                            <?php $tinyImg = str_replace('/uploads/products/high/', '/uploads/products/tiny/', $vp['image']); ?>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; <?= $i === count($topViewedProducts) - 1 ? 'border-bottom:none;' : '' ?>">
+                                <img src="<?= htmlspecialchars($tinyImg) ?>" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= htmlspecialchars($vp['name']) ?></div>
+                                    <div style="font-size: 10.5px; color: #718096;"><?= htmlspecialchars($vp['product_code']) ?> · <?= number_format($vp['price'], 2) ?> BHD</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #8b5cf6; background: #f3e8ff; padding: 2px 7px; border-radius: 10px;">
+                                        👁️ <?= number_format($vp['total_views']) ?>
+                                    </span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div style="color: #718096; font-size: 13px; text-align: center; padding: 30px 0;">No product view data yet.</div>
                     <?php endif; ?>
                 </div>
 

@@ -501,24 +501,47 @@ class AdminController extends Controller {
         // --- Total products (always all) ---
         $totalProductsCount = count($productModel->getAll());
 
+        // --- Product View Analytics ---
+        $totalProductViewsCount = $productModel->getTotalProductViewsCount($startDate ?: null, $endDate ?: null);
+        $topViewedProducts = $productModel->getTopViewedProducts(5, $startDate ?: null, $endDate ?: null);
+
         $data = [
-            'pageTitle'          => 'Admin Dashboard | Dar Jana Fashion',
-            'totalRevenue'       => number_format($totalRevenue, 3, '.', ','),
-            'paidRevenue'        => number_format($paidRevenue,  3, '.', ','),
-            'totalOrdersCount'   => count($orders),
-            'totalProductsCount' => $totalProductsCount,
-            'pendingCount'       => $pendingCount,
-            'paidCount'          => $paidCount,
-            'failedCount'        => $failedCount,
-            'chartLabels'        => $chartLabels,
-            'chartData'          => array_values($chartData),
-            'topProducts'        => $topProducts,
-            'recentOrders'       => $recentOrders,
-            'startDate'          => $startDate,
-            'endDate'            => $endDate,
+            'pageTitle'              => 'Admin Dashboard | Dar Jana Fashion',
+            'totalRevenue'           => number_format($totalRevenue, 3, '.', ','),
+            'paidRevenue'            => number_format($paidRevenue,  3, '.', ','),
+            'totalOrdersCount'       => count($orders),
+            'totalProductsCount'     => $totalProductsCount,
+            'totalProductViewsCount' => $totalProductViewsCount,
+            'topViewedProducts'      => $topViewedProducts,
+            'pendingCount'           => $pendingCount,
+            'paidCount'              => $paidCount,
+            'failedCount'            => $failedCount,
+            'chartLabels'            => $chartLabels,
+            'chartData'              => array_values($chartData),
+            'topProducts'            => $topProducts,
+            'recentOrders'           => $recentOrders,
+            'startDate'              => $startDate,
+            'endDate'                => $endDate,
         ];
 
         $this->render('admin/dashboard', $data, 'admin');
+    }
+
+    public function productViewInsights() {
+        $this->requireAuth();
+        $productModel = new Product();
+        $insights = $productModel->getDetailedProductViewInsights();
+
+        $data = [
+            'pageTitle' => 'Product Detail View Insights & Analytics | Admin',
+            'summary' => $insights['summary'],
+            'productPerformance' => $insights['product_performance'],
+            'locationPerformance' => $insights['location_performance'],
+            'repeatIpReport' => $insights['repeat_ip_report'],
+            'recentViews' => $insights['recent_views']
+        ];
+
+        $this->render('admin/product_view_insights', $data, 'admin');
     }
 
     public function products() {
