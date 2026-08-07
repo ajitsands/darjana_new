@@ -190,6 +190,96 @@
             </div>
         </div>
 
+        <!-- Store Policies & Terms Configuration -->
+        <div class="settings-card" style="background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); grid-column: span 2; margin-top: 24px;">
+            <h3 style="font-size: 18px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; margin-bottom: 20px; color: #2b6cb0;">
+                📜 Store Policies & Legal Terms Configuration
+            </h3>
+            <p style="color: #718096; font-size: 13px; margin-bottom: 20px;">
+                Admin can enter formatted content, HTML tags, bullet lists, or rich terms for customer policies. These populate the customer policy pages and footer links.
+            </p>
+
+            <!-- 1. Shipping & GCC Delivery -->
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    🚚 Shipping &amp; GCC Delivery Policy (`shipping_policy`)
+                </label>
+                <textarea name="shipping_policy" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['shipping_policy'] ?? '<h3>Shipping & GCC Delivery Policy</h3>
+<p>At Dar Jana Fashion, we craft and deliver high-couture luxury abayas and sets across Bahrain and all GCC countries (Saudi Arabia, Kuwait, United Arab Emirates, Qatar, Oman) as well as international destinations.</p>
+
+<h4>1. Order Processing & Tailoring Time</h4>
+<p>Every garment is hand-crafted with precision. Standard tailoring and quality inspection take <strong>3 to 5 business days</strong> prior to dispatch.</p>
+
+<h4>2. Shipping Times & Carriers</h4>
+<ul>
+  <li><strong>Bahrain Local Express:</strong> 1 to 2 business days (1.500 BHD or Free on orders above 50 BHD).</li>
+  <li><strong>GCC Regional Shipping (KSA, UAE, Kuwait, Qatar, Oman):</strong> 3 to 5 business days via DHL / Aramex Express.</li>
+  <li><strong>Worldwide Express Shipping:</strong> 5 to 7 business days.</li>
+</ul>
+
+<h4>3. Tracking & Receipts</h4>
+<p>Once dispatched, customers receive an SMS and Email containing an instant tracking link and official courier waybill receipt.</p>') ?></textarea>
+            </div>
+
+            <!-- 2. Returns & Exchanges -->
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    🔄 Returns &amp; Exchanges Policy (`return_policy`)
+                </label>
+                <textarea name="return_policy" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['return_policy'] ?? '<h3>Returns & Exchanges Policy</h3>
+<p>We take pride in the craftsmanship of Dar Jana Fashion. If you are not entirely satisfied with your item, we are here to assist you.</p>
+
+<h4>1. Return Window</h4>
+<p>You may request a return or exchange within <strong>7 days</strong> of receiving your shipment.</p>
+
+<h4>2. Conditions for Returns</h4>
+<ul>
+  <li>Garments must be unworn, unwashed, unaltered, and free of perfume or stains.</li>
+  <li>Original tags, luxury dust bags, and labels must remain attached.</li>
+  <li>Customized measurements or made-to-order bespoke pieces are non-refundable unless defective.</li>
+</ul>
+
+<h4>3. Exchange Process</h4>
+<p>To initiate an exchange, please contact our Concierge Customer Support via WhatsApp at <strong>+973 3330 0160</strong> or email <strong>care@darjanafashion.com</strong>.</p>') ?></textarea>
+            </div>
+
+            <!-- 3. Terms & Conditions -->
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    📜 Terms &amp; Conditions (`terms_conditions`)
+                </label>
+                <textarea name="terms_conditions" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['terms_conditions'] ?? '<h3>Terms & Conditions</h3>
+<p>Welcome to Dar Jana Fashion. By accessing our website, browsing our collections, or making a purchase, you agree to comply with and be bound by the following terms.</p>
+
+<h4>1. Intellectual Property</h4>
+<p>All designs, imagery, brand names, product codes, and content on this site are the exclusive property of Dar Jana Fashion.</p>
+
+<h4>2. Pricing & Currency</h4>
+<p>Prices are listed in Bahraini Dinar (BHD) and multi-currency equivalents for GCC regions. We reserve the right to modify prices without prior notice.</p>
+
+<h4>3. Orders & Acceptance</h4>
+<p>Order placement constitutes an offer to purchase. We reserve the right to cancel orders in case of stock unavailability or pricing anomalies.</p>') ?></textarea>
+            </div>
+
+            <!-- 4. Privacy Policy -->
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                    🔒 Privacy Policy (`privacy_policy`)
+                </label>
+                <textarea name="privacy_policy" rows="8" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['privacy_policy'] ?? '<h3>Privacy Policy</h3>
+<p>Dar Jana Fashion values your privacy and is dedicated to protecting your personal information.</p>
+
+<h4>1. Information Collection</h4>
+<p>We collect essential personal information (name, address, email, mobile number, and payment details) strictly to process your orders and enhance your shopping experience.</p>
+
+<h4>2. Data Security & Third Parties</h4>
+<p>We use SSL encryption and secure payment gateways. We never sell or share your personal data with unauthorized third parties.</p>
+
+<h4>3. Your Rights</h4>
+<p>You have the right to inspect, correct, or request deletion of your personal account details at any time by contacting our support team.</p>') ?></textarea>
+            </div>
+        </div>
+
     </div>
 </div>
 

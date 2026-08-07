@@ -37,6 +37,20 @@ class AdminController extends Controller {
                 $settingModel->set('share_click_dedup_minutes', (int)$_POST['share_click_dedup_minutes']);
             }
             
+            // Store Legal & Policy Contents
+            if (isset($_POST['shipping_policy'])) {
+                $settingModel->set('shipping_policy', $_POST['shipping_policy']);
+            }
+            if (isset($_POST['return_policy'])) {
+                $settingModel->set('return_policy', $_POST['return_policy']);
+            }
+            if (isset($_POST['terms_conditions'])) {
+                $settingModel->set('terms_conditions', $_POST['terms_conditions']);
+            }
+            if (isset($_POST['privacy_policy'])) {
+                $settingModel->set('privacy_policy', $_POST['privacy_policy']);
+            }
+
             // Payment Gateway Settings
             $afsEnabled = isset($_POST['afs_gateway_enabled']) ? '1' : '0';
             $settingModel->set('afs_gateway_enabled', $afsEnabled);

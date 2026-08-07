@@ -49,11 +49,11 @@
                 <div class="footer-column" style="text-align: left;">
                     <h4>CUSTOMER CARE</h4>
                     <ul class="footer-links">
-                        <li><a href="#">Size Guide</a></li>
-                        <li><a href="#">Shipping & GCC Delivery</a></li>
-                        <li><a href="#">Returns & Exchanges</a></li>
-                        <li><a href="#">Terms & Conditions</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="javascript:void(0)" onclick="openSizeGuideModal && openSizeGuideModal()">Size Guide</a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/shipping">Shipping & GCC Delivery</a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/returns">Returns & Exchanges</a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/terms">Terms & Conditions</a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/privacy">Privacy Policy</a></li>
                         <li><a href="<?= BASE_URL ?>/track-order">Track Order</a></li>
                     </ul>
                 </div>
