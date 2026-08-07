@@ -77,7 +77,7 @@
 
         <!-- TAB 1: GENERAL SETTINGS -->
         <div id="generalTab" class="settings-pane active">
-            <div style="background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 900px;">
+            <div style="background: #fff; padding: 32px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
                 <h2 style="font-size: 18px; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; color: #2d3748;">
                     ⚙️ General Store Settings
                 </h2>
@@ -160,7 +160,7 @@
 
         <!-- TAB: CURRENCY EXCHANGE RATES -->
         <div id="currencyTab" class="settings-pane">
-            <div style="background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px;">
+            <div style="background: #fff; padding: 32px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
                 <h2 style="font-size: 18px; margin-top: 0; margin-bottom: 12px; color: #2b6cb0;">
                     💱 Multi-Currency Exchange Rates Configuration (Relative to 1.000 BHD)
                 </h2>
@@ -216,7 +216,7 @@
 
         <!-- TAB 2: SIZE GUIDE CONFIGURATION -->
         <div id="sizeguideTab" class="settings-pane">
-            <div style="background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 1100px;">
+            <div style="background: #fff; padding: 32px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
                 <h2 style="font-size: 18px; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; color: #2d3748;">
                     📐 Size Guide Configuration &amp; Measurement Charts
                 </h2>
@@ -278,7 +278,7 @@
 
         <!-- TAB 3: PAYMENT GATEWAY CONFIG -->
         <div id="paymentTab" class="settings-pane">
-            <div style="background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 1000px;">
+            <div style="background: #fff; padding: 32px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
                 <h2 style="font-size: 18px; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; color: #2d3748;">
                     💳 Payment Gateway Configuration (AFS / OPPWA)
                 </h2>
@@ -360,7 +360,7 @@
 
         <!-- TAB 4: POLICIES & LEGAL TERMS -->
         <div id="policiesTab" class="settings-pane">
-            <div style="background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 1100px;">
+            <div style="background: #fff; padding: 32px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
                 <h2 style="font-size: 18px; margin-top: 0; margin-bottom: 12px; color: #2b6cb0;">
                     📜 Store Policies &amp; Legal Terms Configuration
                 </h2>
@@ -404,7 +404,7 @@
 
         <!-- TAB 5: WEBSITE HEADER & BANNERS -->
         <div id="headerTab" class="settings-pane">
-            <div style="background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 900px;">
+            <div style="background: #fff; padding: 32px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
                 <h2 style="font-size: 18px; margin-top: 0; margin-bottom: 12px; color: #2b6cb0;">
                     📢 Website Header Banner &amp; Homepage Promotions
                 </h2>
