@@ -173,26 +173,35 @@ class CheckoutController extends Controller {
             $entityId = $settingModel->get('afs_entity_id', '');
             $accessToken = $settingModel->get('afs_access_token', '');
 
-            // Determine active customer currency & exchange rate configured by admin
-            $userCurrency = strtoupper(trim($_POST['user_currency'] ?? $_COOKIE['user_currency'] ?? ''));
-            $supportedRates = [
-                'BHD' => 1.00,
-                'KWD' => (float)($settingModel->get('currency_rate_kwd', 0.81)),
-                'SAR' => (float)($settingModel->get('currency_rate_sar', 9.95)),
-                'AED' => (float)($settingModel->get('currency_rate_aed', 9.76)),
-                'QAR' => (float)($settingModel->get('currency_rate_qar', 9.67)),
-                'OMR' => (float)($settingModel->get('currency_rate_omr', 1.02)),
-                'USD' => (float)($settingModel->get('currency_rate_usd', 2.65)),
-                'EUR' => (float)($settingModel->get('currency_rate_eur', 2.44))
-            ];
+            $chargeMode = $settingModel->get('afs_charge_currency_mode', 'base');
+            $baseCurrency = strtoupper($settingModel->get('afs_currency', 'BHD'));
 
-            if (!isset($supportedRates[$userCurrency])) {
-                $userCurrency = strtoupper($settingModel->get('afs_currency', 'BHD'));
+            if ($chargeMode === 'customer_currency') {
+                // Determine active customer currency & exchange rate configured by admin
+                $userCurrency = strtoupper(trim($_POST['user_currency'] ?? $_COOKIE['user_currency'] ?? ''));
+                $supportedRates = [
+                    'BHD' => 1.00,
+                    'KWD' => (float)($settingModel->get('currency_rate_kwd', 0.81)),
+                    'SAR' => (float)($settingModel->get('currency_rate_sar', 9.95)),
+                    'AED' => (float)($settingModel->get('currency_rate_aed', 9.76)),
+                    'QAR' => (float)($settingModel->get('currency_rate_qar', 9.67)),
+                    'OMR' => (float)($settingModel->get('currency_rate_omr', 1.02)),
+                    'USD' => (float)($settingModel->get('currency_rate_usd', 2.65)),
+                    'EUR' => (float)($settingModel->get('currency_rate_eur', 2.44))
+                ];
+
+                if (!isset($supportedRates[$userCurrency])) {
+                    $userCurrency = $baseCurrency;
+                }
+
+                $rate = $supportedRates[$userCurrency] ?? 1.00;
+                $gatewayAmount = number_format($finalTotal * $rate, 2, '.', '');
+                $gatewayCurrency = $userCurrency;
+            } else {
+                // Charge in Store Base Currency (e.g. BHD) to prevent AFS single-currency MID authorization rejection
+                $gatewayAmount = number_format($finalTotal, 2, '.', '');
+                $gatewayCurrency = $baseCurrency;
             }
-
-            $rate = $supportedRates[$userCurrency] ?? 1.00;
-            $gatewayAmount = number_format($finalTotal * $rate, 2, '.', '');
-            $gatewayCurrency = $userCurrency;
 
             $url = $apiEndpoint . "/v1/checkouts";
             $data = http_build_query([

@@ -319,6 +319,21 @@
                             <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">Default Base Currency</label>
                             <input type="text" name="afs_currency" value="<?= htmlspecialchars($settings['afs_currency'] ?? 'BHD') ?>" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 14px;">
                         </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">Gateway Charge Currency Mode</label>
+                            <select name="afs_charge_currency_mode" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 14px;">
+                                <option value="base" <?= ($settings['afs_charge_currency_mode'] ?? 'base') === 'base' ? 'selected' : '' ?>>
+                                    Always Charge in Store Base Currency (e.g. BHD) — Recommended
+                                </option>
+                                <option value="customer_currency" <?= ($settings['afs_charge_currency_mode'] ?? 'base') === 'customer_currency' ? 'selected' : '' ?>>
+                                    Charge in Customer Selected Currency (Requires Multi-Currency MID)
+                                </option>
+                            </select>
+                            <p style="font-size: 12px; color: #718096; margin-top: 6px;">
+                                Select <strong>Base Currency (BHD)</strong> if your AFS account is single-currency. Customers view prices converted in SAR/KWD, and payment checkout processes seamlessly in base BHD.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
