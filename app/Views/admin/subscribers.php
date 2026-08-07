@@ -1,4 +1,6 @@
 <?php
+include __DIR__ . '/header.php';
+
 if (!function_exists('getPromoFlagEmoji')) {
     function getPromoFlagEmoji($countryCode) {
         if (!$countryCode || $countryCode === 'LOCAL') return '📍';
