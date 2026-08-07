@@ -90,7 +90,7 @@ class AdminController extends Controller {
                 $settingModel->set('afs_access_token', trim($_POST['afs_access_token']));
             }
             if (isset($_POST['afs_currency'])) {
-                $settingModel->set('afs_currency', trim($_POST['afs_currency']));
+                $settingModel->set('afs_currency', strtoupper(trim($_POST['afs_currency'])));
             }
             if (isset($_POST['afs_charge_currency_mode'])) {
                 $settingModel->set('afs_charge_currency_mode', trim($_POST['afs_charge_currency_mode']));

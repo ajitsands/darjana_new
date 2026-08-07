@@ -316,8 +316,27 @@
                         </div>
 
                         <div class="form-group" style="margin-bottom: 20px;">
-                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">Default Base Currency</label>
-                            <input type="text" name="afs_currency" value="<?= htmlspecialchars($settings['afs_currency'] ?? 'BHD') ?>" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 14px;">
+                            <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">Payment Gateway Settlement Currency Code</label>
+                            <select name="afs_currency" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 14px;">
+                                <?php
+                                $gwCurrencies = [
+                                    'BHD' => '🇧🇭 BHD - Bahraini Dinar',
+                                    'SAR' => '🇸🇦 SAR - Saudi Riyal',
+                                    'KWD' => '🇰🇼 KWD - Kuwaiti Dinar',
+                                    'AED' => '🇦🇪 AED - UAE Dirham',
+                                    'QAR' => '🇶🇦 QAR - Qatari Riyal',
+                                    'OMR' => '🇴🇲 OMR - Omani Rial',
+                                    'USD' => '🇺🇸 USD - US Dollar',
+                                    'EUR' => '🇪🇺 EUR - Euro'
+                                ];
+                                $currentGwCurrency = strtoupper($settings['afs_currency'] ?? 'BHD');
+                                foreach ($gwCurrencies as $cCode => $cLabel) {
+                                    $sel = ($cCode === $currentGwCurrency) ? 'selected' : '';
+                                    echo "<option value=\"$cCode\" $sel>$cLabel</option>";
+                                }
+                                ?>
+                            </select>
+                            <p style="font-size: 12px; color: #718096; margin-top: 6px;">Select the exact currency code authorized for your AFS Payment Gateway merchant account.</p>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 20px;">
