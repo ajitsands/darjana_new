@@ -199,7 +199,6 @@ function getViewFlagEmoji($countryCode) {
                 <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic;">No location data available.</div>
             <?php endif; ?>
         </div>
-    </div>
 </div>
-
-<?php include __DIR__ . '/footer.php'; ?>
+</body>
+</html>
