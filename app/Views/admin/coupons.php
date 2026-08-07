@@ -78,7 +78,7 @@
                             <td style="padding: 12px; font-size: 13px; color: #718096;"><?= date('M j, Y', strtotime($coupon['created_at'])) ?></td>
                             <td style="padding: 12px; text-align: right; white-space: nowrap;">
                                 <a href="<?= BASE_URL ?>/admin/coupons/edit/<?= $coupon['id'] ?>" style="display: inline-block; text-decoration: none; padding: 6px 12px; font-size: 12px; background: #edf2f7; color: #4a5568; border-radius: 4px; margin-right: 6px; font-weight: 500;">Edit</a>
-                                <a href="<?= BASE_URL ?>/admin/coupons/delete/<?= $coupon['id'] ?>" class="btn-danger" style="display: inline-block; text-decoration: none; padding: 6px 12px; font-size: 12px;" onclick="return confirm('Are you sure you want to delete this coupon?');">Delete</a>
+                                <a href="<?= BASE_URL ?>/admin/coupons/delete/<?= $coupon['id'] ?>" class="btn-danger" style="display: inline-block; text-decoration: none; padding: 6px 12px; font-size: 12px;" onclick="return confirmDelete(event, '<?= BASE_URL ?>/admin/coupons/delete/<?= $coupon['id'] ?>', 'Are you sure you want to delete this coupon?');">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

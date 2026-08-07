@@ -212,6 +212,25 @@
                 window.location.href = url;
             }
         });
+        return false;
+    }
+
+    function confirmDeleteForm(event, form, message = 'Are you sure you want to delete this?') {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e53e3e',
+            cancelButtonColor: '#718096',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        return false;
     }
     </script>
 </head>

@@ -100,7 +100,7 @@
                                         <button type="button" onclick="sendSinglePromo('<?= htmlspecialchars($s['email']) ?>')" style="background: #f8fafc; border: 1px solid #cbd5e0; color: #181818; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
                                             ✉️ Send Promo
                                         </button>
-                                        <form method="POST" action="<?= BASE_URL ?>/admin/subscribers/delete/<?= $s['id'] ?>" onsubmit="return confirm('Are you sure you want to delete subscriber <?= htmlspecialchars($s['email']) ?>?');" style="margin:0;">
+                                        <form method="POST" action="<?= BASE_URL ?>/admin/subscribers/delete/<?= $s['id'] ?>" onsubmit="return confirmDeleteForm(event, this, 'Are you sure you want to delete subscriber <?= htmlspecialchars($s['email']) ?>?');" style="margin:0;">
                                             <button type="submit" style="background: #fef2f2; border: 1px solid #fecaca; color: #ef4444; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
                                                 🗑️ Delete
                                             </button>
