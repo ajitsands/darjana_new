@@ -51,6 +51,7 @@ $router->add('GET', '/admin/logout', 'AdminController@logout');
 
 $router->add('GET', '/admin', 'AdminController@index');
 $router->add('GET', '/admin/products', 'AdminController@products');
+$router->add('GET', '/admin/click-insights', 'AdminController@clickInsights');
 $router->add('GET', '/admin/generate-tiny', 'AdminController@generateTinyThumbnails');
 $router->add('GET', '/admin/optimize-images', 'AdminController@optimizeImages');
 $router->add('GET', '/admin/categories', 'AdminController@categories');

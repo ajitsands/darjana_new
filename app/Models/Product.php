@@ -491,4 +491,162 @@ class Product extends Model {
             return $stats;
         }
     }
+
+    /**
+     * Get comprehensive click insights data for admin reporting dashboard
+     */
+    public function getDetailedClickInsights() {
+        $totalRow = $this->fetchOne("SELECT COUNT(*) as total FROM product_share_clicks");
+        $totalClicks = (int)($totalRow['total'] ?? 0);
+
+        $allProducts = $this->getAll(null, 0, 'featured', null, null, false);
+        $shareStats = $this->getShareStats();
+
+        $topLocationsByProduct = [];
+        $locQuery = $this->fetchAll("
+            SELECT product_id, country, city, country_code, COUNT(*) as cnt 
+            FROM product_share_clicks 
+            GROUP BY product_id, country, city, country_code 
+            ORDER BY cnt DESC
+        ");
+        foreach ($locQuery as $lq) {
+            $pid = (int)$lq['product_id'];
+            if (!isset($topLocationsByProduct[$pid])) {
+                $topLocationsByProduct[$pid] = ($lq['country'] ?: 'Unknown') . ' (' . ($lq['city'] ?: 'Unknown') . ')';
+            }
+        }
+
+        $latestClicksByProduct = [];
+        $latestQuery = $this->fetchAll("
+            SELECT product_id, MAX(clicked_at) as max_clicked 
+            FROM product_share_clicks 
+            GROUP BY product_id
+        ");
+        foreach ($latestQuery as $lq) {
+            $latestClicksByProduct[(int)$lq['product_id']] = $lq['max_clicked'];
+        }
+
+        $productPerformance = [];
+        foreach ($allProducts as $p) {
+            $pid = (int)$p['id'];
+            $pStats = $shareStats[$pid] ?? [
+                'total' => 0,
+                'by_source' => ['instagram' => 0, 'facebook' => 0, 'whatsapp' => 0, 'tiktok' => 0, 'youtube' => 0]
+            ];
+
+            $productPerformance[] = [
+                'id' => $pid,
+                'product_code' => $p['product_code'],
+                'name' => $p['name'],
+                'image' => $p['image'],
+                'price' => $p['price'],
+                'category_name' => $p['category_name'] ?? 'General',
+                'total_clicks' => $pStats['total'],
+                'by_source' => $pStats['by_source'],
+                'top_location' => $topLocationsByProduct[$pid] ?? 'No clicks yet',
+                'last_clicked_at' => $latestClicksByProduct[$pid] ?? null
+            ];
+        }
+
+        usort($productPerformance, fn($a, $b) => $b['total_clicks'] <=> $a['total_clicks']);
+
+        $platformsConfig = [
+            'whatsapp' => ['name' => 'WhatsApp', 'icon' => '💬', 'color' => '#38a169'],
+            'instagram' => ['name' => 'Instagram', 'icon' => '📸', 'color' => '#d69e2e'],
+            'facebook' => ['name' => 'Facebook', 'icon' => '📘', 'color' => '#3182ce'],
+            'tiktok' => ['name' => 'TikTok', 'icon' => '🎵', 'color' => '#805ad5'],
+            'youtube' => ['name' => 'YouTube', 'icon' => '📺', 'color' => '#e53e3e']
+        ];
+
+        $platformCounts = $this->fetchAll("
+            SELECT source, COUNT(*) as cnt 
+            FROM product_share_clicks 
+            GROUP BY source
+        ");
+        $platformTotals = [];
+        foreach ($platformCounts as $pc) {
+            $platformTotals[strtolower($pc['source'])] = (int)$pc['cnt'];
+        }
+
+        $topProductByPlatform = [];
+        $topProdQuery = $this->fetchAll("
+            SELECT psc.source, p.name as product_name, COUNT(*) as cnt
+            FROM product_share_clicks psc
+            JOIN products p ON p.id = psc.product_id
+            GROUP BY psc.source, psc.product_id
+            ORDER BY cnt DESC
+        ");
+        foreach ($topProdQuery as $tpq) {
+            $src = strtolower($tpq['source']);
+            if (!isset($topProductByPlatform[$src])) {
+                $topProductByPlatform[$src] = $tpq['product_name'];
+            }
+        }
+
+        $topCountryByPlatform = [];
+        $topCountryQuery = $this->fetchAll("
+            SELECT source, country, COUNT(*) as cnt
+            FROM product_share_clicks
+            GROUP BY source, country
+            ORDER BY cnt DESC
+        ");
+        foreach ($topCountryQuery as $tcq) {
+            $src = strtolower($tcq['source']);
+            if (!isset($topCountryByPlatform[$src])) {
+                $topCountryByPlatform[$src] = $tcq['country'] ?: 'Unknown';
+            }
+        }
+
+        $platformPerformance = [];
+        foreach ($platformsConfig as $key => $cfg) {
+            $clicks = $platformTotals[$key] ?? 0;
+            $sharePct = $totalClicks > 0 ? round(($clicks / $totalClicks) * 100, 1) : 0;
+            $platformPerformance[] = [
+                'key' => $key,
+                'name' => $cfg['name'],
+                'icon' => $cfg['icon'],
+                'color' => $cfg['color'],
+                'total_clicks' => $clicks,
+                'share_percent' => $sharePct,
+                'top_product' => $topProductByPlatform[$key] ?? 'N/A',
+                'top_country' => $topCountryByPlatform[$key] ?? 'N/A'
+            ];
+        }
+
+        usort($platformPerformance, fn($a, $b) => $b['total_clicks'] <=> $a['total_clicks']);
+
+        $locationPerformance = $this->fetchAll("
+            SELECT country, country_code, city, COUNT(*) as total_clicks
+            FROM product_share_clicks
+            GROUP BY country, country_code, city
+            ORDER BY total_clicks DESC
+            LIMIT 20
+        ");
+
+        $recentClicks = $this->fetchAll("
+            SELECT psc.*, p.name as product_name, p.product_code, p.image
+            FROM product_share_clicks psc
+            JOIN products p ON p.id = psc.product_id
+            ORDER BY psc.clicked_at DESC
+            LIMIT 25
+        ");
+
+        $topProduct = count($productPerformance) > 0 && $productPerformance[0]['total_clicks'] > 0 ? $productPerformance[0]['name'] : 'None';
+        $topPlatform = count($platformPerformance) > 0 && $platformPerformance[0]['total_clicks'] > 0 ? $platformPerformance[0]['name'] : 'None';
+        $topCountryRow = $this->fetchOne("SELECT country, COUNT(*) as cnt FROM product_share_clicks GROUP BY country ORDER BY cnt DESC LIMIT 1");
+        $topCountry = $topCountryRow ? ($topCountryRow['country'] ?: 'Unknown') : 'None';
+
+        return [
+            'summary' => [
+                'total_clicks' => $totalClicks,
+                'top_product' => $topProduct,
+                'top_platform' => $topPlatform,
+                'top_country' => $topCountry
+            ],
+            'product_performance' => $productPerformance,
+            'platform_performance' => $platformPerformance,
+            'location_performance' => $locationPerformance,
+            'recent_clicks' => $recentClicks
+        ];
+    }
 }

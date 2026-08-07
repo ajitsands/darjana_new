@@ -825,6 +825,19 @@ class AdminController extends Controller {
         exit;
     }
 
+    public function clickInsights() {
+        $this->requireAuth();
+        $productModel = new Product();
+        $insights = $productModel->getDetailedClickInsights();
+
+        $data = [
+            'pageTitle' => 'Click Insights & Performance | Admin',
+            'insights' => $insights
+        ];
+
+        $this->render('admin/click_insights', $data, 'admin');
+    }
+
     public function editProduct($id) {
         $this->requireAuth();
         $productModel = new Product();

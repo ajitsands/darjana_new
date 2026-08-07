@@ -5,6 +5,12 @@
                     <h1 style="font-size: 26px;">Products</h1>
                     <p style="color: #718096; font-size: 14px;"><?= $totalProductsCount ?> products in the catalog</p>
                 </div>
+                <div>
+                    <a href="<?= BASE_URL ?>/admin/click-insights" style="background: #2b6cb0; color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.background='#2c5282'" onmouseout="this.style.background='#2b6cb0'">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        Click Insights
+                    </a>
+                </div>
             </div>
 
             
