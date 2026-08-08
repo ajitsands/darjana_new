@@ -218,31 +218,40 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                                 <input type="text" name="lengths" value="52, 54, 55, 56, 57, 58, 60" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="e.g. 52, 54, 55, 56, 57, 58, 60">
                             </div>
 
-                            <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">PRIMARY IMAGE</label>
+                            <!-- Primary Image Selection -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #1e293b;">PRIMARY PRODUCT IMAGE *</label>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                     <div>
                                         <label style="display: block; font-size: 11px; margin-bottom: 4px; color: #718096;">Upload Image File</label>
-                                        <input type="file" name="primary_image_file" accept="image/*" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
+                                        <input type="file" id="primaryImageInput" name="primary_image_file" accept="image/*" onchange="handlePrimaryImageChange(this)" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
                                     </div>
                                     <div>
                                         <label style="display: block; font-size: 11px; margin-bottom: 4px; color: #718096;">Or Image URL</label>
-                                        <input type="url" name="image" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="https://...">
+                                        <input type="url" id="primaryUrlInput" name="image" oninput="handlePrimaryUrlChange(this)" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="https://...">
                                     </div>
                                 </div>
+                                <div id="primaryImagePreviewBox" style="display:none; margin-top: 8px;"></div>
+                                <div id="primaryUrlPreviewBox" style="display:none; margin-top: 8px;"></div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; background: #f8fafc; padding: 16px; border-radius: 4px; border: 1px solid #e2e8f0;">
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--color-primary);">UPLOAD GALLERY IMAGES</label>
-                                    <input type="file" name="gallery_images[]" multiple accept="image/*" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
-                                    <div style="font-size: 10.5px; color: #64748b; margin-top: 4px;">Select multiple images for the gallery.</div>
+                            <!-- Gallery & Video Section -->
+                            <div style="margin-bottom: 16px; background: #f8fafc; padding: 16px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                    <div>
+                                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #0f172a;">UPLOAD GALLERY IMAGES</label>
+                                        <input type="file" id="galleryInput" name="gallery_images[]" multiple accept="image/*" onchange="handleGalleryImagesChange(this)" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
+                                        <div style="font-size: 10.5px; color: #64748b; margin-top: 4px;">Select multiple images. Preview &amp; delete available below.</div>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #0f172a;">UPLOAD PRODUCT VIDEO</label>
+                                        <input type="file" id="videoInput" name="product_video" accept="video/mp4,video/webm" onchange="handleVideoChange(this)" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
+                                        <div style="font-size: 10.5px; color: #e53e3e; margin-top: 4px; font-weight: 600;">Max Size: 5.5 MB (MP4/WebM)</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--color-primary);">UPLOAD PRODUCT VIDEO</label>
-                                    <input type="file" name="product_video" accept="video/mp4,video/webm" style="width: 100%; padding: 8px; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
-                                    <div style="font-size: 10.5px; color: #e53e3e; margin-top: 4px; font-weight: 600;">Max Size: 5.5 MB (MP4/WebM)</div>
-                                </div>
+                                <!-- Live Gallery Preview Container -->
+                                <div id="galleryPreviewContainer" style="display:none; margin-top: 14px;"></div>
+                                <div id="videoPreviewBox" style="display:none; margin-top: 14px;"></div>
                             </div>
 
                             <div style="margin-bottom: 14px;">
@@ -265,12 +274,20 @@ function addColorRow(name = '', c1 = '#181818', c2 = '', c3 = '') {
                                     <label for="is_active" style="font-size: 13px; font-weight: bold; color: var(--color-primary);">Display on Website (Product Available)</label>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" name="is_verified" value="1" id="is_verified">
-                                    <label for="is_verified" style="font-size: 13px; font-weight: 700; color: #16a34a;">🟢 Verify &amp; Publish Immediately</label>
+                                    <input type="checkbox" name="is_verified" value="1" id="is_verified" checked>
+                                    <label for="is_verified" style="font-size: 13px; font-weight: 700; color: #16a34a;">🟢 Verified &amp; Ready to Publish</label>
                                 </div>
                             </div>
 
-                            <button type="submit" id="publishBtn" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 4px;" onclick="this.innerHTML='<span style=\'display:inline-block;animation:spin 1s linear infinite;\'>⏳</span> Uploading... Please Wait'; this.style.opacity='0.7'; this.style.pointerEvents='none'; this.form.submit();">Publish Product</button>
+                            <!-- Action Buttons -->
+                            <div style="display: flex; gap: 12px; margin-top: 10px;">
+                                <button type="button" onclick="openImageVerificationModal()" style="flex: 1; background: #3b82f6; color: #ffffff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 6px rgba(59,130,246,0.3);">
+                                    🔍 Verify All Images
+                                </button>
+                                <button type="submit" id="publishBtn" class="btn-primary" style="flex: 1; background: #181818; color: #ffffff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    🚀 Publish Product
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -880,6 +897,356 @@ document.addEventListener('DOMContentLoaded', function() {
     if (tagTypeSelect) tagTypeSelect.addEventListener('change', updatePreview);
     updatePreview();
 });
+
+/* ====================================================================
+   INTERACTIVE PRODUCT IMAGE PREVIEW, DELETE & VERIFICATION SYSTEM
+   ==================================================================== */
+let galleryFilesDT = new DataTransfer();
+
+function handlePrimaryImageChange(input) {
+    const box = document.getElementById('primaryImagePreviewBox');
+    if (!box) return;
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            box.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px; background:#f0fdf4; border:1px solid #bbf7d0; padding:8px 12px; border-radius:6px;">
+                    <img src="${e.target.result}" style="width:52px; height:52px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e0;">
+                    <div style="flex:1; overflow:hidden;">
+                        <div style="font-size:11px; font-weight:700; color:#16a34a; text-transform:uppercase;">PRIMARY PHOTO SELECTED</div>
+                        <div style="font-size:12px; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${file.name}</div>
+                        <div style="font-size:11px; color:#64748b;">${(file.size/1024).toFixed(1)} KB</div>
+                    </div>
+                    <button type="button" onclick="clearPrimaryImageFile()" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:4px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">❌ Delete</button>
+                </div>
+            `;
+            box.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
+}
+
+function clearPrimaryImageFile() {
+    const input = document.getElementById('primaryImageInput');
+    if (input) input.value = '';
+    const box = document.getElementById('primaryImagePreviewBox');
+    if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
+
+function handlePrimaryUrlChange(input) {
+    const box = document.getElementById('primaryUrlPreviewBox');
+    if (!box) return;
+    const val = input.value.trim();
+    if (val && (val.startsWith('http://') || val.startsWith('https://'))) {
+        box.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 12px; border-radius:6px;">
+                <img src="${val}" onerror="this.src='https://via.placeholder.com/52?text=Error';" style="width:52px; height:52px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e0;">
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-size:11px; font-weight:700; color:#3b82f6; text-transform:uppercase;">IMAGE URL PREVIEW</div>
+                    <div style="font-size:11.5px; color:#64748b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${val}</div>
+                </div>
+                <button type="button" onclick="clearPrimaryUrl()" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:4px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">❌ Clear</button>
+            </div>
+        `;
+        box.style.display = 'block';
+    } else {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
+}
+
+function clearPrimaryUrl() {
+    const input = document.getElementById('primaryUrlInput');
+    if (input) input.value = '';
+    const box = document.getElementById('primaryUrlPreviewBox');
+    if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
+
+function handleGalleryImagesChange(input) {
+    if (input.files && input.files.length > 0) {
+        for (let i = 0; i < input.files.length; i++) {
+            galleryFilesDT.items.add(input.files[i]);
+        }
+        input.files = galleryFilesDT.files;
+    }
+    renderGalleryPreviews();
+}
+
+function removeGalleryFile(index) {
+    const newDT = new DataTransfer();
+    const { files } = galleryFilesDT;
+    for (let i = 0; i < files.length; i++) {
+        if (i !== index) newDT.items.add(files[i]);
+    }
+    galleryFilesDT = newDT;
+    const input = document.getElementById('galleryInput');
+    if (input) input.files = galleryFilesDT.files;
+    renderGalleryPreviews();
+}
+
+function renderGalleryPreviews() {
+    const container = document.getElementById('galleryPreviewContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    const files = galleryFilesDT.files;
+    if (files.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(95px, 1fr))';
+    container.style.gap = '10px';
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const card = document.createElement('div');
+        card.style.cssText = 'position:relative; background:#ffffff; border:1px solid #cbd5e0; border-radius:6px; padding:6px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.03);';
+        
+        const reader = new FileReader();
+        reader.onload = (function(idx, fname, fsize) {
+            return function(e) {
+                card.innerHTML = `
+                    <div style="position:relative;">
+                        <img src="${e.target.result}" style="width:100%; height:75px; object-fit:cover; border-radius:4px;">
+                        <button type="button" onclick="removeGalleryFile(${idx})" style="position:absolute; top:-6px; right:-6px; background:#ef4444; color:#ffffff; border:2px solid #ffffff; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.2);" title="Delete Image">✕</button>
+                    </div>
+                    <div style="font-size:10px; font-weight:700; color:#3b82f6; margin-top:4px;">Gallery #${idx + 1}</div>
+                    <div style="font-size:9.5px; color:#64748b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${fname}</div>
+                    <div style="font-size:9px; color:#94a3b8;">${(fsize/1024).toFixed(0)} KB</div>
+                `;
+            };
+        })(i, file.name, file.size);
+        reader.readAsDataURL(file);
+        container.appendChild(card);
+    }
+}
+
+function handleVideoChange(input) {
+    const box = document.getElementById('videoPreviewBox');
+    if (!box) return;
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const videoUrl = URL.createObjectURL(file);
+        box.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px; background:#fff5f5; border:1px solid #feb2b2; padding:8px 12px; border-radius:6px;">
+                <video src="${videoUrl}" controls style="width:80px; height:55px; object-fit:cover; border-radius:4px; background:#000;"></video>
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-size:11px; font-weight:700; color:#e53e3e; text-transform:uppercase;">PRODUCT VIDEO SELECTED</div>
+                    <div style="font-size:12px; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${file.name}</div>
+                    <div style="font-size:11px; color:#64748b;">${(file.size/(1024*1024)).toFixed(2)} MB</div>
+                </div>
+                <button type="button" onclick="clearVideoFile()" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:4px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">❌ Delete</button>
+            </div>
+        `;
+        box.style.display = 'block';
+    } else {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
+}
+
+function clearVideoFile() {
+    const input = document.getElementById('videoInput');
+    if (input) input.value = '';
+    const box = document.getElementById('videoPreviewBox');
+    if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
+
+function openImageVerificationModal() {
+    const grid = document.getElementById('verifyModalGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    let mediaItems = [];
+
+    const primaryInput = document.getElementById('primaryImageInput');
+    const primaryUrlInput = document.getElementById('primaryUrlInput');
+
+    if (primaryInput && primaryInput.files && primaryInput.files[0]) {
+        const file = primaryInput.files[0];
+        mediaItems.push({
+            type: 'file',
+            file: file,
+            badge: 'PRIMARY PHOTO',
+            badgeBg: '#181818',
+            name: file.name,
+            size: (file.size / 1024).toFixed(1) + ' KB'
+        });
+    } else if (primaryUrlInput && primaryUrlInput.value.trim()) {
+        const url = primaryUrlInput.value.trim();
+        mediaItems.push({
+            type: 'url',
+            url: url,
+            badge: 'PRIMARY URL',
+            badgeBg: '#181818',
+            name: 'Image URL',
+            size: 'External URL'
+        });
+    }
+
+    if (galleryFilesDT && galleryFilesDT.files) {
+        for (let i = 0; i < galleryFilesDT.files.length; i++) {
+            const f = galleryFilesDT.files[i];
+            mediaItems.push({
+                type: 'file',
+                file: f,
+                badge: `GALLERY PHOTO #${i + 1}`,
+                badgeBg: '#3b82f6',
+                name: f.name,
+                size: (f.size / 1024).toFixed(1) + ' KB'
+            });
+        }
+    }
+
+    const videoInput = document.getElementById('videoInput');
+    if (videoInput && videoInput.files && videoInput.files[0]) {
+        const vf = videoInput.files[0];
+        mediaItems.push({
+            type: 'video_file',
+            file: vf,
+            badge: 'PRODUCT VIDEO',
+            badgeBg: '#e53e3e',
+            name: vf.name,
+            size: (vf.size / (1024 * 1024)).toFixed(2) + ' MB'
+        });
+    }
+
+    if (mediaItems.length === 0) {
+        Swal.fire({
+            title: 'No Images Selected',
+            text: 'Please select a primary product photo or gallery images before verifying.',
+            icon: 'warning',
+            confirmButtonColor: '#181818'
+        });
+        return;
+    }
+
+    mediaItems.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'img-verify-card';
+
+        if (item.type === 'file') {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                card.innerHTML = `
+                    <div style="position:relative; height:180px; background:#000;">
+                        <span class="img-verify-badge" style="background:${item.badgeBg};">${item.badge}</span>
+                        <img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div style="padding:10px; text-align:left;">
+                        <div style="font-size:12px; font-weight:700; color:#0f172a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${item.name}</div>
+                        <div style="font-size:11px; color:#64748b; margin-top:2px;">Size: ${item.size}</div>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(item.file);
+        } else if (item.type === 'url') {
+            card.innerHTML = `
+                <div style="position:relative; height:180px; background:#000;">
+                    <span class="img-verify-badge" style="background:${item.badgeBg};">${item.badge}</span>
+                    <img src="${item.url}" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div style="padding:10px; text-align:left;">
+                    <div style="font-size:12px; font-weight:700; color:#0f172a;">${item.name}</div>
+                    <div style="font-size:11px; color:#64748b; margin-top:2px;">External URL</div>
+                </div>
+            `;
+        } else if (item.type === 'video_file') {
+            const videoUrl = URL.createObjectURL(item.file);
+            card.innerHTML = `
+                <div style="position:relative; height:180px; background:#000;">
+                    <span class="img-verify-badge" style="background:${item.badgeBg};">${item.badge}</span>
+                    <video src="${videoUrl}" controls style="width:100%; height:100%; object-fit:cover;"></video>
+                </div>
+                <div style="padding:10px; text-align:left;">
+                    <div style="font-size:12px; font-weight:700; color:#0f172a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${item.name}</div>
+                    <div style="font-size:11px; color:#e53e3e; margin-top:2px; font-weight:600;">Video Size: ${item.size}</div>
+                </div>
+            `;
+        }
+        grid.appendChild(card);
+    });
+
+    document.getElementById('verifyImagesModal').style.display = 'flex';
+}
+
+function closeImageVerificationModal() {
+    const modal = document.getElementById('verifyImagesModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function submitProductFormAfterVerify() {
+    closeImageVerificationModal();
+    const isVerifiedCheck = document.getElementById('is_verified');
+    if (isVerifiedCheck) isVerifiedCheck.checked = true;
+
+    const publishBtn = document.getElementById('publishBtn');
+    if (publishBtn) {
+        publishBtn.innerHTML = '⏳ Uploading &amp; Publishing... Please Wait';
+        publishBtn.style.opacity = '0.7';
+        publishBtn.style.pointerEvents = 'none';
+        publishBtn.form.submit();
+    }
+}
 </script>
+
+<!-- ===== PRODUCT IMAGE VERIFICATION & INSPECTION MODAL ===== -->
+<style>
+.img-verify-modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75); z-index: 999999; backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+}
+.img-verify-modal-card {
+    background: #ffffff; border-radius: 12px; width: 92%; max-width: 900px;
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column;
+}
+.img-verify-modal-header {
+    padding: 20px 24px; background: #181818; color: #ffffff;
+    display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0;
+}
+.img-verify-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px; padding: 24px;
+}
+.img-verify-card {
+    border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;
+    background: #f8fafc; text-align: center; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.img-verify-badge {
+    position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.75); color: #fff;
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; z-index: 10;
+}
+</style>
+
+<div class="img-verify-modal-overlay" id="verifyImagesModal">
+    <div class="img-verify-modal-card">
+        <div class="img-verify-modal-header">
+            <h3 style="font-size: 18px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                🔍 Product Image Verification &amp; Inspection
+            </h3>
+            <button type="button" onclick="closeImageVerificationModal()" style="background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer;">✕</button>
+        </div>
+        <div style="padding: 16px 24px 0; font-size: 13px; color: #64748b;">
+            Verify all selected dress/abaya photos before publishing. Review clarity, order, and details below:
+        </div>
+        <div class="img-verify-grid" id="verifyModalGrid">
+            <!-- Populated via JS -->
+        </div>
+        <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 12px 12px;">
+            <button type="button" onclick="closeImageVerificationModal()" style="background: #ffffff; border: 1px solid #cbd5e0; color: #475569; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">
+                ✏️ Edit &amp; Change Photos
+            </button>
+            <button type="button" onclick="submitProductFormAfterVerify()" style="background: #16a34a; color: #ffffff; border: none; padding: 12px 28px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(22,163,74,0.25);">
+                ✅ All Images Verified — Publish Product Now
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
