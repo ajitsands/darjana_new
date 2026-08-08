@@ -96,6 +96,8 @@
                                         }, 120);
                                     }
                                 }
+                            });
+
                             $('.select2-category').select2({
                                 placeholder: '🔍 Search & Select Categories...',
                                 allowClear: true,
