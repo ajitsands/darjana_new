@@ -7,7 +7,70 @@
     <meta name="developer" content="Developed by SaNDS Lab (www.sandslab.com)">
     <title><?= $pageTitle ?? 'Admin Dashboard | Dar Jana Fashion' ?></title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+    <!-- Select2 Multi-Select Dropdown Assets -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
+        /* Select2 Modern Admin Styling */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #cbd5e0 !important;
+            border-radius: 6px !important;
+            min-height: 44px !important;
+            padding: 3px 8px !important;
+            background-color: #ffffff !important;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #2b6cb0 !important;
+            box-shadow: 0 0 0 3px rgba(43,108,176,0.15) !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #181818 !important;
+            border: none !important;
+            color: #ffffff !important;
+            border-radius: 4px !important;
+            padding: 4px 10px 4px 22px !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            position: relative !important;
+            margin-top: 4px !important;
+            margin-right: 6px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #ffffff !important;
+            border: none !important;
+            position: absolute !important;
+            left: 4px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            font-size: 13px !important;
+            font-weight: bold !important;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #ef4444 !important;
+            background: none !important;
+            opacity: 1;
+        }
+        .select2-dropdown {
+            border: 1px solid #cbd5e0 !important;
+            border-radius: 6px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;
+            z-index: 99999 !important;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #2b6cb0 !important;
+            color: #ffffff !important;
+        }
+        .select2-container--default .select2-search--inline .select2-search__field {
+            font-family: inherit !important;
+            font-size: 13px !important;
+            margin-top: 5px !important;
+        }
         body { background-color: #f4f5f7; margin: 0; }
         .admin-header {
             background: #181818;

@@ -96,6 +96,10 @@
                                         }, 120);
                                     }
                                 }
+                            $('.select2-category').select2({
+                                placeholder: '🔍 Search & Select Categories...',
+                                allowClear: true,
+                                width: '100%'
                             });
                         });
                     </script>
@@ -122,13 +126,13 @@
                                     <input type="text" name="product_code" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="C:6900">
                                 </div>
                                 <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">CATEGORY</label>
-                                    <select name="category_id[]" multiple style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; background: #fff; height: 80px;">
+                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">CATEGORY (MULTI-SELECT)</label>
+                                    <select name="category_id[]" class="select2-category" multiple style="width: 100%;">
                                         <?php foreach ($categories as $cat): ?>
                                             <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <div style="font-size: 10.5px; color: #718096; margin-top: 4px;">Hold Ctrl (Win) or Cmd (Mac) to select multiple</div>
+                                    <div style="font-size: 10.5px; color: #718096; margin-top: 4px;">Search and click to select multiple categories</div>
                                 </div>
                             </div>
 
