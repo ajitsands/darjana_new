@@ -83,17 +83,19 @@
                             </div>
 
                             <div class="form-group">
-                                <label>CATEGORY IMAGE (Explore Collections Thumbnail)</label>
+                                <label style="font-weight: 700; color: #1e293b;">CATEGORY IMAGE (Explore Collections Thumbnail)</label>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                     <div>
-                                        <label style="font-size: 11px; font-weight: normal; margin-bottom: 4px; display: block;">Upload File (Overrides URL)</label>
-                                        <input type="file" name="image_file" accept="image/*" style="padding: 6px;">
+                                        <label style="font-size: 11px; font-weight: normal; margin-bottom: 4px; display: block; color: #64748b;">Upload File (Overrides URL)</label>
+                                        <input type="file" name="image_file" accept="image/*" onchange="handleCatImageFileChange(this)" style="padding: 6px; width: 100%; border: 1px dashed #cbd5e0; border-radius: 4px; background: #fff;">
                                     </div>
                                     <div>
-                                        <label style="font-size: 11px; font-weight: normal; margin-bottom: 4px; display: block;">Or Image URL</label>
-                                        <input type="url" name="image" placeholder="https://...">
+                                        <label style="font-size: 11px; font-weight: normal; margin-bottom: 4px; display: block; color: #64748b;">Or Image URL</label>
+                                        <input type="url" name="image" oninput="handleCatImageUrlChange(this)" placeholder="https://..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;">
                                     </div>
                                 </div>
+                                <div id="catImagePreviewBox" style="display:none;"></div>
+                                <div id="catUrlPreviewBox" style="display:none;"></div>
                             </div>
 
                             <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Add Category</button>
@@ -104,5 +106,70 @@
 
         </div>
     </div>
+
+<script>
+function handleCatImageFileChange(input) {
+    const box = document.getElementById('catImagePreviewBox');
+    if (!box) return;
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            box.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px; background:#f0fdf4; border:1px solid #bbf7d0; padding:8px 12px; border-radius:6px; margin-top:10px;">
+                    <img src="${e.target.result}" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e0;">
+                    <div style="flex:1; overflow:hidden;">
+                        <div style="font-size:11px; font-weight:700; color:#16a34a; text-transform:uppercase;">SELECTED IMAGE PREVIEW</div>
+                        <div style="font-size:12px; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${file.name}</div>
+                        <div style="font-size:11px; color:#64748b;">${(file.size/1024).toFixed(1)} KB</div>
+                    </div>
+                    <button type="button" onclick="clearCatImageFile()" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:4px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">❌ Delete</button>
+                </div>
+            `;
+            box.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
+}
+
+function clearCatImageFile() {
+    const input = document.querySelector('input[name="image_file"]');
+    if (input) input.value = '';
+    const box = document.getElementById('catImagePreviewBox');
+    if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
+
+function handleCatImageUrlChange(input) {
+    const box = document.getElementById('catUrlPreviewBox');
+    if (!box) return;
+    const val = input.value.trim();
+    if (val && (val.startsWith('http://') || val.startsWith('https://'))) {
+        box.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 12px; border-radius:6px; margin-top:10px;">
+                <img src="${val}" onerror="this.src='https://via.placeholder.com/60?text=Error';" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e0;">
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-size:11px; font-weight:700; color:#3b82f6; text-transform:uppercase;">IMAGE URL PREVIEW</div>
+                    <div style="font-size:11.5px; color:#64748b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${val}</div>
+                </div>
+                <button type="button" onclick="clearCatImageUrl()" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:4px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">❌ Clear</button>
+            </div>
+        `;
+        box.style.display = 'block';
+    } else {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
+}
+
+function clearCatImageUrl() {
+    const input = document.querySelector('input[name="image"]');
+    if (input) input.value = '';
+    const box = document.getElementById('catUrlPreviewBox');
+    if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
+</script>
 </body>
 </html>
