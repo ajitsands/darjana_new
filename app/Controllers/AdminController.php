@@ -96,8 +96,68 @@ class AdminController extends Controller {
                 $settingModel->set('afs_charge_currency_mode', trim($_POST['afs_charge_currency_mode']));
             }
             
+            // Delete Homepage Hero Video Option
+            if (isset($_POST['delete_home_hero_video']) && $_POST['delete_home_hero_video'] === '1') {
+                $existingVideo = $settingModel->get('home_hero_video');
+                if ($existingVideo) {
+                    $oldPath = __DIR__ . '/../../public' . $existingVideo;
+                    if (file_exists($oldPath) && is_file($oldPath)) {
+                        @unlink($oldPath);
+                    }
+                    $settingModel->set('home_hero_video', '');
+                }
+            }
+
+            // Homepage Hero Video Upload (Max 50MB limit)
+            if (isset($_FILES['home_hero_video']) && $_FILES['home_hero_video']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $fileError = $_FILES['home_hero_video']['error'];
+                if ($fileError === UPLOAD_ERR_INI_SIZE || $fileError === UPLOAD_ERR_FORM_SIZE) {
+                    $_SESSION['admin_error'] = 'Video file size exceeds server upload limit.';
+                } elseif ($fileError === UPLOAD_ERR_OK) {
+                    $fileSize = $_FILES['home_hero_video']['size'];
+                    $maxSize = 50 * 1024 * 1024; // 50 MB
+                    if ($fileSize > $maxSize) {
+                        $_SESSION['admin_error'] = 'Video file size must not exceed 50 MB (uploaded size: ' . round($fileSize / 1048576, 2) . ' MB).';
+                    } else {
+                        $ext = strtolower(pathinfo($_FILES['home_hero_video']['name'], PATHINFO_EXTENSION));
+                        $allowedExts = ['mp4', 'webm', 'ogg', 'mov'];
+                        if (!in_array($ext, $allowedExts)) {
+                            $_SESSION['admin_error'] = 'Invalid video file format. Allowed formats: MP4, WebM, OGG, MOV.';
+                        } else {
+                            $uploadDir = __DIR__ . '/../../public/uploads/videos/';
+                            if (!file_exists($uploadDir)) {
+                                mkdir($uploadDir, 0777, true);
+                            }
+
+                            // Delete existing video file if present
+                            $existingVideo = $settingModel->get('home_hero_video');
+                            if (!empty($existingVideo)) {
+                                $oldPath = __DIR__ . '/../../public' . $existingVideo;
+                                if (file_exists($oldPath) && is_file($oldPath)) {
+                                    @unlink($oldPath);
+                                }
+                            }
+
+                            // Generate unique filename and save
+                            $filename = 'home_hero_' . time() . '_' . uniqid() . '.' . $ext;
+                            $targetPath = $uploadDir . $filename;
+                            if (move_uploaded_file($_FILES['home_hero_video']['tmp_name'], $targetPath)) {
+                                $relativeUrl = '/uploads/videos/' . $filename;
+                                $settingModel->set('home_hero_video', $relativeUrl);
+                            } else {
+                                $_SESSION['admin_error'] = 'Failed to save uploaded video file to server.';
+                            }
+                        }
+                    }
+                } else {
+                    $_SESSION['admin_error'] = 'An error occurred during video upload (Error Code: ' . $fileError . ').';
+                }
+            }
+
             $this->logActivity('UPDATE_SETTINGS', "Updated store settings (VAT: $vatPercentage%, Type: $vatType, TZ: $timezone)");
-            $_SESSION['admin_success'] = 'Settings updated successfully.';
+            if (!isset($_SESSION['admin_error'])) {
+                $_SESSION['admin_success'] = 'Settings updated successfully.';
+            }
             $this->redirect(BASE_URL . '/admin/settings');
         }
         

@@ -15,6 +15,13 @@
         </div>
     <?php endif; ?>
 
+    <?php if (isset($_SESSION['admin_error'])): ?>
+        <div style="background-color: #fef2f2; color: #dc2626; padding: 14px 18px; border-radius: 6px; margin-bottom: 24px; border: 1px solid #fecaca; font-weight: 600;">
+            ❌ <?= htmlspecialchars($_SESSION['admin_error']) ?>
+            <?php unset($_SESSION['admin_error']); ?>
+        </div>
+    <?php endif; ?>
+
     <!-- TAB NAVIGATION BAR -->
     <div style="border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; display: flex; gap: 10px; flex-wrap: wrap; background: #fff; padding: 10px 10px 0; border-radius: 8px 8px 0 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
         <button type="button" class="settings-tab-btn active" onclick="switchSettingsTab('generalTab', this)">
@@ -73,7 +80,7 @@
         }
     </style>
 
-    <form method="POST" action="<?= BASE_URL ?>/admin/settings" id="settingsForm">
+    <form method="POST" action="<?= BASE_URL ?>/admin/settings" id="settingsForm" enctype="multipart/form-data">
 
         <!-- TAB 1: GENERAL SETTINGS -->
         <div id="generalTab" class="settings-pane active">
@@ -444,6 +451,44 @@
                     </label>
                     <textarea name="promo_desc" rows="3" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 13px; line-height: 1.5;"><?= htmlspecialchars($settings['promo_desc'] ?? 'Enjoy complimentary express delivery on all dress and abaya orders across all GCC regions for a limited period.') ?></textarea>
                 </div>
+
+                <hr style="margin: 32px 0 24px; border: 0; border-top: 1px dashed #cbd5e0;">
+
+                <!-- 5. Homepage Hero Video Upload -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                        🎥 Homepage Hero Video (`home_hero_video`)
+                    </label>
+                    <p style="font-size: 12px; color: #718096; margin-bottom: 12px;">
+                        Upload a video for the main hero banner on the homepage. Maximum allowed size is <strong>50 MB</strong>. Supported formats: MP4, WebM, OGG, MOV. <em>Uploading a new video will delete the existing video file.</em>
+                    </p>
+
+                    <?php if (!empty($settings['home_hero_video'])): ?>
+                        <div style="background: #f7fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 16px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                            <video src="<?= BASE_URL . htmlspecialchars($settings['home_hero_video']) ?>" controls style="max-width: 320px; max-height: 180px; border-radius: 6px; background: #000;"></video>
+                            <div>
+                                <div style="font-weight: 600; color: #2d3748; font-size: 13px; margin-bottom: 4px;">Current Active Video:</div>
+                                <code style="font-size: 12px; color: #4a5568; background: #edf2f7; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px; word-break: break-all;">
+                                    <?= htmlspecialchars($settings['home_hero_video']) ?>
+                                </code>
+                                <div style="margin-top: 6px;">
+                                    <label style="display: inline-flex; align-items: center; gap: 6px; color: #e53e3e; font-size: 13px; cursor: pointer; font-weight: 600;">
+                                        <input type="checkbox" name="delete_home_hero_video" value="1"> 🗑️ Delete current video &amp; revert to default
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div style="background: #fffaf0; border: 1px solid #feebc8; color: #c05621; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px;">
+                            ℹ️ No custom video uploaded. The default fallback video (<code>/assets/videos/home_video.mp4</code>) is currently active on the homepage.
+                        </div>
+                    <?php endif; ?>
+
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="file" name="home_hero_video" id="homeHeroVideoInput" accept="video/mp4,video/webm,video/ogg,video/quicktime" onchange="validateHeroVideoSize(this)" style="padding: 10px; border: 1px dashed #cbd5e0; border-radius: 6px; background: #fff; max-width: 450px; width: 100%;">
+                    </div>
+                    <div id="heroVideoError" style="color: #e53e3e; font-size: 13px; font-weight: 600; margin-top: 8px; display: none;"></div>
+                </div>
             </div>
         </div>
 
@@ -588,10 +633,35 @@ function removeLengthRow(index) {
     renderLengthTable();
 }
 
+function validateHeroVideoSize(input) {
+    const errorDiv = document.getElementById('heroVideoError');
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+        if (file.size > maxSize) {
+            errorDiv.textContent = '❌ Selected video file is ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB. Maximum allowed size is 50 MB.';
+            errorDiv.style.display = 'block';
+            input.value = ''; // clear file input
+        }
+    }
+}
+
 renderChestTable();
 renderLengthTable();
 
-document.getElementById('settingsForm').addEventListener('submit', function() {
+document.getElementById('settingsForm').addEventListener('submit', function(e) {
+    const videoInput = document.getElementById('homeHeroVideoInput');
+    if (videoInput && videoInput.files && videoInput.files[0]) {
+        const file = videoInput.files[0];
+        if (file.size > 50 * 1024 * 1024) {
+            alert('Video file size must not exceed 50 MB.');
+            e.preventDefault();
+            return false;
+        }
+    }
     document.getElementById('size_guide_chest_input').value = JSON.stringify(chestData);
     document.getElementById('size_guide_length_input').value = JSON.stringify(lengthData);
 });

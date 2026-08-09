@@ -1,6 +1,13 @@
 <?php
 // Front Controller for Dar Jana Fashion
 
+if (php_sapi_name() === 'cli-server') {
+    $urlPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if ($urlPath !== '/' && file_exists(__DIR__ . $urlPath) && is_file(__DIR__ . $urlPath)) {
+        return false;
+    }
+}
+
 session_start();
 
 require_once __DIR__ . '/../vendor/autoload.php';

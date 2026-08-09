@@ -1,18 +1,23 @@
-<!-- Full Screen Clean Video Hero Banner (No poster image fallback) -->
-<section class="hero-video-section">
-    <video class="hero-video-element" autoplay loop muted playsinline preload="auto">
-        <source src="<?= BASE_URL ?>/assets/videos/home_video.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-</section>
-
-<!-- Promotional Announcement Callout (Section Padding: 50px) -->
 <?php
 if (!isset($siteSettings)) {
     require_once __DIR__ . '/../../Models/Setting.php';
     $settingModelHelper = new Setting();
     $siteSettings = $settingModelHelper->getAll();
 }
+$homeHeroVideoUrl = !empty($siteSettings['home_hero_video']) 
+    ? (BASE_URL . $siteSettings['home_hero_video']) 
+    : (BASE_URL . '/assets/videos/home_video.mp4');
+?>
+<!-- Full Screen Clean Video Hero Banner (No poster image fallback) -->
+<section class="hero-video-section">
+    <video class="hero-video-element" autoplay loop muted playsinline preload="auto">
+        <source src="<?= htmlspecialchars($homeHeroVideoUrl) ?>">
+        Your browser does not support the video tag.
+    </video>
+</section>
+
+<!-- Promotional Announcement Callout (Section Padding: 50px) -->
+<?php
 $promoTagline = $siteSettings['promo_tagline'] ?? 'PROMOTION';
 $promoTitle = $siteSettings['promo_title'] ?? 'التوصيل مجاني لمدة أسبوع';
 $promoDesc = $siteSettings['promo_desc'] ?? 'Enjoy complimentary express delivery on all dress and abaya orders across all GCC regions for a limited period.';
