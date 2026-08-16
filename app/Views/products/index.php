@@ -14,7 +14,13 @@ $titleMap = [
 ];
 
 $slugKey = $currentSlug ?? ($category['slug'] ?? '');
-$displayTitle = $titleMap[$slugKey] ?? strtoupper($category['name'] ?? 'ALL ABAYA');
+$currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
+$displayTitle = '';
+if ($currentLang === 'ar' && !empty($category['name_ar'])) {
+    $displayTitle = strtoupper($category['name_ar']);
+} else {
+    $displayTitle = $titleMap[$slugKey] ?? strtoupper($category['name'] ?? 'ALL ABAYA');
+}
 $totalCount = $productCount ?? count($products);
 $loaded = $loadedCount ?? count($products);
 $sort = $currentSort ?? 'featured';
@@ -32,7 +38,7 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
                 <?= htmlspecialchars($displayTitle) ?>
             </h1>
             <div style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.2em; color: var(--color-text-muted); margin-top: 6px; font-weight: 600;">
-                (<span id="totalProductCountLabel"><?= $totalCount ?></span> <?= $totalCount === 1 ? 'PRODUCT' : 'PRODUCTS' ?>)
+                (<span id="totalProductCountLabel"><?= $totalCount ?></span> <?= $totalCount === 1 ? mb_strtoupper(__('product')) : mb_strtoupper(__('products')) ?>)
             </div>
         </div>
 
@@ -43,27 +49,27 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
             <div>
                 <button type="button" id="filterToggleBtn" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: var(--heading-font-family); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; color: var(--color-primary); text-transform: uppercase;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M6 12h12M9 18h6"></path></svg>
-                    <span>FILTER <?= $isFilterActive ? '(ACTIVE)' : '' ?></span>
+                    <span><?= $isFilterActive ? mb_strtoupper(__('filter_active')) : mb_strtoupper(__('filter')) ?></span>
                 </button>
             </div>
 
             <!-- Right Side: Sort By Selector Dropdown -->
             <div style="display: flex; align-items: center; gap: 10px;">
-                <label for="sortBySelect" style="font-family: var(--heading-font-family); font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; color: var(--color-text-muted); text-transform: uppercase;">SORT BY:</label>
+                <label for="sortBySelect" style="font-family: var(--heading-font-family); font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; color: var(--color-text-muted); text-transform: uppercase;"><?= mb_strtoupper(__('sort_by')) ?>:</label>
                 <form id="sortForm" method="GET" action="" style="margin: 0;">
                     <?php if ($minPrice !== null && $minPrice !== ''): ?><input type="hidden" name="min_price" value="<?= htmlspecialchars($minPrice) ?>"><?php endif; ?>
                     <?php if ($maxPrice !== null && $maxPrice !== ''): ?><input type="hidden" name="max_price" value="<?= htmlspecialchars($maxPrice) ?>"><?php endif; ?>
                     
                     <select id="sortBySelect" name="sort" onchange="this.form.submit()" style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 4px; padding: 8px 14px; font-family: var(--heading-font-family); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; color: var(--color-primary); cursor: pointer; outline: none;">
-                        <option value="featured" <?= $sort === 'featured' ? 'selected' : '' ?>>Featured</option>
-                        <option value="relevant" <?= $sort === 'relevant' ? 'selected' : '' ?>>Most Relevant</option>
-                        <option value="best_selling" <?= $sort === 'best_selling' ? 'selected' : '' ?>>Best Selling</option>
-                        <option value="title_asc" <?= $sort === 'title_asc' ? 'selected' : '' ?>>Alphabetically, A-Z</option>
-                        <option value="title_desc" <?= $sort === 'title_desc' ? 'selected' : '' ?>>Alphabetically, Z-A</option>
-                        <option value="price_asc" <?= $sort === 'price_asc' ? 'selected' : '' ?>>Price, Low to High</option>
-                        <option value="price_desc" <?= $sort === 'price_desc' ? 'selected' : '' ?>>Price, High to Low</option>
-                        <option value="date_asc" <?= $sort === 'date_asc' ? 'selected' : '' ?>>Date, Old to New</option>
-                        <option value="date_desc" <?= $sort === 'date_desc' ? 'selected' : '' ?>>Date, New to Old</option>
+                        <option value="featured" <?= $sort === 'featured' ? 'selected' : '' ?>><?= __('featured') ?></option>
+                        <option value="relevant" <?= $sort === 'relevant' ? 'selected' : '' ?>><?= __('most_relevant') ?></option>
+                        <option value="best_selling" <?= $sort === 'best_selling' ? 'selected' : '' ?>><?= __('best_selling') ?></option>
+                        <option value="title_asc" <?= $sort === 'title_asc' ? 'selected' : '' ?>><?= __('alpha_asc') ?></option>
+                        <option value="title_desc" <?= $sort === 'title_desc' ? 'selected' : '' ?>><?= __('alpha_desc') ?></option>
+                        <option value="price_asc" <?= $sort === 'price_asc' ? 'selected' : '' ?>><?= __('price_asc') ?></option>
+                        <option value="price_desc" <?= $sort === 'price_desc' ? 'selected' : '' ?>><?= __('price_desc') ?></option>
+                        <option value="date_asc" <?= $sort === 'date_asc' ? 'selected' : '' ?>><?= __('date_asc') ?></option>
+                        <option value="date_desc" <?= $sort === 'date_desc' ? 'selected' : '' ?>><?= __('date_desc') ?></option>
                     </select>
                 </form>
             </div>
@@ -75,24 +81,24 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
                 <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
                 
                 <div>
-                    <label style="display: block; font-family: var(--heading-font-family); font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--color-primary); margin-bottom: 6px; text-transform: uppercase;">Min Price (BHD)</label>
+                    <label style="display: block; font-family: var(--heading-font-family); font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--color-primary); margin-bottom: 6px; text-transform: uppercase;"><?= __('min_price') ?></label>
                     <input type="number" step="0.001" name="min_price" value="<?= htmlspecialchars($minPrice ?? '') ?>" placeholder="e.g. 35.000" style="padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 4px; font-size: 13px; outline: none; width: 130px;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-family: var(--heading-font-family); font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--color-primary); margin-bottom: 6px; text-transform: uppercase;">Max Price (BHD)</label>
+                    <label style="display: block; font-family: var(--heading-font-family); font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--color-primary); margin-bottom: 6px; text-transform: uppercase;"><?= __('max_price') ?></label>
                     <input type="number" step="0.001" name="max_price" value="<?= htmlspecialchars($maxPrice ?? '') ?>" placeholder="e.g. 50.000" style="padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 4px; font-size: 13px; outline: none; width: 130px;">
                 </div>
 
-                <button type="submit" class="btn-primary" style="padding: 10px 24px; font-size: 11px;">APPLY FILTER</button>
-                <a href="<?= BASE_URL ?>/collections/<?= $currentSlug ?>" style="font-size: 12px; color: var(--color-text-muted); text-decoration: underline; margin-bottom: 10px;">Clear Filter</a>
+                <button type="submit" class="btn-primary" style="padding: 10px 24px; font-size: 11px;"><?= mb_strtoupper(__('apply_filter')) ?></button>
+                <a href="<?= BASE_URL ?>/collections/<?= $currentSlug ?>" style="font-size: 12px; color: var(--color-text-muted); text-decoration: underline; margin-bottom: 10px;"><?= __('clear_filter') ?></a>
             </form>
         </div>
 
         <?php if (empty($products)): ?>
             <div style="text-align: center; padding: 60px 0; color: var(--color-text-muted);">
-                <p>No products currently match your filter criteria.</p>
-                <a href="<?= BASE_URL ?>/collections/<?= $currentSlug ?>" class="btn-primary" style="margin-top: 20px;">Clear Filter</a>
+                <p><?= __('no_products_filter') ?></p>
+                <a href="<?= BASE_URL ?>/collections/<?= $currentSlug ?>" class="btn-primary" style="margin-top: 20px;"><?= __('clear_filter') ?></a>
             </div>
         <?php else: ?>
             <div class="products-grid" id="mainProductsGrid">
@@ -156,12 +162,12 @@ $isFilterActive = ($minPrice !== null && $minPrice !== '') || ($maxPrice !== nul
             <!-- Sleek LOAD MORE Mechanism & Item Progress Counter -->
             <div id="loadMoreContainer" style="text-align: center; margin-top: 50px;">
                 <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 14px; font-weight: 500;">
-                    Showing <span id="loadedCountNum"><?= $loaded ?></span> of <?= $totalCount ?> items
+                    <?= __('showing') ?> <span id="loadedCountNum"><?= $loaded ?></span> <?= __('of') ?> <?= $totalCount ?> <?= __('items') ?>
                 </div>
 
                 <?php if ($hasMore): ?>
                     <button type="button" id="loadMoreBtn" data-next-page="2" data-slug="<?= htmlspecialchars($currentSlug) ?>" data-sort="<?= htmlspecialchars($sort) ?>" data-min="<?= htmlspecialchars($minPrice ?? '') ?>" data-max="<?= htmlspecialchars($maxPrice ?? '') ?>" class="btn-view-all" style="min-width: 220px;">
-                        LOAD MORE
+                        <?= __('load_more') ?>
                     </button>
                 <?php endif; ?>
             </div>

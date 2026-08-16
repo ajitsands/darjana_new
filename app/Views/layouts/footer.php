@@ -1,11 +1,11 @@
     <!-- Newsletter Section -->
     <section class="newsletter-section">
         <div class="container">
-            <h3 style="font-family: var(--heading-font-family); font-size: 22px; font-weight: 500; letter-spacing: 0.2em; color: var(--color-primary);">BE THE FIRST TO KNOW</h3>
-            <p style="color: var(--color-text-muted); font-size: 14.5px; margin-top: 6px;">Subscribe to receive updates on new couture collections and exclusive private invitations.</p>
+            <h3 style="font-family: var(--heading-font-family); font-size: 22px; font-weight: 500; letter-spacing: 0.2em; color: var(--color-primary);"><?= __('be_first') ?></h3>
+            <p style="color: var(--color-text-muted); font-size: 14.5px; margin-top: 6px;"><?= __('subscribe_desc') ?></p>
             <form class="newsletter-form" id="newsletterForm">
-                <input type="email" name="email" class="newsletter-input" placeholder="Enter your email address" required>
-                <button type="submit" class="btn-primary" style="padding: 14px 28px; font-size: 11px;">SUBSCRIBE</button>
+                <input type="email" name="email" class="newsletter-input" placeholder="<?= __('enter_email') ?>" required>
+                <button type="submit" class="btn-primary" style="padding: 14px 28px; font-size: 11px;"><?= mb_strtoupper(__('subscribe')) ?></button>
             </form>
         </div>
     </section>
