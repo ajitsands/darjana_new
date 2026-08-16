@@ -28,7 +28,11 @@
         $settingModelHelper = new Setting();
         $siteSettings = $settingModelHelper->getAll();
     }
-    $topAnnouncementText = $siteSettings['top_announcement_bar'] ?? __('express_delivery');
+    $defaultEnglishAnnouncement = 'EXPRESS GCC DELIVERY TO BAHRAIN, KUWAIT, KSA, UAE, QATAR & OMAN';
+    $topAnnouncementText = $siteSettings['top_announcement_bar'] ?? $defaultEnglishAnnouncement;
+    if ($currentLang === 'ar' && trim($topAnnouncementText) === $defaultEnglishAnnouncement) {
+        $topAnnouncementText = __('express_delivery');
+    }
     $currencyRatesConfig = [
         'BHD' => 1.00,
         'KWD' => (float)($siteSettings['currency_rate_kwd'] ?? 0.81),
