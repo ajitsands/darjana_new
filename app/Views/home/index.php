@@ -35,8 +35,8 @@ $promoDesc = $siteSettings['promo_desc'] ?? 'Enjoy complimentary express deliver
     <div class="full-width-container">
         <!-- Identical Section Header Format & Font Size -->
         <div class="section-title-wrap" style="margin-bottom: 36px;">
-            <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 6px;">HANDPICKED COUTURE</span>
-            <h2 class="section-title">FEATURED COLLECTION</h2>
+            <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 6px;"><?= __('handpicked_couture') ?></span>
+            <h2 class="section-title"><?= __('featured_collection') ?></h2>
         </div>
 
         <!-- Single Row Sliding Carousel Wrapper with Left & Right Arrow Navigation -->
@@ -61,13 +61,13 @@ $promoDesc = $siteSettings['promo_desc'] ?? 'Enjoy complimentary express deliver
                                             if ($saveAmtVal > 0):
                                                 $saveAmt = number_format($saveAmtVal, 3);
                                     ?>
-                                                <span class="product-offer-tag" data-save-bhd="<?= $saveAmtVal ?>">SAVE <?= $saveAmt ?> BHD</span>
+                                                <span class="product-offer-tag" data-save-bhd="<?= $saveAmtVal ?>"><?= __('save') ?> <?= $saveAmt ?> BHD</span>
                                             <?php endif; ?>
                                     <?php else: 
                                             $discountPct = round((($product['price'] - $product['sale_price']) / $product['price']) * 100);
                                             if ($discountPct > 0):
                                     ?>
-                                                <span class="product-offer-tag"><?= $discountPct ?>% OFF</span>
+                                                <span class="product-offer-tag"><?= $discountPct ?>% <?= __('off') ?></span>
                                             <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endif; ?>
@@ -115,7 +115,7 @@ $promoDesc = $siteSettings['promo_desc'] ?? 'Enjoy complimentary express deliver
 
         <!-- Solid Black VIEW ALL Button -->
         <div style="text-align: center; margin-top: 32px;">
-            <a href="<?= BASE_URL ?>/collections/all-abaya" class="btn-view-all">VIEW ALL</a>
+            <a href="<?= BASE_URL ?>/collections/all-abaya" class="btn-view-all"><?= __('view_all') ?></a>
         </div>
     </div>
 </section>
@@ -125,16 +125,16 @@ $promoDesc = $siteSettings['promo_desc'] ?? 'Enjoy complimentary express deliver
     <div class="full-width-container">
         <!-- DISCOVER BY CATEGORY on Top of EXPLORE COLLECTIONS with Identical Font Size -->
         <div class="section-title-wrap" style="margin-bottom: 36px;">
-            <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 6px;">DISCOVER BY CATEGORY</span>
-            <h2 class="section-title">EXPLORE COLLECTIONS</h2>
+            <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 6px;"><?= __('discover_category') ?></span>
+            <h2 class="section-title"><?= __('explore_collections') ?></h2>
         </div>
         <div class="category-grid">
             <?php foreach ($categories as $cat): ?>
                 <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="category-card">
                     <img src="<?= $cat['image'] ?>" alt="<?= htmlspecialchars($cat['name']) ?>" loading="lazy" width="600" height="800">
                     <div class="category-card-overlay">
-                        <h3 class="category-card-title"><?= htmlspecialchars($cat['name']) ?></h3>
-                        <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.15em; color: var(--color-accent); text-transform: uppercase;">View Products →</span>
+                        <h3 class="category-card-title"><?= htmlspecialchars(isset($currentLang) && $currentLang === 'ar' && !empty($cat['name_ar']) ? $cat['name_ar'] : $cat['name']) ?></h3>
+                        <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.15em; color: var(--color-accent); text-transform: uppercase;"><?= __('view_products') ?></span>
                     </div>
                 </a>
             <?php endforeach; ?>

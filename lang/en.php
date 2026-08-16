@@ -122,5 +122,13 @@ return [
     'payment_failed_desc' => 'Unfortunately, your payment could not be processed at this time.',
     'reason_label' => 'Reason:',
     'contact_support_desc' => 'If you continue to face issues, please contact our support team.',
-    'try_again' => 'Try Again'
+    'try_again' => 'Try Again',
+    'handpicked_couture' => 'HANDPICKED COUTURE',
+    'featured_collection' => 'FEATURED COLLECTION',
+    'view_all' => 'VIEW ALL',
+    'discover_category' => 'DISCOVER BY CATEGORY',
+    'explore_collections' => 'EXPLORE COLLECTIONS',
+    'view_products' => 'View Products →',
+    'save' => 'SAVE',
+    'off' => 'OFF'
 ];

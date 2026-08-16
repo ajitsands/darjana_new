@@ -122,5 +122,13 @@ return [
     'payment_failed_desc' => 'للأسف، لم نتمكن من معالجة دفعتك في الوقت الحالي.',
     'reason_label' => 'السبب:',
     'contact_support_desc' => 'إذا استمرت المشكلة، يرجى التواصل مع فريق الدعم لدينا.',
-    'try_again' => 'حاول مرة أخرى'
+    'try_again' => 'حاول مرة أخرى',
+    'handpicked_couture' => 'أزياء راقية مختارة',
+    'featured_collection' => 'المجموعة المميزة',
+    'view_all' => 'عرض الكل',
+    'discover_category' => 'اكتشف حسب الفئة',
+    'explore_collections' => 'استكشف المجموعات',
+    'view_products' => 'عرض المنتجات ←',
+    'save' => 'وفر',
+    'off' => 'خصم'
 ];
