@@ -71,5 +71,16 @@ return [
     'date_desc' => 'Date, New to Old',
     'be_first' => 'BE THE FIRST TO KNOW',
     'subscribe_desc' => 'Subscribe to receive updates on new couture collections and exclusive private invitations.',
-    'enter_email' => 'Enter your email address'
+    'enter_email' => 'Enter your email address',
+    'footer_desc' => 'Dar Jana Fashion represents luxury, elegance, and modern modest couture. Designing exclusive abayas, sets, and luxury blazers across the GCC region.',
+    'customer_support' => 'Customer Support',
+    'email' => 'Email',
+    'customer_care' => 'CUSTOMER CARE',
+    'size_guide_footer' => 'Size Guide',
+    'shipping' => 'Shipping & GCC Delivery',
+    'returns' => 'Returns & Exchanges',
+    'terms' => 'Terms & Conditions',
+    'privacy' => 'Privacy Policy',
+    'follow_us' => 'FOLLOW OUR JOURNEY',
+    'follow_desc' => 'Connect with us on our social platforms for daily styling inspiration and behind-the-scenes.'
 ];

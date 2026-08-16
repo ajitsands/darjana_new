@@ -20,49 +20,50 @@
                         <img src="<?= BASE_URL ?>/assets/images/web_logo_menu.png" alt="Dar Jana Fashion" style="height: 52px; object-fit: contain;">
                     </div>
                     <p style="color: #64748b; font-size: 14px; line-height: 1.7; max-width: 380px; margin-bottom: 20px;">
-                        Dar Jana Fashion represents luxury, elegance, and modern modest couture. Designing exclusive abayas, sets, and luxury blazers across the GCC region.
+                        <?= __('footer_desc') ?>
                     </p>
                     <p style="color: #64748b; font-size: 13px;">
-                        <strong>Customer Support:</strong> +973 3330 0160<br>
-                        <strong>Email:</strong> care@darjanafashion.com
+                        <strong><?= __('customer_support') ?>:</strong> +973 3330 0160<br>
+                        <strong><?= __('email') ?>:</strong> care@darjanafashion.com
                     </p>
                 </div>
 
                 <!-- Column 2: Quick Links (Left Aligned) -->
                 <div class="footer-column" style="text-align: left;">
-                    <h4>SHOP COLLECTIONS</h4>
+                    <h4><?= mb_strtoupper(__('shop_collections')) ?></h4>
                     <?php 
                     $footerCats = $headerCategories ?? [];
                     if (empty($footerCats)) {
                         require_once __DIR__ . '/../../../core/Database.php';
                         $footerCats = Database::getInstance()->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
                     }
+                    $currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
                     ?>
                     <ul class="footer-links" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0px 18px;">
                         <?php foreach($footerCats as $cat): ?>
-                            <li><a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>"><?= htmlspecialchars($cat['name']) ?></a></li>
+                            <li><a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>"><?= htmlspecialchars($currentLang === 'ar' && !empty($cat['name_ar']) ? $cat['name_ar'] : $cat['name']) ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
 
                 <!-- Column 3: Customer Care (Left Aligned) -->
                 <div class="footer-column" style="text-align: left;">
-                    <h4>CUSTOMER CARE</h4>
+                    <h4><?= mb_strtoupper(__('customer_care')) ?></h4>
                     <ul class="footer-links">
-                        <li><a href="javascript:void(0)" onclick="openSizeGuideModal && openSizeGuideModal()">Size Guide</a></li>
-                        <li><a href="<?= BASE_URL ?>/policies/shipping">Shipping & GCC Delivery</a></li>
-                        <li><a href="<?= BASE_URL ?>/policies/returns">Returns & Exchanges</a></li>
-                        <li><a href="<?= BASE_URL ?>/policies/terms">Terms & Conditions</a></li>
-                        <li><a href="<?= BASE_URL ?>/policies/privacy">Privacy Policy</a></li>
-                        <li><a href="<?= BASE_URL ?>/track-order">Track Order</a></li>
+                        <li><a href="javascript:void(0)" onclick="openSizeGuideModal && openSizeGuideModal()"><?= __('size_guide_footer') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/shipping"><?= __('shipping') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/returns"><?= __('returns') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/terms"><?= __('terms') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/policies/privacy"><?= __('privacy') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/track-order"><?= __('track_order') ?></a></li>
                     </ul>
                 </div>
 
                 <!-- Column 4: Contact & Social (Left Aligned) -->
                 <div class="footer-column" style="text-align: left;">
-                    <h4>FOLLOW OUR JOURNEY</h4>
+                    <h4><?= mb_strtoupper(__('follow_us')) ?></h4>
                     <p style="color: #64748b; font-size: 13.5px; margin-bottom: 16px;">
-                        Connect with us on our social platforms for daily styling inspiration and behind-the-scenes.
+                        <?= __('follow_desc') ?>
                     </p>
                     <div style="display: flex; gap: 14px; margin-top: 10px;">
                         <a href="https://wa.me/97333300160" target="_blank" style="width: 38px; height: 38px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; color: #fff;" title="WhatsApp">
@@ -80,7 +81,7 @@
 
             <!-- EXCLUSIVELY CENTER ALIGNED CLEAN COPYRIGHT TEXT -->
             <div class="footer-bottom" style="justify-content: center; text-align: center;">
-                <div>&copy; <?= date('Y') ?> Dar Jana Fashion. All rights reserved.</div>
+                <div dir="ltr">&copy; <?= date('Y') ?> Dar Jana Fashion. <?= __('all_rights_reserved') ?></div>
             </div>
         </div>
     </footer>
