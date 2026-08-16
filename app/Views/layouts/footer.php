@@ -156,7 +156,7 @@
     <div class="cart-drawer-overlay" id="cartDrawerOverlay"></div>
     <div class="cart-drawer" id="cartDrawer">
         <div class="cart-drawer-header">
-            <h3 class="cart-drawer-title">YOUR SHOPPING BAG</h3>
+            <h3 class="cart-drawer-title"><?= __('your_shopping_bag') ?></h3>
             <button class="icon-btn" id="cartDrawerClose" style="font-size: 22px;">✕</button>
         </div>
         <div class="cart-drawer-body" id="cartDrawerItems">
@@ -164,11 +164,11 @@
         </div>
         <div class="cart-drawer-footer">
             <div class="cart-subtotal-row">
-                <span>Subtotal</span>
-                <span id="cartDrawerSubtotal" data-price-bhd="0.00">0.00 BHD</span>
+                <span><?= __('subtotal') ?></span>
+                <span id="cartDrawerSubtotal" data-price-bhd="0.00">0.00 <?= __('bhd') ?></span>
             </div>
-            <p style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 16px;">Taxes and shipping calculated at checkout.</p>
-            <a href="<?= BASE_URL ?>/checkout" class="btn-primary" style="display: block; width: 100%;">PROCEED TO CHECKOUT</a>
+            <p style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 16px;"><?= __('taxes_calculated') ?></p>
+            <a href="<?= BASE_URL ?>/checkout" class="btn-primary" style="display: block; width: 100%;"><?= __('proceed_to_checkout') ?></a>
         </div>
     </div>
 

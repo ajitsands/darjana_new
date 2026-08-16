@@ -145,7 +145,7 @@ if (empty($mediaItems)) {
 
         <!-- Product Details Info Column -->
         <div class="product-info-column">
-            <div class="product-code" style="font-size: 13px; margin-bottom: 8px;">PRODUCT CODE: <?= htmlspecialchars($product['product_code']) ?></div>
+            <div class="product-code" style="font-size: 13px; margin-bottom: 8px;"><?= __('product_code') ?>: <?= htmlspecialchars($product['product_code']) ?></div>
             <?php
                 $currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
                 $displayName = ($currentLang === 'ar' && !empty($product['name_ar'])) ? $product['name_ar'] : $product['name'];
@@ -180,14 +180,14 @@ if (empty($mediaItems)) {
             <div style="margin-bottom: 24px;">
                 <button type="button" onclick="openSizeGuide()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: #f8f8f8; border: 1px solid #dcdcdc; border-radius: 4px; font-family: var(--heading-font-family); font-size: 13px; letter-spacing: 0.1em; font-weight: 600; cursor: pointer; color: var(--color-primary); transition: all 0.2s;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                    SIZE GUIDE
+                    <?= __('size_guide') ?>
                 </button>
             </div>
 
             <!-- COLOR & MULTI-COLOR COMBINATION SELECTOR WITH SWATCH DOTS -->
             <div style="margin-bottom: 24px;">
                 <label style="font-family: var(--heading-font-family); font-size: 12px; letter-spacing: 0.15em; font-weight: 600; display: block; margin-bottom: 8px;">
-                    COLOR / COMBINATION: <span id="activeColorLabel" style="color: var(--color-accent); font-weight: 700;"></span>
+                    <?= __('color_combination') ?>: <span id="activeColorLabel" style="color: var(--color-accent); font-weight: 700;"></span>
                 </label>
                 <div class="variant-chip-group">
                     <?php 
@@ -229,7 +229,7 @@ if (empty($mediaItems)) {
             <!-- ABAYA SIZE SELECTOR -->
             <div style="margin-bottom: 24px;">
                 <label style="font-family: var(--heading-font-family); font-size: 12px; letter-spacing: 0.15em; font-weight: 600; display: block; margin-bottom: 8px;">
-                    SELECT SIZE: <span id="activeSizeLabel" style="color: var(--color-accent); font-weight: 700;"></span>
+                    <?= __('select_size') ?>: <span id="activeSizeLabel" style="color: var(--color-accent); font-weight: 700;"></span>
                 </label>
                 <div class="variant-chip-group">
                     <?php 
@@ -246,7 +246,7 @@ if (empty($mediaItems)) {
             <!-- LENGTH SELECTOR (INCHES) -->
             <div style="margin-bottom: 24px;">
                 <label style="font-family: var(--heading-font-family); font-size: 12px; letter-spacing: 0.15em; font-weight: 600; display: block; margin-bottom: 8px;">
-                    SELECT LENGTH: <span id="activeLengthLabel" style="color: var(--color-accent); font-weight: 700;"></span>
+                    <?= __('select_length') ?>: <span id="activeLengthLabel" style="color: var(--color-accent); font-weight: 700;"></span>
                 </label>
                 <div class="variant-chip-group">
                     <?php 
@@ -269,7 +269,7 @@ if (empty($mediaItems)) {
 
                 <!-- QUANTITY SELECTOR IMMEDIATELY AFTER SELECT LENGTH -->
                 <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
-                    <label style="font-family: var(--heading-font-family); font-size: 12px; letter-spacing: 0.15em; font-weight: 600;">QUANTITY:</label>
+                    <label style="font-family: var(--heading-font-family); font-size: 12px; letter-spacing: 0.15em; font-weight: 600;"><?= __('quantity') ?>:</label>
                     <div class="qty-btn-group" style="height: 44px;">
                         <button type="button" class="qty-btn" onclick="let input=this.nextElementSibling; if(parseInt(input.value)>1) input.value=parseInt(input.value)-1;">-</button>
                         <input type="text" name="quantity" value="1" readonly class="qty-val" style="border: none; outline: none; height: 100%;">
@@ -280,15 +280,15 @@ if (empty($mediaItems)) {
                 <!-- SPECIAL INSTRUCTIONS / CUSTOMIZATION NOTES TEXTAREA -->
                 <div style="margin-bottom: 24px;">
                     <label for="customNoteInput" style="font-family: var(--heading-font-family); font-size: 11.5px; letter-spacing: 0.15em; font-weight: 600; display: block; margin-bottom: 8px; color: var(--color-primary); text-transform: uppercase;">
-                        SPECIAL INSTRUCTIONS / ORDER NOTES (OPTIONAL):
+                        <?= __('special_instructions') ?>
                     </label>
                     <textarea name="note" id="customNoteInput" placeholder="Add custom measurements, sleeve preferences, embroidery requests, or special instructions..." style="width: 100%; height: 74px; padding: 12px; border: 1.5px solid var(--color-border); border-radius: 4px; font-size: 13.5px; font-family: var(--text-font-family); outline: none; background: #ffffff; resize: vertical; box-shadow: 0 2px 6px rgba(0,0,0,0.02);"></textarea>
                 </div>
 
                 <!-- ADD TO CART & BUY NOW BUTTONS -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                    <button type="submit" class="btn-primary" style="padding: 16px; background-color: #1a1a1a; border-color: #1a1a1a;">Add To Cart</button>
-                    <button type="submit" class="btn-primary btn-buy-now" style="padding: 16px; background-color: var(--color-accent); border-color: var(--color-accent);">Buy Now</button>
+                    <button type="submit" class="btn-primary" style="padding: 16px; background-color: #1a1a1a; border-color: #1a1a1a;"><?= __('add_to_cart') ?></button>
+                    <button type="submit" class="btn-primary btn-buy-now" style="padding: 16px; background-color: var(--color-accent); border-color: var(--color-accent);"><?= __('buy_now') ?></button>
                 </div>
             </form>
 
@@ -304,8 +304,8 @@ if (empty($mediaItems)) {
 
             <!-- Section Header — fully centered title -->
             <div style="text-align: center; margin-bottom: 28px;">
-                <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 6px;">SIMILAR DESIGNS</span>
-                <h2 style="font-family: var(--heading-font-family); font-size: 22px; font-weight: 400; letter-spacing: 0.1em; margin: 0;">YOU MAY ALSO LIKE</h2>
+                <span style="font-family: var(--heading-font-family); font-size: 11px; letter-spacing: 0.25em; color: var(--color-accent); font-weight: 700; display: block; margin-bottom: 6px;"><?= __('similar_designs') ?></span>
+                <h2 style="font-family: var(--heading-font-family); font-size: 22px; font-weight: 400; letter-spacing: 0.1em; margin: 0;"><?= __('you_may_also_like') ?></h2>
             </div>
 
             <!-- Carousel Wrapper with absolute arrow buttons -->

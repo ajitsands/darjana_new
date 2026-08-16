@@ -30,5 +30,20 @@ return [
     'all_rights_reserved' => 'جميع الحقوق محفوظة.',
     'newsletter' => 'النشرة البريدية',
     'subscribe' => 'اشترك',
-    'email_address' => 'البريد الإلكتروني'
+    'email_address' => 'البريد الإلكتروني',
+    'express_delivery' => 'توصيل سريع لدول الخليج: البحرين، الكويت، السعودية، الإمارات، قطر وعُمان',
+    'product_code' => 'كود المنتج',
+    'size_guide' => 'دليل المقاسات',
+    'color_combination' => 'اللون / التنسيق',
+    'select_size' => 'اختر المقاس',
+    'select_length' => 'اختر الطول',
+    'quantity' => 'الكمية',
+    'special_instructions' => 'تعليمات خاصة / ملاحظات الطلب (اختياري)',
+    'your_shopping_bag' => 'حقيبة التسوق الخاصة بك',
+    'shop_collections' => 'تسوق من التشكيلات',
+    'taxes_calculated' => 'تُحسب الضرائب وتكاليف الشحن عند الدفع.',
+    'proceed_to_checkout' => 'متابعة الدفع',
+    'buy_now' => 'اشتري الآن',
+    'similar_designs' => 'تصاميم مشابهة',
+    'you_may_also_like' => 'قد يعجبك أيضاً'
 ];

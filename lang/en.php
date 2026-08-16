@@ -30,5 +30,20 @@ return [
     'all_rights_reserved' => 'All rights reserved.',
     'newsletter' => 'Newsletter',
     'subscribe' => 'Subscribe',
-    'email_address' => 'Email Address'
+    'email_address' => 'Email Address',
+    'express_delivery' => 'EXPRESS GCC DELIVERY TO BAHRAIN, KUWAIT, KSA, UAE, QATAR & OMAN',
+    'product_code' => 'PRODUCT CODE',
+    'size_guide' => 'SIZE GUIDE',
+    'color_combination' => 'COLOR / COMBINATION',
+    'select_size' => 'SELECT SIZE',
+    'select_length' => 'SELECT LENGTH',
+    'quantity' => 'QUANTITY',
+    'special_instructions' => 'SPECIAL INSTRUCTIONS / ORDER NOTES (OPTIONAL)',
+    'your_shopping_bag' => 'YOUR SHOPPING BAG',
+    'shop_collections' => 'SHOP COLLECTIONS',
+    'taxes_calculated' => 'Taxes and shipping calculated at checkout.',
+    'proceed_to_checkout' => 'PROCEED TO CHECKOUT',
+    'buy_now' => 'BUY NOW',
+    'similar_designs' => 'SIMILAR DESIGNS',
+    'you_may_also_like' => 'YOU MAY ALSO LIKE'
 ];
