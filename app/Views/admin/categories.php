@@ -72,6 +72,11 @@
                             </div>
 
                             <div class="form-group">
+                                <label>CATEGORY NAME (ARABIC)</label>
+                                <input type="text" name="name_ar" placeholder="e.g. عباية سوداء" dir="rtl">
+                            </div>
+
+                            <div class="form-group">
                                 <label>CATEGORY SLUG (Optional)</label>
                                 <input type="text" name="slug" placeholder="e.g. black-abaya">
                                 <span style="font-size: 11px; color: #718096;">Leave blank to auto-generate from name</span>
@@ -80,6 +85,11 @@
                             <div class="form-group">
                                 <label>DESCRIPTION (Optional)</label>
                                 <textarea name="description" rows="3" placeholder="Category description..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>DESCRIPTION ARABIC (Optional)</label>
+                                <textarea name="description_ar" rows="3" placeholder="Category description in Arabic..." dir="rtl"></textarea>
                             </div>
 
                             <div class="form-group">

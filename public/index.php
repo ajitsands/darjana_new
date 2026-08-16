@@ -17,11 +17,16 @@ require_once __DIR__ . '/../core/Model.php';
 require_once __DIR__ . '/../core/Controller.php';
 require_once __DIR__ . '/../core/Router.php';
 require_once __DIR__ . '/../core/Mail.php';
+require_once __DIR__ . '/../core/Lang.php';
 
 // Initialize Cart Session if empty
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
+
+// Initialize Language System
+$currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
+Lang::load($currentLang);
 
 require_once __DIR__ . '/../app/Models/Setting.php';
 $settingModel = new Setting();

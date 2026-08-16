@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<?php $currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en'; ?>
+<html lang="<?= $currentLang ?>" dir="<?= $currentLang === 'ar' ? 'rtl' : 'ltr' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -148,11 +149,11 @@
                         $headerCategories = $db->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                     <ul class="main-nav">
-                        <li><a href="<?= BASE_URL ?>/" class="nav-link <?= $isHomeActive ? 'active' : '' ?>">HOME</a></li>
+                        <li><a href="<?= BASE_URL ?>/" class="nav-link <?= $isHomeActive ? 'active' : '' ?>"><?= mb_strtoupper(__('home')) ?></a></li>
                         <?php foreach($headerCategories as $cat): ?>
                             <li>
                                 <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="nav-link <?= (!$isHomeActive && $activeNavSlug === $cat['slug']) ? 'active' : '' ?>">
-                                    <?= htmlspecialchars(strtoupper($cat['name'])) ?>
+                                    <?= htmlspecialchars(mb_strtoupper($currentLang === 'ar' && !empty($cat['name_ar']) ? $cat['name_ar'] : $cat['name'])) ?>
                                 </a>
                             </li>
                         <?php endforeach; ?>
@@ -163,7 +164,7 @@
                 <div class="header-actions">
                     <?php
                         $currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
-                        $langDisplay = $currentLang === 'ar' ? 'العربية' : 'ENGLISH';
+                        $langDisplay = $currentLang === 'ar' ? 'ENGLISH' : 'العربية';
                         $switchLangTo = $currentLang === 'ar' ? 'en' : 'ar';
                     ?>
                     <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--color-primary); cursor: pointer; position: relative;" class="desktop-only-action" onclick="window.location.href='<?= BASE_URL ?>/lang/<?= $switchLangTo ?>'">
@@ -200,11 +201,11 @@
         </div>
         <div class="mobile-menu-body">
             <ul class="mobile-nav-list">
-                <li><a href="<?= BASE_URL ?>/" class="mobile-nav-link <?= $isHomeActive ? 'active' : '' ?>">HOME</a></li>
+                <li><a href="<?= BASE_URL ?>/" class="mobile-nav-link <?= $isHomeActive ? 'active' : '' ?>"><?= mb_strtoupper(__('home')) ?></a></li>
                 <?php foreach($headerCategories as $cat): ?>
                     <li>
                         <a href="<?= BASE_URL ?>/collections/<?= $cat['slug'] ?>" class="mobile-nav-link <?= (!$isHomeActive && $activeNavSlug === $cat['slug']) ? 'active' : '' ?>">
-                            <?= htmlspecialchars(strtoupper($cat['name'])) ?>
+                            <?= htmlspecialchars(mb_strtoupper($currentLang === 'ar' && !empty($cat['name_ar']) ? $cat['name_ar'] : $cat['name'])) ?>
                         </a>
                     </li>
                 <?php endforeach; ?>
@@ -212,7 +213,7 @@
         </div>
         <div class="mobile-menu-footer">
             <div style="font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.15em; cursor: pointer;" onclick="window.location.href='<?= BASE_URL ?>/lang/<?= $switchLangTo ?>'">
-                LANGUAGE: <span style="color: var(--color-accent);"><?= $langDisplay ?></span>
+                <?= mb_strtoupper(__('language')) ?>: <span style="color: var(--color-accent);"><?= $langDisplay ?></span>
             </div>
             <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 6px;">
                 Customer Support: +973 3330 0160

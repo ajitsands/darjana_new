@@ -16,6 +16,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label>CATEGORY NAME (ARABIC)</label>
+                        <input type="text" name="name_ar" value="<?= htmlspecialchars($category['name_ar'] ?? '') ?>" dir="rtl">
+                    </div>
+
+                    <div class="form-group">
                         <label>CATEGORY SLUG</label>
                         <input type="text" name="slug" value="<?= htmlspecialchars($category['slug']) ?>" required>
                     </div>
@@ -23,6 +28,11 @@
                     <div class="form-group">
                         <label>DESCRIPTION</label>
                         <textarea name="description" rows="4"><?= htmlspecialchars($category['description'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DESCRIPTION ARABIC</label>
+                        <textarea name="description_ar" rows="4" dir="rtl"><?= htmlspecialchars($category['description_ar'] ?? '') ?></textarea>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 30px;">

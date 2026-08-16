@@ -1627,6 +1627,8 @@ class AdminController extends Controller {
                 $slug = preg_replace('/[^a-z0-9\-]/', '', $slug);
             }
             $description = trim($_POST['description'] ?? '');
+            $name_ar = trim($_POST['name_ar'] ?? '');
+            $description_ar = trim($_POST['description_ar'] ?? '');
             $imagePath = '';
             
             // Image upload or URL logic
@@ -1646,8 +1648,8 @@ class AdminController extends Controller {
             
             if ($name && $slug && $imagePath) {
                 $db = Database::getInstance();
-                $stmt = $db->prepare("INSERT INTO categories (name, slug, description, image) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$name, $slug, $description, $imagePath]);
+                $stmt = $db->prepare("INSERT INTO categories (name, name_ar, slug, description, description_ar, image) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$name, $name_ar, $slug, $description, $description_ar, $imagePath]);
                 $this->logActivity('CATEGORY_ADD', "Added category: $name");
             }
         }
@@ -1689,7 +1691,10 @@ class AdminController extends Controller {
             if ($category) {
                 $name = trim($_POST['name'] ?? $category['name']);
                 $slug = trim($_POST['slug'] ?? $category['slug']);
+                $slug = trim($_POST['slug'] ?? $category['slug']);
                 $description = trim($_POST['description'] ?? $category['description']);
+                $name_ar = trim($_POST['name_ar'] ?? $category['name_ar']);
+                $description_ar = trim($_POST['description_ar'] ?? $category['description_ar']);
                 $imagePath = $category['image'];
                 
                 if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
@@ -1706,8 +1711,8 @@ class AdminController extends Controller {
                     $imagePath = $_POST['image'];
                 }
                 
-                $stmt = $db->prepare("UPDATE categories SET name = ?, slug = ?, description = ?, image = ? WHERE id = ?");
-                $stmt->execute([$name, $slug, $description, $imagePath, $id]);
+                $stmt = $db->prepare("UPDATE categories SET name = ?, name_ar = ?, slug = ?, description = ?, description_ar = ?, image = ? WHERE id = ?");
+                $stmt->execute([$name, $name_ar, $slug, $description, $description_ar, $imagePath, $id]);
                 $this->logActivity('CATEGORY_EDIT', "Updated category: $name");
             }
         }
