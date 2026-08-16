@@ -64,6 +64,18 @@ class AdminController extends Controller {
             if (isset($_POST['promo_desc'])) {
                 $settingModel->set('promo_desc', trim($_POST['promo_desc']));
             }
+            if (isset($_POST['header_bg_web'])) {
+                $settingModel->set('header_bg_web', trim($_POST['header_bg_web']));
+            }
+            if (isset($_POST['header_bg_mobile'])) {
+                $settingModel->set('header_bg_mobile', trim($_POST['header_bg_mobile']));
+            }
+            if (isset($_POST['header_text_web'])) {
+                $settingModel->set('header_text_web', trim($_POST['header_text_web']));
+            }
+            if (isset($_POST['header_text_mobile'])) {
+                $settingModel->set('header_text_mobile', trim($_POST['header_text_mobile']));
+            }
 
             // Currency Exchange Rates (Relative to 1 BHD)
             $rateKeys = ['kwd', 'sar', 'aed', 'qar', 'omr', 'usd', 'eur'];

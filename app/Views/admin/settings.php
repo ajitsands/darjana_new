@@ -419,6 +419,38 @@
                     Customize the top announcement ticker banner text and the homepage promotional callout block.
                 </p>
 
+                <!-- Header Background Colors -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                            🖥️ Web View Header Color
+                        </label>
+                        <input type="color" name="header_bg_web" value="<?= htmlspecialchars($settings['header_bg_web'] ?? '#ffffff') ?>" class="form-control" style="width: 100%; height: 40px; padding: 2px; border: 1px solid #cbd5e0; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 12px; color: #718096;">Background color for the header on desktop devices.</span>
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                            📱 Mobile View Header Color
+                        </label>
+                        <input type="color" name="header_bg_mobile" value="<?= htmlspecialchars($settings['header_bg_mobile'] ?? '#ffffff') ?>" class="form-control" style="width: 100%; height: 40px; padding: 2px; border: 1px solid #cbd5e0; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 12px; color: #718096;">Background color for the header on mobile/tablet devices.</span>
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                            🖥️ Web View Text/Icon Color
+                        </label>
+                        <input type="color" name="header_text_web" value="<?= htmlspecialchars($settings['header_text_web'] ?? '#000000') ?>" class="form-control" style="width: 100%; height: 40px; padding: 2px; border: 1px solid #cbd5e0; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 12px; color: #718096;">Color of the navigation links and icons on desktop.</span>
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">
+                            📱 Mobile View Text/Icon Color
+                        </label>
+                        <input type="color" name="header_text_mobile" value="<?= htmlspecialchars($settings['header_text_mobile'] ?? '#000000') ?>" class="form-control" style="width: 100%; height: 40px; padding: 2px; border: 1px solid #cbd5e0; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 12px; color: #718096;">Color of the navigation links and icons on mobile.</span>
+                    </div>
+                </div>
+
                 <!-- 1. Top Announcement Bar -->
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; font-weight: 700; color: #2d3748; margin-bottom: 6px; font-size: 14px;">

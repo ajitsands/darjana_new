@@ -43,6 +43,49 @@
         window.BASE_URL = '<?= BASE_URL ?>';
         window.siteCurrencyRates = <?= json_encode($currencyRatesConfig) ?>;
     </script>
+    
+    <?php
+        $headerBgWeb = $siteSettings['header_bg_web'] ?? '';
+        $headerBgMobile = $siteSettings['header_bg_mobile'] ?? '';
+        $headerTextWeb = $siteSettings['header_text_web'] ?? '';
+        $headerTextMobile = $siteSettings['header_text_mobile'] ?? '';
+    ?>
+    <style>
+        <?php if (!empty($headerBgWeb) && $headerBgWeb !== '#ffffff'): ?>
+        @media (min-width: 1200px) {
+            .header-wrapper { background-color: <?= htmlspecialchars($headerBgWeb) ?> !important; }
+        }
+        <?php endif; ?>
+        <?php if (!empty($headerTextWeb) && $headerTextWeb !== '#000000'): ?>
+        @media (min-width: 1200px) {
+            .header-wrapper, 
+            .header-wrapper .nav-link, 
+            .header-wrapper .icon-btn, 
+            .header-wrapper .desktop-only-action, 
+            .header-wrapper svg {
+                color: <?= htmlspecialchars($headerTextWeb) ?> !important;
+            }
+        }
+        <?php endif; ?>
+        
+        <?php if (!empty($headerBgMobile) && $headerBgMobile !== '#ffffff'): ?>
+        @media (max-width: 1199px) {
+            .header-wrapper { background-color: <?= htmlspecialchars($headerBgMobile) ?> !important; }
+        }
+        <?php endif; ?>
+        <?php if (!empty($headerTextMobile) && $headerTextMobile !== '#000000'): ?>
+        @media (max-width: 1199px) {
+            .header-wrapper, 
+            .header-wrapper .nav-link, 
+            .header-wrapper .icon-btn, 
+            .header-wrapper .mobile-nav-toggle, 
+            .header-wrapper .desktop-only-action,
+            .header-wrapper svg {
+                color: <?= htmlspecialchars($headerTextMobile) ?> !important;
+            }
+        }
+        <?php endif; ?>
+    </style>
 </head>
 <body>
 
