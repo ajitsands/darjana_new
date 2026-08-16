@@ -209,6 +209,7 @@
         </div>
     </form>
 </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
