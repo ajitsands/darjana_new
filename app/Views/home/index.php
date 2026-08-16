@@ -4,6 +4,7 @@ if (!isset($siteSettings)) {
     $settingModelHelper = new Setting();
     $siteSettings = $settingModelHelper->getAll();
 }
+$currentLang = $_SESSION['lang'] ?? $_COOKIE['lang'] ?? 'en';
 $homeHeroVideoUrl = !empty($siteSettings['home_hero_video']) 
     ? (BASE_URL . $siteSettings['home_hero_video']) 
     : (BASE_URL . '/assets/videos/home_video.mp4');
