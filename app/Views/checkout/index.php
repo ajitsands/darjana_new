@@ -23,13 +23,13 @@
 </style>
 
 <div class="container" style="padding: 60px 20px 80px;">
-    <h1 style="font-size: 30px; text-align: center; margin-bottom: 10px;">Express Checkout</h1>
-    <p style="text-align: center; color: var(--color-text-muted); margin-bottom: 40px;">Complete your purchase for Dar Jana Fashion luxury dresses & abayas</p>
+    <h1 style="font-size: 30px; text-align: center; margin-bottom: 10px;"><?= __('express_checkout') ?></h1>
+    <p style="text-align: center; color: var(--color-text-muted); margin-bottom: 40px;"><?= __('checkout_desc') ?></p>
 
     <div id="checkoutSuccessMessage" style="display: none; text-align: center; padding: 40px 20px; background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 8px; margin-bottom: 30px;">
-    <h2 style="color: #2f855a; margin-bottom: 15px;">Order Placed Successfully!</h2>
-    <p style="font-size: 16px; margin-bottom: 20px; color: #4a5568;">Your order <strong id="orderNumberDisplay" style="font-size: 18px;"></strong> has been placed.</p>
-    <a href="<?= BASE_URL ?>/" class="btn-primary" style="padding: 12px 24px;">Continue Shopping</a>
+    <h2 style="color: #2f855a; margin-bottom: 15px;"><?= __('order_success_title') ?></h2>
+    <p style="font-size: 16px; margin-bottom: 20px; color: #4a5568;" id="orderSuccessDesc"><?= __('order_success_desc') ?></p>
+    <a href="<?= BASE_URL ?>/" class="btn-primary" style="padding: 12px 24px;"><?= __('continue_shopping') ?></a>
 </div>
 
 <div id="paymentWidgetContainer"></div>
@@ -38,11 +38,11 @@
     <form id="checkoutForm" method="POST" class="checkout-grid">
         <!-- Shipping Form Column -->
         <div style="background-color: #fff; border: 1px solid var(--color-border); padding: 36px;">
-            <h3 style="font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px;">Billing Information</h3>
+            <h3 style="font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px;"><?= mb_strtoupper(__('billing_info')) ?></h3>
             
             <div class="address-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                 <div>
-                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">PHONE / WHATSAPP *</label>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('phone_whatsapp') ?></label>
                     <div style="display: flex; gap: 8px;">
                         <select name="phone_code" id="phone_code" style="padding: 12px; border: 1px solid var(--color-border); background: #fff; width: 110px; flex-shrink: 0; font-size: 14px;">
                             <option value="+973" selected>🇧🇭 +973</option>
@@ -56,28 +56,28 @@
                     </div>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">EMAIL ADDRESS *</label>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('email_address') ?></label>
                     <input type="email" name="email" id="email" required style="width: 100%; padding: 12px; border: 1px solid var(--color-border);" placeholder="maryam@example.com">
                 </div>
             </div>
 
             <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">FULL NAME *</label>
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('full_name') ?></label>
                 <input type="text" name="name" required style="width: 100%; padding: 12px; border: 1px solid var(--color-border);" placeholder="e.g. Maryam Al-Sabah">
             </div>
 
             <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">BILLING ADDRESS *</label>
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('billing_address') ?></label>
                 <textarea name="address" required style="width: 100%; padding: 12px; border: 1px solid var(--color-border); height: 90px;" placeholder="Block, Street, House / Apartment Number..."></textarea>
             </div>
 
             <div class="address-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
                 <div>
-                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">CITY / REGION *</label>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('city_region') ?></label>
                     <input type="text" name="city" value="Manama, Bahrain" required style="width: 100%; padding: 12px; border: 1px solid var(--color-border);">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">COUNTRY *</label>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('country') ?></label>
                     <select name="country" id="billing_country" style="width: 100%; padding: 12px; border: 1px solid var(--color-border); background: #fff;">
                         <option value="Bahrain" selected>Bahrain (البحرين)</option>
                         <option value="Kuwait">Kuwait (الكويت)</option>
@@ -93,25 +93,25 @@
             <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border);">
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 14px;">
                     <input type="checkbox" name="different_shipping" id="different_shipping" value="1" style="width: 18px; height: 18px; cursor: pointer;">
-                    Ship to a different address?
+                    <?= __('different_shipping') ?>
                 </label>
             </div>
 
             <!-- Shipping Fields (Hidden by default) -->
             <div id="shipping_fields" style="display: none;">
-                <h3 style="font-size: 16px; margin-bottom: 16px; color: #4a5568;">Shipping Address</h3>
+                <h3 style="font-size: 16px; margin-bottom: 16px; color: #4a5568;"><?= __('shipping_address') ?></h3>
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">DELIVERY ADDRESS *</label>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('delivery_address') ?></label>
                     <textarea name="shipping_address" id="shipping_address" style="width: 100%; padding: 12px; border: 1px solid var(--color-border); height: 90px;" placeholder="Block, Street, House / Apartment Number..."></textarea>
                 </div>
 
                 <div class="address-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
                     <div>
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">CITY / REGION *</label>
+                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('city_region') ?></label>
                         <input type="text" name="shipping_city" id="shipping_city" value="Manama, Bahrain" style="width: 100%; padding: 12px; border: 1px solid var(--color-border);">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">COUNTRY *</label>
+                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('country') ?></label>
                         <select name="shipping_country" id="shipping_country" style="width: 100%; padding: 12px; border: 1px solid var(--color-border); background: #fff;">
                             <option value="Bahrain" selected>Bahrain (البحرين)</option>
                             <option value="Kuwait">Kuwait (الكويت)</option>
@@ -127,18 +127,18 @@
 
             <!-- Order Note -->
             <div style="margin-bottom: 24px; padding-top: 16px; border-top: 1px solid var(--color-border);">
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">ORDER NOTE (OPTIONAL)</label>
-                <textarea name="order_note" style="width: 100%; padding: 12px; border: 1px solid var(--color-border); height: 70px;" placeholder="Notes about your order, e.g. special notes for delivery."></textarea>
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('order_note') ?></label>
+                <textarea name="order_note" style="width: 100%; padding: 12px; border: 1px solid var(--color-border); height: 70px;" placeholder="<?= __('order_note_placeholder') ?>"></textarea>
             </div>
 
             <?php if (isset($afs_gateway_enabled) && $afs_gateway_enabled): ?>
                 <button type="submit" id="submitCheckoutBtn" class="btn-primary btn-buy-now" style="width: 100%; padding: 18px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
-                    <span id="btnText">Complete Order and Pay Now</span>
+                    <span id="btnText"><?= __('pay_now') ?></span>
                     <span id="btnLoader" style="display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top: 2px solid #ffffff; border-radius: 50%; animation: checkoutSpin 0.8s linear infinite;"></span>
                 </button>
             <?php else: ?>
                 <button type="submit" id="submitCheckoutBtn" class="btn-primary btn-buy-now" style="width: 100%; padding: 18px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
-                    <span id="btnText">Complete Order & Pay Cash / KNET on Delivery</span>
+                    <span id="btnText"><?= __('pay_cash') ?></span>
                     <span id="btnLoader" style="display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top: 2px solid #ffffff; border-radius: 50%; animation: checkoutSpin 0.8s linear infinite;"></span>
                 </button>
             <?php endif; ?>
@@ -153,7 +153,7 @@
 
         <!-- Order Items Breakdown Sidebar -->
         <div style="background-color: var(--color-bg-light); border: 1px solid var(--color-border); padding: 30px;">
-            <h3 style="font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px;">Your Order</h3>
+            <h3 style="font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px;"><?= mb_strtoupper(__('your_order')) ?></h3>
             
             <div style="margin-bottom: 20px; max-height: 350px; overflow-y: auto;">
                 <?php foreach ($cart as $item): ?>
@@ -162,10 +162,10 @@
                         <div style="flex-grow: 1;">
                             <div style="font-size: 13px; font-weight: 600; line-height: 1.3;"><?= htmlspecialchars($item['name']) ?></div>
                             <div style="font-size: 11px; color: #666;">
-                                Size: <?= htmlspecialchars($item['size']) ?> | 
-                                Color: <?= htmlspecialchars($item['color'] ?? 'N/A') ?> | 
-                                Length: <?= htmlspecialchars($item['length'] ?? 'N/A') ?>" | 
-                                Qty: <?= $item['quantity'] ?>
+                                <?= __('size') ?>: <?= htmlspecialchars($item['size']) ?> | 
+                                <?= __('color') ?>: <?= htmlspecialchars($item['color'] ?? 'N/A') ?> | 
+                                <?= __('length') ?>: <?= htmlspecialchars($item['length'] ?? 'N/A') ?>" | 
+                                <?= __('qty') ?>: <?= $item['quantity'] ?>
                             </div>
                             <div style="font-weight: 700; font-size: 13px; color: var(--color-accent); margin-top: 4px;"><?= number_format($item['price'] * $item['quantity'], 2) ?> BHD</div>
                         </div>
@@ -174,10 +174,10 @@
             </div>
 
             <div style="border-top: 1px solid var(--color-border); padding-top: 16px; margin-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">PROMO CODE (OPTIONAL)</label>
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;"><?= __('promo_code') ?></label>
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" id="coupon_code_input" placeholder="Enter offer code" style="flex-grow: 1; padding: 10px; border: 1px solid var(--color-border);">
-                    <button type="button" id="apply_coupon_btn" style="padding: 10px 16px; background-color: #4a5568; color: #fff; border: none; cursor: pointer;">Apply</button>
+                    <input type="text" id="coupon_code_input" placeholder="<?= __('enter_promo') ?>" style="flex-grow: 1; padding: 10px; border: 1px solid var(--color-border);">
+                    <button type="button" id="apply_coupon_btn" style="padding: 10px 16px; background-color: #4a5568; color: #fff; border: none; cursor: pointer;"><?= __('apply') ?></button>
                 </div>
                 <div id="coupon_message" style="font-size: 12px; margin-top: 5px;"></div>
                 <input type="hidden" name="coupon_code" id="applied_coupon_code">
@@ -186,23 +186,23 @@
 
             <div style="border-top: 2px solid var(--color-primary); padding-top: 16px;">
                 <div style="display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 8px;">
-                    <span>Subtotal</span>
+                    <span><?= __('subtotal') ?></span>
                     <span id="display_subtotal" data-value="<?= $subtotal ?>"><?= number_format($subtotal, 2) ?> BHD</span>
                 </div>
                 <div id="discount_row" style="display: none; justify-content: space-between; font-size: 15px; margin-bottom: 8px; color: #38a169;">
-                    <span>Discount</span>
+                    <span><?= __('discount') ?></span>
                     <span>-<span id="display_discount">0.00</span> BHD</span>
                 </div>
                 
                 <?php if ($vatPercentage > 0 && $vatType !== 'none'): ?>
                 <div style="display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 8px; color: #666;">
-                    <span>VAT (<?= $vatPercentage ?>% - <?= ucfirst($vatType) ?>)</span>
+                    <span><?= __('vat_label') ?> (<?= $vatPercentage ?>% - <?= ucfirst($vatType) ?>)</span>
                     <span id="display_vat" data-value="<?= $vatAmount ?>"><?= number_format($vatAmount, 2) ?> BHD</span>
                 </div>
                 <?php endif; ?>
 
                 <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; margin-top: 14px; color: var(--color-primary);">
-                    <span>Total</span>
+                    <span><?= __('total') ?></span>
                     <span style="color: var(--color-accent);"><span id="display_total" data-value="<?= $total ?>"><?= number_format($total, 2) ?></span> BHD</span>
                 </div>
             </div>
