@@ -112,5 +112,15 @@ return [
     'size' => 'Size',
     'color' => 'Color',
     'length' => 'Length',
-    'qty' => 'Qty'
+    'qty' => 'Qty',
+    'complete_payment' => 'Complete Your Payment',
+    'enter_payment_details' => 'Please enter your payment details below to complete order',
+    'payment_success_title' => 'Payment Successful!',
+    'payment_success_desc' => 'Thank you for your order. Your payment has been successfully processed.',
+    'order_number_label' => 'Order Number:',
+    'payment_failed_title' => 'Payment Failed',
+    'payment_failed_desc' => 'Unfortunately, your payment could not be processed at this time.',
+    'reason_label' => 'Reason:',
+    'contact_support_desc' => 'If you continue to face issues, please contact our support team.',
+    'try_again' => 'Try Again'
 ];

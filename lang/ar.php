@@ -112,5 +112,15 @@ return [
     'size' => 'المقاس',
     'color' => 'اللون',
     'length' => 'الطول',
-    'qty' => 'الكمية'
+    'qty' => 'الكمية',
+    'complete_payment' => 'أكمل عملية الدفع',
+    'enter_payment_details' => 'يرجى إدخال تفاصيل الدفع الخاصة بك أدناه لإكمال الطلب',
+    'payment_success_title' => 'تم الدفع بنجاح!',
+    'payment_success_desc' => 'شكراً لطلبك. لقد تم معالجة الدفع بنجاح.',
+    'order_number_label' => 'رقم الطلب:',
+    'payment_failed_title' => 'فشلت عملية الدفع',
+    'payment_failed_desc' => 'للأسف، لم نتمكن من معالجة دفعتك في الوقت الحالي.',
+    'reason_label' => 'السبب:',
+    'contact_support_desc' => 'إذا استمرت المشكلة، يرجى التواصل مع فريق الدعم لدينا.',
+    'try_again' => 'حاول مرة أخرى'
 ];

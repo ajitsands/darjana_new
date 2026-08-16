@@ -324,8 +324,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const pContainer = document.getElementById('paymentWidgetContainer');
                         pContainer.innerHTML = `
                             <div style="padding: 40px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                                <h2 style="font-size: 20px; margin-bottom: 20px;">Complete Your Payment</h2>
-                                <p style="margin-bottom: 20px; color: #4a5568;">Please enter your payment details below to complete order <strong>${data.order_number}</strong>.</p>
+                                <h2 style="font-size: 20px; margin-bottom: 20px;"><?= __('complete_payment') ?></h2>
+                                <p style="margin-bottom: 20px; color: #4a5568;"><?= __('enter_payment_details') ?> <strong>${data.order_number}</strong>.</p>
                                 <form action="${window.BASE_URL}/checkout/payment-result?order_id=${data.order_id}" class="paymentWidgets" data-brands="VISA MASTER AMEX"></form>
                             </div>
                         `;
