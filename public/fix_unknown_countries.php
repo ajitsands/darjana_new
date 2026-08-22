@@ -1,58 +1,66 @@
 <?php
 /**
- * Script to fix "Unknown Country" entries in the database.
- * Run this from the browser or command line on your live server to backfill location data.
+ * Script to fix "Unknown Country" entries in the database using Batch API.
  */
-// Prevent timeout and flush output to browser immediately
 set_time_limit(0);
-ob_implicit_flush(true);
-while (ob_get_level()) { ob_end_flush(); }
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../core/Database.php';
-require_once __DIR__ . '/../app/Models/Product.php';
 
 $db = Database::getInstance();
-$productModel = new Product();
-
 $tables = ['product_views', 'product_share_clicks'];
 $updated = 0;
-$ipCache = []; // Cache IPs to avoid duplicate API calls
 
-echo "<h2>Fixing Unknown Countries</h2>\n";
+echo "<h2>Fixing Unknown Countries (Batch Mode)</h2>\n";
 
 foreach ($tables as $table) {
     echo "<h3>Updating table: $table</h3>\n";
-    // Get unique IPs first to reduce API calls
     $stmt = $db->query("SELECT DISTINCT ip_address FROM $table WHERE country = 'Unknown Country' OR country IS NULL");
     $ips = $stmt->fetchAll(PDO::FETCH_COLUMN);
     
-    echo "Found " . count($ips) . " unique IPs to resolve in $table.<br><br>\n";
+    echo "Found " . count($ips) . " unique IPs to resolve in $table.<br>\n";
     
-    foreach ($ips as $ip) {
-        if (!isset($ipCache[$ip])) {
-            $loc = $productModel->resolveGeoLocation($ip);
-            $ipCache[$ip] = $loc;
-            usleep(300000); // 300ms delay only for new API calls
-        } else {
-            $loc = $ipCache[$ip];
+    // Chunk IPs into groups of 100 for batch API
+    $chunks = array_chunk($ips, 100);
+    
+    foreach ($chunks as $index => $chunk) {
+        $url = 'http://ip-api.com/batch?fields=query,status,country,countryCode,city';
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($chunk));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        if ($response) {
+            $data = json_decode($response, true);
+            if (is_array($data)) {
+                foreach ($data as $res) {
+                    if (isset($res['status']) && $res['status'] === 'success') {
+                        $country = $res['country'] ?? 'Unknown Country';
+                        $countryCode = strtoupper($res['countryCode'] ?? 'UN');
+                        $city = $res['city'] ?? 'Unknown City';
+                        $ip = $res['query'];
+                        
+                        if ($country !== 'Unknown Country') {
+                            $updateStmt = $db->prepare("UPDATE $table SET country = ?, country_code = ?, city = ? WHERE ip_address = ? AND (country = 'Unknown Country' OR country IS NULL)");
+                            $updateStmt->execute([$country, $countryCode, $city, $ip]);
+                            $count = $updateStmt->rowCount();
+                            $updated += $count;
+                        }
+                    }
+                }
+                echo "Processed batch " . ($index + 1) . " of " . count($chunks) . ".<br>\n";
+            }
         }
         
-        if ($loc['country'] !== 'Unknown Country') {
-            $updateStmt = $db->prepare("UPDATE $table SET country = ?, country_code = ?, city = ? WHERE ip_address = ? AND (country = 'Unknown Country' OR country IS NULL)");
-            $updateStmt->execute([$loc['country'], $loc['country_code'], $loc['city'], $ip]);
-            $count = $updateStmt->rowCount();
-            echo "Fixed $count records for IP: $ip -> {$loc['country']}<br>\n";
-            $updated += $count;
-        } else {
-            echo "<span style='color:red;'>Could not resolve IP: $ip</span><br>\n";
-        }
-        
-        // Output padding so browser renders immediately
-        echo str_repeat(" ", 1024) . "\n"; 
-        flush();
+        // Sleep slightly to respect rate limits (batch limit is 15/min)
+        sleep(2);
     }
 }
 
 echo "<br><b>Done. Total records updated: $updated</b>\n";
+
 
