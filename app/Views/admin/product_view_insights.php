@@ -255,26 +255,42 @@ $endDate = $endDate ?? '';
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
             <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px;">🌐 Geographic Location Breakdown</h3>
             <?php if (!empty($locationPerformance)): ?>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <?php 
-                        $maxLoc = max(array_column($locationPerformance, 'total_views')) ?: 1;
-                        foreach ($locationPerformance as $loc): 
-                            $pct = round(($loc['total_views'] / $maxLoc) * 100);
-                    ?>
-                        <div>
-                            <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px;">
-                                <span>
-                                    <span style="font-size: 15px; margin-right: 4px;"><?= getViewFlagEmoji($loc['country_code']) ?></span>
-                                    <strong style="color: #1e293b;"><?= htmlspecialchars($loc['country']) ?></strong>
-                                    <span style="color: #64748b; font-size: 11px;">(<?= htmlspecialchars($loc['city']) ?>)</span>
-                                </span>
-                                <span style="font-weight: 700; color: #8b5cf6;"><?= number_format($loc['total_views']) ?> views</span>
-                            </div>
-                            <div style="width: 100%; height: 6px; background: #f1f5f9; border-radius: 3px; overflow: hidden;">
-                                <div style="width: <?= $pct ?>%; height: 100%; background: #8b5cf6; border-radius: 3px;"></div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                <div class="table-responsive">
+                    <table id="locationTable" class="display" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th style="text-align: right;">Total Views</th>
+                                <th style="text-align: right;">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                $maxLoc = max(array_column($locationPerformance, 'total_views')) ?: 1;
+                                foreach ($locationPerformance as $loc): 
+                                    $pct = round(($loc['total_views'] / $maxLoc) * 100);
+                            ?>
+                                <tr>
+                                    <td>
+                                        <span style="font-size: 15px; margin-right: 4px;"><?= getViewFlagEmoji($loc['country_code']) ?></span>
+                                        <strong style="color: #1e293b;"><?= htmlspecialchars($loc['country']) ?></strong>
+                                        <span style="color: #64748b; font-size: 11px;">(<?= htmlspecialchars($loc['city']) ?>)</span>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 700; color: #8b5cf6;" data-order="<?= (int)$loc['total_views'] ?>">
+                                        <?= number_format($loc['total_views']) ?>
+                                    </td>
+                                    <td style="text-align: right; width: 60px;" data-order="<?= $pct ?>">
+                                        <div style="width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+                                            <span style="font-size: 11px; color: #64748b;"><?= $pct ?>%</span>
+                                            <div style="width: 40px; height: 4px; background: #f1f5f9; border-radius: 2px; overflow: hidden; flex-shrink: 0;">
+                                                <div style="width: <?= $pct ?>%; height: 100%; background: #8b5cf6; border-radius: 2px;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             <?php else: ?>
                 <div style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic;">No location data available.</div>
@@ -361,6 +377,17 @@ $(document).ready(function() {
             "order": [[ 3, "desc" ]],
             "language": {
                 "search": "Filter Activity:",
+                "lengthMenu": "Show _MENU_ rows"
+            }
+        });
+    }
+
+    if ($('#locationTable').length) {
+        $('#locationTable').DataTable({
+            "pageLength": 15,
+            "order": [[ 1, "desc" ]],
+            "language": {
+                "search": "Filter Location:",
                 "lengthMenu": "Show _MENU_ rows"
             }
         });
