@@ -3,9 +3,9 @@
  * Script to fix "Unknown Country" entries in the database.
  * Run this from the browser or command line on your live server to backfill location data.
  */
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/core/Database.php';
-require_once __DIR__ . '/app/Models/Product.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../app/Models/Product.php';
 
 $db = Database::getInstance();
 $productModel = new Product();
