@@ -384,7 +384,7 @@ $(document).ready(function() {
 
     if ($('#locationTable').length) {
         $('#locationTable').DataTable({
-            "pageLength": 15,
+            "pageLength": 20,
             "order": [[ 1, "desc" ]],
             "language": {
                 "search": "Filter Location:",
