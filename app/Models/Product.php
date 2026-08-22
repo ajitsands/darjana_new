@@ -402,12 +402,17 @@ class Product extends Model {
             ];
         }
 
+        // Try IP-API
         try {
             $url = "http://ip-api.com/json/" . urlencode($ipAddress) . "?fields=status,country,countryCode,city";
-            $ctx = stream_context_create([
-                'http' => ['timeout' => 2]
-            ]);
-            $response = @file_get_contents($url, false, $ctx);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+            $response = curl_exec($ch);
+            curl_close($ch);
+            
             if ($response) {
                 $data = json_decode($response, true);
                 if (isset($data['status']) && $data['status'] === 'success') {
@@ -415,6 +420,29 @@ class Product extends Model {
                         'country' => $data['country'] ?? 'Unknown Country',
                         'country_code' => strtoupper($data['countryCode'] ?? 'UN'),
                         'city' => $data['city'] ?? 'Unknown City'
+                    ];
+                }
+            }
+        } catch (Exception $e) {}
+
+        // Fallback to freeipapi
+        try {
+            $url = "https://freeipapi.com/api/json/" . urlencode($ipAddress);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+            $response = curl_exec($ch);
+            curl_close($ch);
+            
+            if ($response) {
+                $data = json_decode($response, true);
+                if (!empty($data['countryName'])) {
+                    return [
+                        'country' => $data['countryName'] ?? 'Unknown Country',
+                        'country_code' => strtoupper($data['countryCode'] ?? 'UN'),
+                        'city' => $data['cityName'] ?? 'Unknown City'
                     ];
                 }
             }
